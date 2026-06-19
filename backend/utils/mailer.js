@@ -9,13 +9,13 @@ let transporter;
 if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
   transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL/TLS on port 465
+    port: 587,
+    secure: false, // false for 587 (uses STARTTLS)
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_APP_PASSWORD,
     },
-    connectionTimeout: 15000, // 15 seconds
+    connectionTimeout: 15000,
     greetingTimeout: 15000,
     socketTimeout: 20000
   });
