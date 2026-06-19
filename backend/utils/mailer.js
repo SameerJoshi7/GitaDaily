@@ -18,8 +18,8 @@ if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
 
 export const sendEmailOTP = async (toEmail, otp) => {
   if (!transporter) {
-    console.warn(`[Mailer] No EMAIL_USER and EMAIL_APP_PASSWORD configured. Simulated OTP for ${toEmail}: ${otp}`);
-    return { success: true, simulated: true };
+    console.error(`[Mailer] No EMAIL_USER and EMAIL_APP_PASSWORD configured. Cannot send OTP to ${toEmail}`);
+    return { success: false, error: 'Email configuration is missing on the server. Please set EMAIL_USER and EMAIL_APP_PASSWORD in the .env file.' };
   }
 
   try {
@@ -49,8 +49,8 @@ export const sendEmailOTP = async (toEmail, otp) => {
 
 export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language = 'english') => {
   if (!transporter) {
-    console.warn(`[Mailer] No EMAIL_USER and EMAIL_APP_PASSWORD configured. Simulated daily email to ${toEmail} for Ch ${shloka.chapter} V ${shloka.verse}`);
-    return { success: true, simulated: true };
+    console.error(`[Mailer] No EMAIL_USER and EMAIL_APP_PASSWORD configured. Cannot send daily email to ${toEmail}`);
+    return { success: false, error: 'Email configuration is missing on the server.' };
   }
 
   try {

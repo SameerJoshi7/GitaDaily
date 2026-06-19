@@ -250,14 +250,10 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
   // Send via Email
   const result = await sendEmailOTP(identifier, otp);
-  if (!result.success && !result.simulated) {
-    return res.status(500).json({ error: 'Failed to send email OTP.' });
+  if (!result.success) {
+    return res.status(500).json({ error: result.error || 'Failed to send email OTP.' });
   }
-  // In dev mode (no email configured), return the OTP directly for testing
-  if (result.simulated) {
-    console.log(`[DEV] OTP for ${identifier}: ${otp}`);
-    return res.json({ message: 'OTP simulated (no email config). Check server logs.', devOtp: otp });
-  }
+
   return res.json({ message: 'OTP sent via Email' });
 });
 
@@ -673,6 +669,18 @@ app.get('/api/config', (req, res) => {
   res.json({
     telegramBotUsername: process.env.TELEGRAM_BOT_USERNAME || 'GitaDailyBot'
   });
+});
+
+// 13. Trigger daily broadcast manually (for external cron schedules)
+app.post('/api/trigger-daily-broadcast', async (req, res) => {
+  try {
+    console.log('[API] Triggering daily morning shloka broadcast manually...');
+    await broadcastDailyShloka();
+    res.json({ success: true, message: 'Broadcast triggered successfully.' });
+  } catch (error) {
+    console.error('[API] Error during broadcast:', error);
+    res.status(500).json({ error: 'Broadcast failed.' });
+  }
 });
 
 // Broadcast task

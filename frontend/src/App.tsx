@@ -39,7 +39,6 @@ function App() {
   const [authIdentifier, setAuthIdentifier] = useState(''); // email or phone
   const [otpInput, setOtpInput] = useState('');
   const [otpError, setOtpError] = useState('');
-  const [devOtp, setDevOtp] = useState(''); // shown if no email configured
 
   // Registration form states (shown after OTP verified for new user)
   const [regEmail, setRegEmail] = useState('');
@@ -132,9 +131,6 @@ function App() {
       const data = await res.json();
       if (res.ok) {
         setAuthStep('otp');
-        if (data.devOtp) {
-          setDevOtp(data.devOtp); // Show OTP directly in dev mode
-        }
       } else {
         setOtpError(data.error || 'Failed to send OTP. Please try again.');
       }
@@ -223,7 +219,6 @@ function App() {
     setAuthStep('entry');
     setOtpInput('');
     setOtpError('');
-    setDevOtp('');
     setAuthIdentifier('');
   };
 
@@ -574,11 +569,6 @@ function App() {
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                   OTP sent to <strong style={{ color: 'var(--gold-primary)' }}>{authIdentifier}</strong> via Email.
                 </p>
-                {devOtp && (
-                  <p style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(250,204,21,0.1)', borderRadius: '8px', color: 'var(--gold-primary)', fontSize: '0.85rem' }}>
-                    📧 Dev Mode OTP: <strong>{devOtp}</strong>
-                  </p>
-                )}
               </div>
               <div className="form-group">
                 <label className="form-label">Enter 6-digit OTP</label>
@@ -649,8 +639,8 @@ function App() {
               </div>
 
               {(regPref === 'telegram' || regPref === 'both' || regPref === 'all') && (
-                <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
-                  💡 Note: To receive Telegram messages, you'll click "Connect Telegram Bot" on the settings sidebar once logged in.
+                <p style={{ fontSize: '0.75rem', color: '#ef4444', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
+                  ⚠️ Note: Telegram Bot connection is temporarily unavailable due to service restrictions in India. Please use Email or Web Push instead.
                 </p>
               )}
 
@@ -813,16 +803,40 @@ function App() {
 
                 {/* Telegram Bot Connector */}
                 {(pref === 'telegram' || pref === 'both' || pref === 'all') && (
-                  <a 
-                    href={`https://t.me/${telegramBotUsername}?start=${Array.from(email).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('')}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="primary-btn"
-                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', justifyContent: 'center', background: 'linear-gradient(135deg, #0088cc, #0077b5)', color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-                  >
-                    <Send size={12} />
-                    <span>Connect Telegram Bot</span>
-                  </a>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <button 
+                      disabled
+                      className="primary-btn"
+                      style={{ 
+                        padding: '0.4rem 0.8rem', 
+                        fontSize: '0.8rem', 
+                        justifyContent: 'center', 
+                        background: 'linear-gradient(135deg, #555, #777)', 
+                        color: '#bbb', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.4rem',
+                        cursor: 'not-allowed',
+                        opacity: 0.7,
+                        border: 'none'
+                      }}
+                    >
+                      <Send size={12} />
+                      <span>Connect Telegram Bot</span>
+                    </button>
+                    <div style={{ 
+                      fontSize: '0.7rem', 
+                      color: '#ef4444', 
+                      textAlign: 'center', 
+                      padding: '0.4rem', 
+                      background: 'rgba(239, 68, 68, 0.1)', 
+                      borderRadius: '6px', 
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      lineHeight: '1.2'
+                    }}>
+                      ⚠️ Telegram Bot connection is temporarily unavailable as Telegram services and bot creation are currently restricted/banned in India.
+                    </div>
+                  </div>
                 )}
 
                 {/* Web Push Subscription Action */}
