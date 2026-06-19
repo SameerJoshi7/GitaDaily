@@ -461,13 +461,26 @@ function App() {
 
     const handleHashChange = () => {
       const hash = window.location.hash;
-      const match = hash.match(/#\/chapter\/(\d+)\/verse\/(\d+)/);
-      if (match) {
-        const chapter = parseInt(match[1]);
-        const verse = parseInt(match[2]);
+      const matchSpecific = hash.match(/#\/chapter\/(\d+)\/verse\/(\d+)/);
+      
+      if (matchSpecific) {
+        const chapter = parseInt(matchSpecific[1]);
+        const verse = parseInt(matchSpecific[2]);
         fetchSpecificShloka(chapter, verse);
-      } else {
+      } else if (hash === '#/browsechapters') {
+        setActiveTab('browse');
+        fetchChapters();
+      } else if (hash === '#/searchinsights') {
+        setActiveTab('search');
+      } else if (hash === '#/bookmarks') {
+        setActiveTab('bookmarks');
+        fetchBookmarks();
+      } else if (hash === '#/dailyinsights') {
+        setActiveTab('daily');
         fetchDailyShloka();
+      } else {
+        // Default route
+        window.location.hash = '#/dailyinsights';
       }
     };
 
@@ -663,14 +676,14 @@ function App() {
       {/* Sidebar Navigation */}
       <aside className="sidebar">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('daily'); }} className="brand">
+          <a href="#/dailyinsights" onClick={(e) => { e.preventDefault(); window.location.hash = '#/dailyinsights'; }} className="brand">
             <span className="brand-icon">🪔</span>
             <span className="brand-name">GitaDaily</span>
           </a>
 
           <div className="sidebar-artwork" style={{ borderRadius: '8px', overflow: 'hidden', width: '100%', height: '110px', border: '1px solid rgba(255,255,255,0.05)', marginTop: '-0.75rem', marginBottom: '-0.5rem' }}>
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg" 
+              src="https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg" 
               alt="Gita Sidebar Art" 
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
             />
@@ -680,9 +693,11 @@ function App() {
             <li className="nav-item">
               <button 
                 onClick={() => { 
-                  window.location.hash = ''; // clear hash route to load today's standard shloka
-                  setActiveTab('daily'); 
-                  fetchDailyShloka(); 
+                  if (window.location.hash === '#/dailyinsights') {
+                    fetchDailyShloka();
+                  } else {
+                    window.location.hash = '#/dailyinsights'; 
+                  }
                 }} 
                 className={`nav-button ${activeTab === 'daily' ? 'active' : ''}`}
               >
@@ -692,7 +707,7 @@ function App() {
             </li>
             <li className="nav-item">
               <button 
-                onClick={() => { setActiveTab('browse'); fetchChapters(); }} 
+                onClick={() => { window.location.hash = '#/browsechapters'; }} 
                 className={`nav-button ${activeTab === 'browse' ? 'active' : ''}`}
               >
                 <BookOpen size={18} />
@@ -701,7 +716,7 @@ function App() {
             </li>
             <li className="nav-item">
               <button 
-                onClick={() => { setActiveTab('search'); }} 
+                onClick={() => { window.location.hash = '#/searchinsights'; }} 
                 className={`nav-button ${activeTab === 'search' ? 'active' : ''}`}
               >
                 <Search size={18} />
@@ -710,7 +725,7 @@ function App() {
             </li>
             <li className="nav-item">
               <button 
-                onClick={() => { setActiveTab('bookmarks'); fetchBookmarks(); }} 
+                onClick={() => { window.location.hash = '#/bookmarks'; }} 
                 className={`nav-button ${activeTab === 'bookmarks' ? 'active' : ''}`}
               >
                 <Bookmark size={18} />
@@ -905,7 +920,7 @@ function App() {
                     {ch.verses.map((verse) => (
                       <button 
                         key={verse} 
-                        onClick={() => fetchSpecificShloka(ch.chapterNumber, verse)}
+                        onClick={() => { window.location.hash = `#/chapter/${ch.chapterNumber}/verse/${verse}`; }}
                         className="verse-tag"
                       >
                         Verse {verse}
@@ -957,7 +972,7 @@ function App() {
                   <div 
                     key={idx} 
                     className="search-result-row"
-                    onClick={() => fetchSpecificShloka(s.chapter, s.verse)}
+                    onClick={() => { window.location.hash = `#/chapter/${s.chapter}/verse/${s.verse}`; }}
                   >
                     <div className="result-info">
                       <span className="result-meta">Chapter {s.chapter}, Verse {s.verse}</span>
@@ -991,7 +1006,7 @@ function App() {
                   <div 
                     key={idx} 
                     className="bookmark-card"
-                    onClick={() => fetchSpecificShloka(s.chapter, s.verse)}
+                    onClick={() => { window.location.hash = `#/chapter/${s.chapter}/verse/${s.verse}`; }}
                   >
                     <div>
                       <div className="bookmark-header">
