@@ -834,7 +834,7 @@ function App() {
                       border: '1px solid rgba(239, 68, 68, 0.2)',
                       lineHeight: '1.2'
                     }}>
-                      ⚠️ Telegram Bot connection is temporarily unavailable as Telegram services and bot creation are currently restricted/banned in India.
+                      ⚠️ Telegram Bot (@{telegramBotUsername}) connection is temporarily unavailable as Telegram services and bot creation are currently restricted/banned in India.
                     </div>
                   </div>
                 )}
