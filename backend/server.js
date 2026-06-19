@@ -62,6 +62,26 @@ const writeData = (filePath, data) => {
   }
 };
 
+// Normalize phone numbers to E.164 format, default to Indian country code (+91) if 10 digits
+function normalizePhoneNumber(phone) {
+  if (!phone) return '';
+  if (phone.includes('@')) return phone; // Skip email addresses
+
+  // Strip all non-digit characters
+  let digits = phone.replace(/\D/g, '');
+  
+  if (digits.length === 10) {
+    return `+91${digits}`;
+  }
+  if (digits.length === 12 && digits.startsWith('91')) {
+    return `+${digits}`;
+  }
+  if (phone.trim().startsWith('+')) {
+    return `+${digits}`;
+  }
+  return `+${digits}`;
+}
+
 // Load Gita Data
 let gitaData = [];
 try {
@@ -100,7 +120,7 @@ async function getGeminiReflection(shloka, language = 'english') {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const prompt = `
       You are an enlightened guide analyzing the Bhagavad Gita for modern audiences.
       Analyze the following Gita Shloka:
@@ -197,9 +217,14 @@ async function getGeminiReflection(shloka, language = 'english') {
 
 // 0a. Send OTP
 app.post('/api/auth/send-otp', async (req, res) => {
-  const { identifier, method } = req.body; // identifier = email or phone, method = 'email' | 'whatsapp'
+  let { identifier, method } = req.body; // identifier = email or phone, method = 'email' | 'whatsapp'
   if (!identifier) {
     return res.status(400).json({ error: 'Email or phone number is required.' });
+  }
+
+  // Normalize the identifier if it is a phone number
+  if (!identifier.includes('@')) {
+    identifier = normalizePhoneNumber(identifier);
   }
 
   const otp = generateOTP(identifier);
@@ -229,9 +254,14 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
 // 0b. Verify OTP
 app.post('/api/auth/verify-otp', (req, res) => {
-  const { identifier, otp } = req.body;
+  let { identifier, otp } = req.body;
   if (!identifier || !otp) {
     return res.status(400).json({ error: 'Identifier and OTP are required.' });
+  }
+
+  // Normalize the identifier if it is a phone number
+  if (!identifier.includes('@')) {
+    identifier = normalizePhoneNumber(identifier);
   }
 
   const result = verifyOTP(identifier, otp);
@@ -244,7 +274,7 @@ app.post('/api/auth/verify-otp', (req, res) => {
   const existing = users.find(u =>
     typeof u === 'object' && u !== null &&
     (u.email === identifier || u.phone === identifier ||
-     u.phone.replace(/[^\d]/g, '') === identifier.replace(/[^\d]/g, ''))
+     normalizePhoneNumber(u.phone) === identifier)
   );
 
   if (existing) {
@@ -268,7 +298,7 @@ app.post('/api/register', (req, res) => {
   
   const newUser = { 
     email, 
-    phone: phone || '', 
+    phone: phone ? normalizePhoneNumber(phone) : '', 
     pref: pref || 'email',
     lang: lang || 'english'
   };
@@ -506,11 +536,7 @@ ${footer}`;
 
 // Service to send WhatsApp message
 async function sendWhatsAppMessage(toPhone, messageBody) {
-  // Strip non-digits except +
-  let cleanPhone = toPhone.replace(/[^\d+]/g, '');
-  if (!cleanPhone.startsWith('+')) {
-    cleanPhone = `+${cleanPhone}`;
-  }
+  const cleanPhone = normalizePhoneNumber(toPhone);
   const whatsappTo = `whatsapp:${cleanPhone}`;
 
   if (twilioClient) {
@@ -550,7 +576,8 @@ app.post('/api/test-whatsapp', async (req, res) => {
 
   // Lookup language if user exists
   const users = readData(USERS_PATH);
-  const user = users.find(u => u.phone === phone || u.phone.replace(/[^\d]/g, '') === phone.replace(/[^\d]/g, ''));
+  const normalizedSearchPhone = normalizePhoneNumber(phone);
+  const user = users.find(u => u.phone === phone || normalizePhoneNumber(u.phone) === normalizedSearchPhone);
   const language = user && user.lang ? user.lang : 'english';
 
   let shloka = gitaData[0];

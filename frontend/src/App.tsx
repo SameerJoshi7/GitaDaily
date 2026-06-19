@@ -19,6 +19,8 @@ import {
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
 
 type Tab = 'daily' | 'browse' | 'search' | 'bookmarks';
+type AuthStep = 'entry' | 'otp' | 'register';
+type AuthMode = 'signin' | 'signup';
 
 interface Chapter {
   chapterNumber: number;
@@ -33,8 +35,6 @@ function App() {
   const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
   
   // --- OTP Auth States ---
-  type AuthStep = 'entry' | 'otp' | 'register';
-  type AuthMode = 'signin' | 'signup';
   const [authMode, setAuthMode] = useState<AuthMode>('signup');
   const [authStep, setAuthStep] = useState<AuthStep>('entry');
   const [authIdentifier, setAuthIdentifier] = useState(''); // email or phone
@@ -198,11 +198,6 @@ function App() {
     setDevOtp('');
     setAuthIdentifier('');
   };
-
-  const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
-
-
-
 
   const handleLogout = () => {
     localStorage.removeItem('gitadaily_email');
