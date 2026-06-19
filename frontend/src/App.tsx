@@ -555,8 +555,8 @@ function App() {
       <div className="hero-section" style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', margin: 0, borderRadius: 0, border: 'none' }}>
         <span className="hero-subtitle">Sacred Wisdom & AI Reflections</span>
         <h1 className="hero-title" style={{ fontSize: '3rem', fontFamily: 'var(--font-display)' }}>GitaDaily</h1>
-        <p className="hero-description">
-          Receive a hand-picked shloka daily with transliteration, translation, and a personalized Gemini AI analysis relating it to emotional resilience, career focus, and modern mindfulness.
+        <p className="hero-description" style={{ maxWidth: '650px', lineHeight: '1.6' }}>
+          Start your morning with ancient wisdom, or <strong>seek direct counsel for any life problem</strong>. Describe your challenge, and get instant, personalized AI reflections rooted in the eternal truths of the Bhagavad Gita.
         </p>
 
         <div className="auth-card">
@@ -776,13 +776,29 @@ function App() {
                 <span>My Bookmarks</span>
               </button>
             </li>
-            <li className="nav-item">
+            <li className="nav-item" style={{ marginTop: '0.4rem' }}>
               <button 
                 onClick={() => { window.location.hash = '#/guidance'; }} 
                 className={`nav-button ${activeTab === 'guidance' ? 'active' : ''}`}
+                style={activeTab === 'guidance' ? {} : {
+                  border: '1px dashed rgba(212, 175, 55, 0.4)',
+                  background: 'rgba(212, 175, 55, 0.03)',
+                  boxShadow: '0 0 10px rgba(212, 175, 55, 0.05)'
+                }}
               >
-                <Sparkles size={18} style={{ color: activeTab === 'guidance' ? 'var(--gold-primary)' : 'inherit' }} />
-                <span>Seek Guidance</span>
+                <Sparkles size={18} style={{ color: 'var(--gold-primary)', filter: 'drop-shadow(0 0 4px var(--gold-glow))' }} />
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Seek Guidance</span>
+                <span style={{ 
+                  fontSize: '0.6rem', 
+                  background: 'linear-gradient(135deg, #fbbf24, #d97706)', 
+                  color: '#000', 
+                  padding: '1px 6px', 
+                  borderRadius: '10px', 
+                  marginLeft: 'auto', 
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>New</span>
               </button>
             </li>
           </ul>
@@ -960,6 +976,47 @@ function App() {
             <div className="dashboard-header">
               <h2 className="dashboard-title">Today's Wisdom</h2>
               <span className="dashboard-subtitle">A daily dose of wisdom to ground your mind and actions.</span>
+            </div>
+
+            {/* Seek Guidance Promo Banner */}
+            <div 
+              onClick={() => { window.location.hash = '#/guidance'; }}
+              style={{
+                cursor: 'pointer',
+                background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.08) 0%, rgba(79, 70, 229, 0.03) 100%)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                borderRadius: '12px',
+                padding: '1rem 1.25rem',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '1rem',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ fontSize: '1.5rem' }}>🪔</div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gold-secondary)', fontWeight: 600 }}>Facing a specific challenge today?</h4>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Type your problem or mood and let the Gita guide you with customized solutions.</p>
+                </div>
+              </div>
+              <button 
+                className="primary-btn" 
+                style={{ 
+                  padding: '0.3rem 0.75rem', 
+                  fontSize: '0.75rem', 
+                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', 
+                  color: '#000', 
+                  border: 'none', 
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                Seek Solutions
+              </button>
             </div>
 
             {loading ? (
