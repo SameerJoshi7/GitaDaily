@@ -13,7 +13,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5005/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
 
 type Tab = 'daily' | 'browse' | 'search' | 'bookmarks';
 
