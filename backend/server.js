@@ -616,7 +616,7 @@ app.post('/api/test-delivery', async (req, res) => {
         title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
         body: reflection.translatedTranslation || shloka.translation,
         image: HEADER_IMAGE_URL,
-        url: `/chapter/${shloka.chapter}/verse/${shloka.verse}`
+        url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
       });
       await webpush.sendNotification(user.pushSubscription, payload);
       deliveryStatus.push = { success: true };
@@ -701,7 +701,7 @@ async function broadcastDailyShloka() {
             title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
             body: reflection.translatedTranslation || shloka.translation,
             image: HEADER_IMAGE_URL,
-            url: `/chapter/${shloka.chapter}/verse/${shloka.verse}`
+            url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
           });
           await webpush.sendNotification(user.pushSubscription, payload);
           sentToThisUser = true;

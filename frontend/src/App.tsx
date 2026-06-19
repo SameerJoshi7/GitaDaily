@@ -469,11 +469,27 @@ function App() {
 
   // Run initial fetches on email state change
   useEffect(() => {
-    if (email) {
-      fetchDailyShloka();
-      fetchChapters();
-      fetchBookmarks();
-    }
+    if (!email) return;
+
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      const match = hash.match(/#\/chapter\/(\d+)\/verse\/(\d+)/);
+      if (match) {
+        const chapter = parseInt(match[1]);
+        const verse = parseInt(match[2]);
+        fetchSpecificShloka(chapter, verse);
+      } else {
+        fetchDailyShloka();
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange(); // Run on mount/email changes
+
+    fetchChapters();
+    fetchBookmarks();
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, [email]);
 
   // Handle topic click
@@ -667,7 +683,11 @@ function App() {
           <ul className="nav-links">
             <li className="nav-item">
               <button 
-                onClick={() => { setActiveTab('daily'); fetchDailyShloka(); }} 
+                onClick={() => { 
+                  window.location.hash = ''; // clear hash route to load today's standard shloka
+                  setActiveTab('daily'); 
+                  fetchDailyShloka(); 
+                }} 
                 className={`nav-button ${activeTab === 'daily' ? 'active' : ''}`}
               >
                 <Compass size={18} />

@@ -41,7 +41,9 @@ self.addEventListener('notificationclick', function(event) {
       // If a window is already open, focus it and redirect
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.postMessage({ action: 'navigate', url: shlokaUrl });
+          if ('navigate' in client) {
+            client.navigate(shlokaUrl);
+          }
           return client.focus();
         }
       }
