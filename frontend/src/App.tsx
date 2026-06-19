@@ -10,7 +10,10 @@ import {
   User, 
   TrendingUp, 
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  KeyRound,
+  Mail,
+  MessageCircle
 } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
@@ -29,6 +32,18 @@ function App() {
   const [pref, setPref] = useState<string>(() => localStorage.getItem('gitadaily_pref') || 'email');
   const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
   
+  // --- OTP Auth States ---
+  type AuthStep = 'entry' | 'otp' | 'register';
+  type AuthMode = 'signin' | 'signup';
+  const [authMode, setAuthMode] = useState<AuthMode>('signup');
+  const [authStep, setAuthStep] = useState<AuthStep>('entry');
+  const [authIdentifier, setAuthIdentifier] = useState(''); // email or phone
+  const [authMethod, setAuthMethod] = useState<'email' | 'whatsapp'>('email');
+  const [otpInput, setOtpInput] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [devOtp, setDevOtp] = useState(''); // shown if no email configured
+
+  // Registration form states (shown after OTP verified for new user)
   const [regEmail, setRegEmail] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regPref, setRegPref] = useState('email');
@@ -62,7 +77,89 @@ function App() {
   
   const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
 
-  // Handle Login/Registration
+  // --- Auth Handlers ---
+
+  // Step 1: Send OTP
+  const handleSendOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authIdentifier.trim()) {
+      setOtpError('Please enter your email or phone number.');
+      return;
+    }
+    setOtpError('');
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: authIdentifier, method: authMethod }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAuthStep('otp');
+        if (data.devOtp) {
+          setDevOtp(data.devOtp); // Show OTP directly in dev mode
+        }
+      } else {
+        setOtpError(data.error || 'Failed to send OTP. Please try again.');
+      }
+    } catch {
+      setOtpError('Cannot connect to server. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Verify OTP
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpInput.length !== 6) {
+      setOtpError('Please enter the 6-digit OTP.');
+      return;
+    }
+    setOtpError('');
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: authIdentifier, otp: otpInput }),
+      });
+      const data = await res.json();
+      if (res.ok && data.verified) {
+        if (!data.isNewUser && data.user) {
+          // Existing user - log them in directly
+          loginUser(data.user);
+        } else {
+          // New user - proceed to registration form
+          // Pre-fill email/phone from identifier
+          if (authIdentifier.includes('@')) setRegEmail(authIdentifier);
+          else setRegPhone(authIdentifier);
+          setAuthStep('register');
+        }
+      } else {
+        setOtpError(data.error || 'Invalid or expired OTP.');
+      }
+    } catch {
+      setOtpError('Cannot connect to server. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper: save user to localStorage and state
+  const loginUser = (userData: { email: string; phone: string; pref: string; lang: string }) => {
+    localStorage.setItem('gitadaily_email', userData.email);
+    localStorage.setItem('gitadaily_phone', userData.phone || '');
+    localStorage.setItem('gitadaily_pref', userData.pref || 'email');
+    localStorage.setItem('gitadaily_lang', userData.lang || 'english');
+    setEmail(userData.email);
+    setPhone(userData.phone || '');
+    setPref(userData.pref || 'email');
+    setLang(userData.lang || 'english');
+  };
+
+  // Step 3 (new users only): Complete Registration
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regEmail || !regEmail.includes('@')) {
@@ -73,7 +170,6 @@ function App() {
       alert('Please enter your WhatsApp mobile number to select WhatsApp notifications.');
       return;
     }
-    
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/register`, {
@@ -83,26 +179,30 @@ function App() {
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('gitadaily_email', data.email);
-        localStorage.setItem('gitadaily_phone', data.phone || '');
-        localStorage.setItem('gitadaily_pref', data.pref || 'email');
-        localStorage.setItem('gitadaily_lang', data.lang || 'english');
-        setEmail(data.email);
-        setPhone(data.phone || '');
-        setPref(data.pref || 'email');
-        setLang(data.lang || 'english');
-        // Load default dashboard content
+        loginUser(data);
         fetchDailyShloka();
       } else {
         alert(data.error || 'Registration failed');
       }
-    } catch (err) {
-      console.error(err);
-      alert('Could not connect to the server. Please check if backend is running.');
+    } catch {
+      alert('Could not connect to the server.');
     } finally {
       setLoading(false);
     }
   };
+
+  const resetAuth = () => {
+    setAuthStep('entry');
+    setOtpInput('');
+    setOtpError('');
+    setDevOtp('');
+    setAuthIdentifier('');
+  };
+
+  const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
+
+
+
 
   const handleLogout = () => {
     localStorage.removeItem('gitadaily_email');
@@ -115,8 +215,9 @@ function App() {
     setLang('english');
     setDailyShloka(null);
     setBookmarks([]);
-
     setIsEditingPrefs(false);
+    resetAuth();
+    setAuthMode('signin');
   };
 
   const handleSavePrefs = async (e: React.FormEvent) => {
@@ -314,74 +415,193 @@ function App() {
         </p>
 
         <div className="auth-card">
-          <form onSubmit={handleRegister}>
-            <div className="form-group">
-              <label htmlFor="regEmail" className="form-label">Email Address</label>
-              <input
-                id="regEmail"
-                type="email"
-                className="input-field"
-                placeholder="name@example.com"
-                value={regEmail}
-                onChange={(e) => setRegEmail(e.target.value)}
-                required
-              />
+          {/* Sign In / Sign Up Toggle */}
+          {authStep === 'entry' && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px' }}>
+              <button
+                type="button"
+                onClick={() => { setAuthMode('signin'); setOtpError(''); }}
+                style={{
+                  flex: 1, padding: '0.5rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s',
+                  background: authMode === 'signin' ? 'var(--gold-primary)' : 'transparent',
+                  color: authMode === 'signin' ? '#0a0b10' : 'var(--text-secondary)',
+                }}
+              >Sign In</button>
+              <button
+                type="button"
+                onClick={() => { setAuthMode('signup'); setOtpError(''); }}
+                style={{
+                  flex: 1, padding: '0.5rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s',
+                  background: authMode === 'signup' ? 'var(--gold-primary)' : 'transparent',
+                  color: authMode === 'signup' ? '#0a0b10' : 'var(--text-secondary)',
+                }}
+              >Sign Up</button>
             </div>
+          )}
 
-            <div className="form-group">
-              <label htmlFor="regLang" className="form-label">Preferred Language</label>
-              <select
-                id="regLang"
-                className="input-field"
-                style={{ appearance: 'none', background: 'rgba(10, 11, 16, 0.6) url("data:image/svg+xml;utf8,<svg fill=\'white\' height=\'24\' viewBox=\'0 0 24 24\' width=\'24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/><path d=\'M0 0h24v24H0z\' fill=\'none\'/></svg>") no-repeat right 0.75rem center' }}
-                value={regLang}
-                onChange={(e) => setRegLang(e.target.value)}
-              >
-                <option value="english">English</option>
-                <option value="hindi">Hindi (हिन्दी)</option>
-                <option value="telugu">Telugu (తెలుగు)</option>
-                <option value="kannada">Kannada (ಕನ್ನಡ)</option>
-              </select>
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="regPref" className="form-label">Notification Preference</label>
-              <select
-                id="regPref"
-                className="input-field"
-                style={{ appearance: 'none', background: 'rgba(10, 11, 16, 0.6) url("data:image/svg+xml;utf8,<svg fill=\'white\' height=\'24\' viewBox=\'0 0 24 24\' width=\'24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/><path d=\'M0 0h24v24H0z\' fill=\'none\'/></svg>") no-repeat right 0.75rem center' }}
-                value={regPref}
-                onChange={(e) => setRegPref(e.target.value)}
-              >
-                <option value="email">Email Only</option>
-                <option value="whatsapp">WhatsApp Only</option>
-                <option value="both">Both Email & WhatsApp</option>
-              </select>
-            </div>
-
-            {(regPref === 'whatsapp' || regPref === 'both') && (
+          {/* STEP 1: Entry — Enter email/phone + choose OTP method */}
+          {authStep === 'entry' && (
+            <form onSubmit={handleSendOTP}>
               <div className="form-group">
-                <label htmlFor="regPhone" className="form-label">WhatsApp Mobile Number</label>
+                <label className="form-label">
+                  {authMode === 'signin' ? 'Sign in with your Email or WhatsApp Number' : 'Your Email or WhatsApp Number'}
+                </label>
                 <input
-                  id="regPhone"
-                  type="tel"
+                  id="authIdentifier"
+                  type="text"
                   className="input-field"
-                  placeholder="+1234567890 (With country code)"
-                  value={regPhone}
-                  onChange={(e) => setRegPhone(e.target.value)}
+                  placeholder="email@example.com or +91XXXXXXXXXX"
+                  value={authIdentifier}
+                  onChange={(e) => setAuthIdentifier(e.target.value)}
                   required
                 />
               </div>
-            )}
 
-            <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.75rem' }}>
-              {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : 'Begin Spiritual Journey'}
-            </button>
-          </form>
+              <div className="form-group">
+                <label className="form-label">Send OTP via</label>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMethod('email')}
+                    style={{
+                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
+                      padding: '0.6rem', borderRadius: '8px', border: `1.5px solid ${authMethod === 'email' ? 'var(--gold-primary)' : 'rgba(255,255,255,0.1)'}`,
+                      background: authMethod === 'email' ? 'rgba(250,204,21,0.1)' : 'transparent',
+                      color: authMethod === 'email' ? 'var(--gold-primary)' : 'var(--text-secondary)',
+                      cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem'
+                    }}
+                  >
+                    <Mail size={14} /> Email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMethod('whatsapp')}
+                    style={{
+                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
+                      padding: '0.6rem', borderRadius: '8px', border: `1.5px solid ${authMethod === 'whatsapp' ? '#25D366' : 'rgba(255,255,255,0.1)'}`,
+                      background: authMethod === 'whatsapp' ? 'rgba(37,211,102,0.1)' : 'transparent',
+                      color: authMethod === 'whatsapp' ? '#25D366' : 'var(--text-secondary)',
+                      cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem'
+                    }}
+                  >
+                    <MessageCircle size={14} /> WhatsApp
+                  </button>
+                </div>
+              </div>
+
+              {otpError && <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{otpError}</p>}
+
+              <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.25rem' }}>
+                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : <><KeyRound size={16}/> Send OTP</>}
+              </button>
+            </form>
+          )}
+
+          {/* STEP 2: OTP Verification */}
+          {authStep === 'otp' && (
+            <form onSubmit={handleVerifyOTP}>
+              <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+                <KeyRound size={32} style={{ color: 'var(--gold-primary)', marginBottom: '0.5rem' }} />
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                  OTP sent to <strong style={{ color: 'var(--gold-primary)' }}>{authIdentifier}</strong> via {authMethod}.
+                </p>
+                {devOtp && (
+                  <p style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(250,204,21,0.1)', borderRadius: '8px', color: 'var(--gold-primary)', fontSize: '0.85rem' }}>
+                    📧 Dev Mode OTP: <strong>{devOtp}</strong>
+                  </p>
+                )}
+              </div>
+              <div className="form-group">
+                <label className="form-label">Enter 6-digit OTP</label>
+                <input
+                  id="otpInput"
+                  type="text"
+                  className="input-field"
+                  placeholder="_ _ _ _ _ _"
+                  maxLength={6}
+                  value={otpInput}
+                  onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                  style={{ textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.4rem', fontWeight: 700 }}
+                  required
+                />
+              </div>
+
+              {otpError && <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{otpError}</p>}
+
+              <button type="submit" className="primary-btn" disabled={loading} style={{ marginBottom: '0.75rem' }}>
+                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : 'Verify OTP'}
+              </button>
+              <button type="button" className="secondary-btn" onClick={resetAuth} style={{ justifyContent: 'center' }}>
+                ← Back
+              </button>
+            </form>
+          )}
+
+          {/* STEP 3: New User Registration (only shown after OTP verified for first time) */}
+          {authStep === 'register' && (
+            <form onSubmit={handleRegister}>
+              <div style={{ marginBottom: '1rem' }}>
+                <h3 style={{ color: 'var(--gold-primary)', margin: 0 }}>Complete Your Profile</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>Identity verified! Set up your preferences.</p>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Email Address</label>
+                <input
+                  id="regEmail"
+                  type="email"
+                  className="input-field"
+                  placeholder="name@example.com"
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Preferred Language</label>
+                <select id="regLang" className="input-field" value={regLang} onChange={(e) => setRegLang(e.target.value)}>
+                  <option value="english">English</option>
+                  <option value="hindi">Hindi (हिन्दी)</option>
+                  <option value="telugu">Telugu (తెలుగు)</option>
+                  <option value="kannada">Kannada (ಕನ್ನಡ)</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Notification Preference</label>
+                <select id="regPref" className="input-field" value={regPref} onChange={(e) => setRegPref(e.target.value)}>
+                  <option value="email">Email Only</option>
+                  <option value="whatsapp">WhatsApp Only</option>
+                  <option value="both">Both Email & WhatsApp</option>
+                </select>
+              </div>
+
+              {(regPref === 'whatsapp' || regPref === 'both') && (
+                <div className="form-group">
+                  <label className="form-label">WhatsApp Mobile Number</label>
+                  <input
+                    id="regPhone"
+                    type="tel"
+                    className="input-field"
+                    placeholder="+1234567890 (With country code)"
+                    value={regPhone}
+                    onChange={(e) => setRegPhone(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+
+              <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.75rem' }}>
+                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : 'Begin Spiritual Journey'}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="app-container">

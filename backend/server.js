@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import cron from 'node-cron';
 import twilio from 'twilio';
+import { generateOTP, verifyOTP } from './utils/otp.js';
+import { sendEmailOTP } from './utils/mailer.js';
 
 dotenv.config();
 
@@ -192,6 +194,68 @@ async function getGeminiReflection(shloka, language = 'english') {
 }
 
 // Routes
+
+// 0a. Send OTP
+app.post('/api/auth/send-otp', async (req, res) => {
+  const { identifier, method } = req.body; // identifier = email or phone, method = 'email' | 'whatsapp'
+  if (!identifier) {
+    return res.status(400).json({ error: 'Email or phone number is required.' });
+  }
+
+  const otp = generateOTP(identifier);
+
+  if (method === 'whatsapp') {
+    // Send via Twilio WhatsApp
+    const messageBody = `🪔 Your GitaDaily verification code is: *${otp}*\n\nThis code expires in 5 minutes.`;
+    const result = await sendWhatsAppMessage(identifier, messageBody);
+    if (!result.success && !result.simulated) {
+      return res.status(500).json({ error: 'Failed to send WhatsApp OTP.' });
+    }
+    return res.json({ message: 'OTP sent via WhatsApp', simulated: result.simulated || false });
+  } else {
+    // Send via Email
+    const result = await sendEmailOTP(identifier, otp);
+    if (!result.success && !result.simulated) {
+      return res.status(500).json({ error: 'Failed to send email OTP.' });
+    }
+    // In dev mode (no email configured), return the OTP directly for testing
+    if (result.simulated) {
+      console.log(`[DEV] OTP for ${identifier}: ${otp}`);
+      return res.json({ message: 'OTP simulated (no email config). Check server logs.', devOtp: otp });
+    }
+    return res.json({ message: 'OTP sent via Email' });
+  }
+});
+
+// 0b. Verify OTP
+app.post('/api/auth/verify-otp', (req, res) => {
+  const { identifier, otp } = req.body;
+  if (!identifier || !otp) {
+    return res.status(400).json({ error: 'Identifier and OTP are required.' });
+  }
+
+  const result = verifyOTP(identifier, otp);
+  if (!result.valid) {
+    return res.status(401).json({ error: result.error || 'Invalid OTP.' });
+  }
+
+  // Check if the user already exists
+  const users = readData(USERS_PATH);
+  const existing = users.find(u =>
+    typeof u === 'object' && u !== null &&
+    (u.email === identifier || u.phone === identifier ||
+     u.phone.replace(/[^\d]/g, '') === identifier.replace(/[^\d]/g, ''))
+  );
+
+  if (existing) {
+    // Existing user - return their full profile (Login)
+    return res.json({ verified: true, isNewUser: false, user: existing });
+  } else {
+    // New user - they need to complete registration
+    return res.json({ verified: true, isNewUser: true });
+  }
+});
+
 // 1. User Registration
 app.post('/api/register', (req, res) => {
   const { email, phone, pref, lang } = req.body;
