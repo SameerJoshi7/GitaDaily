@@ -535,17 +535,21 @@ ${footer}`;
 }
 
 // Service to send WhatsApp message
-async function sendWhatsAppMessage(toPhone, messageBody) {
+async function sendWhatsAppMessage(toPhone, messageBody, mediaUrl = null) {
   const cleanPhone = normalizePhoneNumber(toPhone);
   const whatsappTo = `whatsapp:${cleanPhone}`;
 
   if (twilioClient) {
     try {
-      const response = await twilioClient.messages.create({
+      const msgOptions = {
         from: twilioNumber,
         body: messageBody,
         to: whatsappTo
-      });
+      };
+      if (mediaUrl) {
+        msgOptions.mediaUrl = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
+      }
+      const response = await twilioClient.messages.create(msgOptions);
       console.log(`[WhatsApp] Sent message to ${cleanPhone}. SID: ${response.sid}`);
       return { success: true, sid: response.sid };
     } catch (err) {
@@ -589,7 +593,7 @@ app.post('/api/test-whatsapp', async (req, res) => {
   const reflection = await getGeminiReflection(shloka, language);
   const messageText = formatShlokaMessage(shloka, reflection, language);
   
-  const result = await sendWhatsAppMessage(phone, messageText);
+  const result = await sendWhatsAppMessage(phone, messageText, HEADER_IMAGE_URL);
   res.json({ message: 'Test triggered', result });
 });
 
@@ -613,7 +617,7 @@ async function broadcastDailyShloka() {
       const language = user.lang || 'english';
       const reflection = await getGeminiReflection(shloka, language);
       const messageText = formatShlokaMessage(shloka, reflection, language);
-      await sendWhatsAppMessage(user.phone, messageText);
+      await sendWhatsAppMessage(user.phone, messageText, HEADER_IMAGE_URL);
       sentCount++;
     }
   }
