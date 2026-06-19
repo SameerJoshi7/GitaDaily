@@ -22,6 +22,40 @@ if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
 }
 
 export const sendEmailOTP = async (toEmail, otp) => {
+  // If EmailJS is configured, prioritize sending via HTTP (avoids SMTP blocks on Render)
+  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY) {
+    try {
+      console.log(`[Mailer] Sending OTP to ${toEmail} using EmailJS HTTP API...`);
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          service_id: process.env.EMAILJS_SERVICE_ID,
+          template_id: process.env.EMAILJS_OTP_TEMPLATE_ID,
+          user_id: process.env.EMAILJS_PUBLIC_KEY,
+          accessToken: process.env.EMAILJS_PRIVATE_KEY,
+          template_params: {
+            to_email: toEmail,
+            otp: otp
+          }
+        })
+      });
+
+      if (response.ok) {
+        console.log(`[Mailer] EmailJS OTP sent successfully to ${toEmail}`);
+        return { success: true };
+      } else {
+        const errText = await response.text();
+        throw new Error(errText || 'EmailJS API returned an error');
+      }
+    } catch (error) {
+      console.error('[Mailer] EmailJS HTTP API error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
   // If Resend API Key is configured, prioritize sending via HTTP (avoids Render SMTP block)
   if (process.env.RESEND_API_KEY) {
     try {
@@ -148,6 +182,49 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
       </div>
     </div>
   `;
+
+  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY) {
+    try {
+      console.log(`[Mailer] Sending daily email to ${toEmail} using EmailJS HTTP API...`);
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          service_id: process.env.EMAILJS_SERVICE_ID,
+          template_id: process.env.EMAILJS_SHLOKA_TEMPLATE_ID,
+          user_id: process.env.EMAILJS_PUBLIC_KEY,
+          accessToken: process.env.EMAILJS_PRIVATE_KEY,
+          template_params: {
+            to_email: toEmail,
+            chapter: shloka.chapter,
+            verse: shloka.verse,
+            language: language.toUpperCase(),
+            artwork: activeArtwork,
+            sanskrit: shloka.sanskrit,
+            transliteration: reflection.translatedTransliteration || shloka.transliteration,
+            translation: reflection.translatedTranslation || shloka.translation,
+            reflection: reflection.modernReflection,
+            wellbeing: reflection.emotionalWellbeing,
+            career: reflection.careerApplication,
+            mindfulness: reflection.mindfulnessTip
+          }
+        })
+      });
+
+      if (response.ok) {
+        console.log(`[Mailer] EmailJS Daily email sent successfully to ${toEmail}`);
+        return { success: true };
+      } else {
+        const errText = await response.text();
+        throw new Error(errText || 'EmailJS API returned an error');
+      }
+    } catch (error) {
+      console.error('[Mailer] EmailJS HTTP API error:', error);
+      return { success: false, error: error.message };
+    }
+  }
 
   if (process.env.RESEND_API_KEY) {
     try {
