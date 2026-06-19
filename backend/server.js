@@ -144,7 +144,7 @@ async function getGeminiReflection(shloka, language = 'english') {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `
       You are an enlightened guide analyzing the Bhagavad Gita for modern audiences.
       Analyze the following Gita Shloka:
@@ -706,7 +706,7 @@ app.post('/api/guidance', async (req, res) => {
       topics: s.topics
     }));
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `
       You are an enlightened guide analyzing the Bhagavad Gita for modern-day challenges.
       The user is facing the following life challenge, feeling, or query:
