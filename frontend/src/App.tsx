@@ -12,8 +12,6 @@ import {
   Sparkles,
   ArrowRight,
   KeyRound,
-  Mail,
-  MessageCircle,
   Send,
   Bell
 } from 'lucide-react';
@@ -32,7 +30,6 @@ interface Chapter {
 
 function App() {
   const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
-  const [phone, setPhone] = useState<string>(() => localStorage.getItem('gitadaily_phone') || '');
   const [pref, setPref] = useState<string>(() => localStorage.getItem('gitadaily_pref') || 'email');
   const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
   
@@ -40,21 +37,18 @@ function App() {
   const [authMode, setAuthMode] = useState<AuthMode>('signup');
   const [authStep, setAuthStep] = useState<AuthStep>('entry');
   const [authIdentifier, setAuthIdentifier] = useState(''); // email or phone
-  const [authMethod, setAuthMethod] = useState<'email' | 'whatsapp'>('email');
   const [otpInput, setOtpInput] = useState('');
   const [otpError, setOtpError] = useState('');
   const [devOtp, setDevOtp] = useState(''); // shown if no email configured
 
   // Registration form states (shown after OTP verified for new user)
   const [regEmail, setRegEmail] = useState('');
-  const [regPhone, setRegPhone] = useState('');
   const [regPref, setRegPref] = useState('email');
   const [regLang, setRegLang] = useState('english');
   const [activeTab, setActiveTab] = useState<Tab>('daily');
   
   // Edit Prefs States
   const [isEditingPrefs, setIsEditingPrefs] = useState(false);
-  const [editPhone, setEditPhone] = useState(phone);
   const [editPref, setEditPref] = useState(pref);
   const [editLang, setEditLang] = useState(lang);
   // Web Push & Telegram configuration states
@@ -64,10 +58,9 @@ function App() {
   
   // Update edit states when profile loads
   useEffect(() => {
-    setEditPhone(phone);
     setEditPref(pref);
     setEditLang(lang);
-  }, [phone, pref, lang]);
+  }, [pref, lang]);
   
   // Fetch app configs and check Service Worker push subscription status on startup
   useEffect(() => {
@@ -134,7 +127,7 @@ function App() {
       const res = await fetch(`${API_BASE}/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: authIdentifier, method: authMethod }),
+        body: JSON.stringify({ identifier: authIdentifier }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -174,9 +167,8 @@ function App() {
           loginUser(data.user);
         } else {
           // New user - proceed to registration form
-          // Pre-fill email/phone from identifier
+          // Pre-fill email from identifier
           if (authIdentifier.includes('@')) setRegEmail(authIdentifier);
-          else setRegPhone(authIdentifier);
           setAuthStep('register');
         }
       } else {
@@ -190,13 +182,11 @@ function App() {
   };
 
   // Helper: save user to localStorage and state
-  const loginUser = (userData: { email: string; phone: string; pref: string; lang: string }) => {
+  const loginUser = (userData: { email: string; pref: string; lang: string }) => {
     localStorage.setItem('gitadaily_email', userData.email);
-    localStorage.setItem('gitadaily_phone', userData.phone || '');
     localStorage.setItem('gitadaily_pref', userData.pref || 'email');
     localStorage.setItem('gitadaily_lang', userData.lang || 'english');
     setEmail(userData.email);
-    setPhone(userData.phone || '');
     setPref(userData.pref || 'email');
     setLang(userData.lang || 'english');
   };
@@ -239,11 +229,9 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('gitadaily_email');
-    localStorage.removeItem('gitadaily_phone');
     localStorage.removeItem('gitadaily_pref');
     localStorage.removeItem('gitadaily_lang');
     setEmail('');
-    setPhone('');
     setPref('email');
     setLang('english');
     setDailyShloka(null);
@@ -571,7 +559,7 @@ function App() {
               <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
                 <KeyRound size={32} style={{ color: 'var(--gold-primary)', marginBottom: '0.5rem' }} />
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  OTP sent to <strong style={{ color: 'var(--gold-primary)' }}>{authIdentifier}</strong> via {authMethod}.
+                  OTP sent to <strong style={{ color: 'var(--gold-primary)' }}>{authIdentifier}</strong> via Email.
                 </p>
                 {devOtp && (
                   <p style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(250,204,21,0.1)', borderRadius: '8px', color: 'var(--gold-primary)', fontSize: '0.85rem' }}>
@@ -679,6 +667,14 @@ function App() {
             <span className="brand-icon">🪔</span>
             <span className="brand-name">GitaDaily</span>
           </a>
+
+          <div className="sidebar-artwork" style={{ borderRadius: '8px', overflow: 'hidden', width: '100%', height: '110px', border: '1px solid rgba(255,255,255,0.05)', marginTop: '-0.75rem', marginBottom: '-0.5rem' }}>
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg" 
+              alt="Gita Sidebar Art" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+          </div>
           
           <ul className="nav-links">
             <li className="nav-item">
@@ -842,6 +838,23 @@ function App() {
                   <LogOut size={12} />
                   <span>Sign Out</span>
                 </button>
+              </div>
+
+              {/* Collapsible Developer Details */}
+              <details style={{ marginTop: '0.75rem', width: '100%', fontSize: '0.75rem', color: 'var(--text-secondary)', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--gold-primary)', listStyle: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  ℹ️ Developer Details
+                </summary>
+                <div style={{ marginTop: '0.4rem', padding: '0.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', lineHeight: '1.4', border: '1px solid rgba(255,255,255,0.03)' }}>
+                  <strong>Developer:</strong> Sameer Joshi<br />
+                  <strong>Stack:</strong> React, Node.js, Express, Gemini 2.5, Telegram Bot, Web Push, Nodemailer<br />
+                  <strong>Links:</strong> <a href="https://github.com/SameerJoshi7" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>LinkedIn</a>
+                </div>
+              </details>
+
+              {/* Made with Love Footer */}
+              <div style={{ marginTop: '0.75rem', textAlign: 'center', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                Made with ❤️ by <a href="https://github.com/SameerJoshi7" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none', fontWeight: 500 }}>Sameer Joshi</a>
               </div>
             </>
           )}

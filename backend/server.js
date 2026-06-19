@@ -468,6 +468,19 @@ if (twilioSid && twilioAuthToken) {
   twilioClient = twilio(twilioSid, twilioAuthToken);
 }
 
+const ARTWORKS = [
+  'https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/8/82/Gita_talk.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/d/df/Vishvarupa.jpg'
+];
+
+function getArtworkForShloka(shloka) {
+  if (!shloka || typeof shloka.chapter === 'undefined' || typeof shloka.verse === 'undefined') {
+    return ARTWORKS[0];
+  }
+  return ARTWORKS[(shloka.chapter + shloka.verse) % ARTWORKS.length];
+}
+
 // Format message helper
 function formatShlokaMessage(shloka, reflection, language = 'english') {
   const lang = (language || 'english').toLowerCase();
@@ -510,7 +523,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
     footer = 'ನಿಮ್ಮ ದಿನವು ಶುಭವಾಗಲಿ ಮತ್ತು ಯಶಸ್ವಿಯಾಗಲಿ! 🌸';
   }
 
-  const artLink = 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg';
+  const artLink = getArtworkForShloka(shloka);
   
   return `${title}
 
@@ -532,6 +545,8 @@ ${reflection.modernReflection}
 ${reflection.mindfulnessTip}
 
 🎨 *Sacred Art:* ${artLink}
+
+Made with ❤️ by [Sameer Joshi](https://www.linkedin.com/in/sameer-joshi-691457146/)
 
 ${footer}`;
 }
@@ -605,7 +620,7 @@ app.post('/api/test-delivery', async (req, res) => {
 
   // 2. Telegram Delivery
   if ((user.pref === 'telegram' || user.pref === 'both' || user.pref === 'all') && user.telegramChatId) {
-    const tgResult = await sendTelegramShloka(user.telegramChatId, messageText, HEADER_IMAGE_URL);
+    const tgResult = await sendTelegramShloka(user.telegramChatId, messageText, getArtworkForShloka(shloka));
     deliveryStatus.telegram = tgResult;
   }
 
@@ -615,7 +630,7 @@ app.post('/api/test-delivery', async (req, res) => {
       const payload = JSON.stringify({
         title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
         body: reflection.translatedTranslation || shloka.translation,
-        image: HEADER_IMAGE_URL,
+        image: getArtworkForShloka(shloka),
         url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
       });
       await webpush.sendNotification(user.pushSubscription, payload);
@@ -690,7 +705,7 @@ async function broadcastDailyShloka() {
 
       // 2. Telegram Channel
       if ((user.pref === 'telegram' || user.pref === 'both' || user.pref === 'all') && user.telegramChatId) {
-        await sendTelegramShloka(user.telegramChatId, messageText, HEADER_IMAGE_URL);
+        await sendTelegramShloka(user.telegramChatId, messageText, getArtworkForShloka(shloka));
         sentToThisUser = true;
       }
 
@@ -700,7 +715,7 @@ async function broadcastDailyShloka() {
           const payload = JSON.stringify({
             title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
             body: reflection.translatedTranslation || shloka.translation,
-            image: HEADER_IMAGE_URL,
+            image: getArtworkForShloka(shloka),
             url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
           });
           await webpush.sendNotification(user.pushSubscription, payload);
@@ -736,7 +751,7 @@ const handleTelegramSubscribe = async (email, chatId, triggerTest = false) => {
       const language = user.lang || 'english';
       const reflection = await getGeminiReflection(shloka, language);
       const messageText = formatShlokaMessage(shloka, reflection, language);
-      await sendTelegramShloka(chatId, messageText, HEADER_IMAGE_URL);
+      await sendTelegramShloka(chatId, messageText, getArtworkForShloka(shloka));
     }
     return true;
   }

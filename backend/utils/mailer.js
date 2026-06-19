@@ -54,6 +54,13 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   }
 
   try {
+    const artworks = [
+      'https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/8/82/Gita_talk.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/d/df/Vishvarupa.jpg'
+    ];
+    const activeArtwork = artworks[(shloka.chapter + shloka.verse) % artworks.length];
+
     const mailOptions = {
       from: `"GitaDaily" <${process.env.EMAIL_USER}>`,
       to: toEmail,
@@ -67,7 +74,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
           </div>
           
           <div style="border-radius: 8px; overflow: hidden; margin-bottom: 20px; text-align: center;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg" alt="Sacred Gita Art" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px;" />
+            <img src="${activeArtwork}" alt="Sacred Gita Art" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px;" />
           </div>
 
           <div style="text-align: center; margin-bottom: 25px;">
@@ -103,6 +110,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
 
           <div style="text-align: center; margin-top: 30px; font-size: 11px; color: #6b7280; border-top: 1px solid #1f2937; padding-top: 15px;">
             <p style="margin: 0;">You received this because you subscribed to daily Gita reflections from GitaDaily.</p>
+            <p style="margin: 5px 0 0 0;">Made with ❤️ by <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none; font-weight: 500;">Sameer Joshi</a> (<a href="https://github.com/SameerJoshi7" target="_blank" style="color: #fbbf24; text-decoration: none;">GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none;">LinkedIn</a>)</p>
             <p style="margin: 5px 0 0 0;">Have a blessed day! 🌸</p>
           </div>
         </div>
