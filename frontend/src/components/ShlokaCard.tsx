@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark, Sparkles, Brain, Heart, Briefcase, Smile } from 'lucide-react';
+import { Bookmark, Sparkles, Brain, Heart, Briefcase } from 'lucide-react';
 
 export interface Reflection {
   modernReflection: string;

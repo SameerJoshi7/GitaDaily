@@ -52,7 +52,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [dailyShloka, setDailyShloka] = useState<Shloka | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [selectedShloka, setSelectedShloka] = useState<Shloka | null>(null);
+
   const [bookmarks, setBookmarks] = useState<Shloka[]>([]);
   
   // Search States
@@ -115,7 +115,7 @@ function App() {
     setLang('english');
     setDailyShloka(null);
     setBookmarks([]);
-    setSelectedShloka(null);
+
     setIsEditingPrefs(false);
   };
 
@@ -234,7 +234,7 @@ function App() {
       const res = await fetch(`${API_BASE}/shloka/${chapter}/${verse}?email=${encodeURIComponent(email)}`);
       if (res.ok) {
         const data = await res.json();
-        setSelectedShloka(data);
+
         // If we fetch a specific shloka, switch to dashboard tab to show it
         setActiveTab('daily');
         setDailyShloka(data); // Display as the main active shloka
