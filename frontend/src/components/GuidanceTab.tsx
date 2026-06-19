@@ -1,0 +1,175 @@
+import React from 'react';
+import { Sparkles, Bookmark } from 'lucide-react';
+import type { Shloka } from './ShlokaCard';
+
+interface GuidanceTabProps {
+  guidanceQuery: string;
+  setGuidanceQuery: (query: string) => void;
+  guidanceLoading: boolean;
+  guidanceResult: {
+    shloka: Shloka;
+    counsel: {
+      modernCounsel: string;
+      wellbeingInsight: string;
+      actionStep: string;
+    };
+  } | null;
+  guidanceError: string | null;
+  onSubmit: (e: React.FormEvent) => void;
+  bookmarks: Shloka[];
+  onToggleBookmark: (shloka: Shloka) => void;
+}
+
+export const GuidanceTab: React.FC<GuidanceTabProps> = ({
+  guidanceQuery,
+  setGuidanceQuery,
+  guidanceLoading,
+  guidanceResult,
+  guidanceError,
+  onSubmit,
+  bookmarks,
+  onToggleBookmark
+}) => {
+  return (
+    <div>
+      <div className="dashboard-header">
+        <h2 className="dashboard-title">Seek Divine Guidance</h2>
+        <span className="dashboard-subtitle">Describe your challenge, mood, or question, and receive counsel inspired by the Bhagavad Gita.</span>
+      </div>
+
+      <div style={{ background: 'linear-gradient(145deg, var(--bg-secondary) 0%, rgba(18, 20, 31, 0.95) 100%)', padding: '2rem', borderRadius: '20px', border: '1px solid var(--card-border)', marginBottom: '2rem' }}>
+        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label" style={{ fontSize: '0.95rem', color: 'var(--gold-secondary)', marginBottom: '0.5rem' }}>What challenge, doubt, or emotion are you facing today?</label>
+            <textarea
+              className="input-field"
+              style={{ 
+                width: '100%', 
+                minHeight: '120px', 
+                padding: '0.75rem', 
+                fontSize: '0.95rem', 
+                borderRadius: '10px', 
+                background: 'rgba(25, 28, 43, 0.3)', 
+                borderColor: 'var(--card-border)',
+                resize: 'vertical',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-sans)',
+                lineHeight: '1.5'
+              }}
+              placeholder="E.g., I am feeling anxious about my career path, or I am struggling to control my anger..."
+              value={guidanceQuery}
+              onChange={(e) => setGuidanceQuery(e.target.value)}
+              disabled={guidanceLoading}
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            className="primary-btn" 
+            disabled={guidanceLoading || !guidanceQuery.trim()} 
+            style={{ alignSelf: 'flex-start', padding: '0.6rem 1.5rem', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+          >
+            {guidanceLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', width: '100%' }}>
+                <div className="spinner" style={{ width: 16, height: 16, borderTopColor: '#000' }} />
+                <span>Consulting the Gita...</span>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', width: '100%' }}>
+                <Sparkles size={16} />
+                <span>Seek Guidance</span>
+              </div>
+            )}
+          </button>
+        </form>
+
+        {guidanceError && (
+          <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--error)', fontSize: '0.9rem' }}>
+            ⚠️ {guidanceError}
+          </div>
+        )}
+      </div>
+
+      {guidanceResult && (
+        <div className="shloka-card-container" style={{ animation: 'fadeIn 0.6s ease-out' }}>
+          <div style={{ textAlign: 'center', margin: '1rem 0 2rem 0' }}>
+            <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: 2, color: 'var(--gold-primary)', fontWeight: 600 }}>Gita's Solution Found</span>
+            <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', marginTop: '0.25rem' }}>Verse selected for your guidance:</h3>
+          </div>
+
+          <div className="shloka-card" style={{ position: 'relative', overflow: 'hidden', border: '1px solid rgba(212, 175, 55, 0.25)', boxShadow: '0 10px 40px rgba(212, 175, 55, 0.05)' }}>
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(/images/${(guidanceResult.shloka.chapter + guidanceResult.shloka.verse) % 3 === 0 ? 'chariot' : (guidanceResult.shloka.chapter + guidanceResult.shloka.verse) % 3 === 1 ? 'discourse' : 'vishwaroopa'}.jpg)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                opacity: 0.1,
+                pointerEvents: 'none',
+                zIndex: 0,
+                borderRadius: '20px',
+                filter: 'blur(1px)'
+              }} 
+            />
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div className="shloka-card-header">
+                <span className="shloka-meta" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>Chapter {guidanceResult.shloka.chapter}, Verse {guidanceResult.shloka.verse}</span>
+                <button 
+                  onClick={() => onToggleBookmark(guidanceResult.shloka)} 
+                  className={`bookmark-icon-btn ${bookmarks.some(b => b.chapter === guidanceResult.shloka.chapter && b.verse === guidanceResult.shloka.verse) ? 'active' : ''}`}
+                  title="Bookmark Shloka"
+                >
+                  <Bookmark size={22} fill={bookmarks.some(b => b.chapter === guidanceResult.shloka.chapter && b.verse === guidanceResult.shloka.verse) ? 'currentColor' : 'none'} />
+                </button>
+              </div>
+
+              <div className="shloka-sanskrit" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{guidanceResult.shloka.sanskrit}</div>
+              <div className="shloka-transliteration" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>{guidanceResult.shloka.transliteration}</div>
+
+              <div className="shloka-translation-box" style={{ background: 'rgba(25, 28, 43, 0.45)', backdropFilter: 'blur(4px)' }}>
+                <div className="shloka-translation-label">English Translation</div>
+                <p className="shloka-translation" style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{guidanceResult.shloka.translation}</p>
+              </div>
+
+              <div className="ai-section">
+                <div className="ai-header">
+                  <Sparkles size={20} style={{ color: 'var(--gold-primary)' }} />
+                  <h3 className="ai-header-title" style={{ color: 'var(--gold-primary)', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>Divine AI Counsel for your query</h3>
+                </div>
+
+                <div className="reflection-grid" style={{ gridTemplateColumns: '1fr' }}>
+                  <div className="reflection-card" style={{ background: 'rgba(212, 175, 55, 0.04)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
+                    <div className="reflection-title" style={{ color: 'var(--gold-primary)', fontWeight: 600 }}>
+                      <span>🎯 Personalized Counsel</span>
+                    </div>
+                    <p className="reflection-text" style={{ color: '#ffffff', fontSize: '1rem', lineHeight: '1.6' }}>"{guidanceResult.counsel.modernCounsel}"</p>
+                  </div>
+
+                  <div className="reflection-card" style={{ background: 'rgba(18, 20, 31, 0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="reflection-title" style={{ color: 'var(--gold-secondary)' }}>
+                      <span>🧘 Mental Peace & Emotional Well-being</span>
+                    </div>
+                    <p className="reflection-text" style={{ color: '#e5e7eb' }}>{guidanceResult.counsel.wellbeingInsight}</p>
+                  </div>
+                </div>
+
+                <div className="mindfulness-banner" style={{ background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(79, 70, 229, 0.05))', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                  <span className="mindfulness-banner-icon">⚡</span>
+                  <div className="mindfulness-content">
+                    <span className="mindfulness-title" style={{ color: '#10B981', fontWeight: 600 }}>Your Actionable Step Today</span>
+                    <span className="mindfulness-desc" style={{ color: '#ffffff', fontWeight: 500 }}>"{guidanceResult.counsel.actionStep}"</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
