@@ -93,6 +93,7 @@ body {
     border-bottom: none;
     border-right: 1px solid var(--card-border);
     justify-content: space-between;
+    overflow-y: auto;
   }
 }
 
