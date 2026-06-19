@@ -8,11 +8,16 @@ let transporter;
 
 if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
   transporter = nodemailer.createTransport({
-    service: 'gmail', // You can change this if using another provider
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL/TLS on port 465
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_APP_PASSWORD,
     },
+    connectionTimeout: 15000, // 15 seconds
+    greetingTimeout: 15000,
+    socketTimeout: 20000
   });
 }
 
