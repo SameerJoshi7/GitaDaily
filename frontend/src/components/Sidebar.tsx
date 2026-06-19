@@ -300,7 +300,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </summary>
               <div style={{ marginTop: '0.4rem', padding: '0.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', lineHeight: '1.4', border: '1px solid rgba(255,255,255,0.03)' }}>
                 <strong>Developer:</strong> Sameer Joshi<br />
-                <strong>Stack:</strong> React, Node.js, Express, Gemini 2.5, Telegram Bot, Web Push, Nodemailer<br />
+                <strong>Stack:</strong> React, Node.js, Express, Gemini Flash (gemini-flash-latest), Web Push, EmailJS API<br />
                 <strong>Links:</strong> <a href="https://github.com/SameerJoshi7" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>LinkedIn</a>
               </div>
             </details>
