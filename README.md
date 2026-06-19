@@ -1,10 +1,23 @@
-# 🪔 GitaDaily — Daily Bhagavad Gita Wisdom & AI Reflections
+# 🪔 GitaDaily — Daily Bhagavad Gita Wisdom & Seek Divine Guidance
 
 > *"Perform your duty equipoised, O Arjuna, abandoning all attachment to success or failure. Such equanimity is called Yoga."* — **Bhagavad Gita (2.48)**
 
 ![Vishwaroopa Artwork](https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/vishwaroopa.jpg)
 
-**GitaDaily** is a modern, high-polish spiritual companion application designed to cultivate daily discipline, mental clarity, and focus. In a fast-paced world filled with distractions, GitaDaily serves as your morning anchor, delivering a daily sacred verse from the Bhagavad Gita alongside advanced AI reflections directly to your inbox, web browser, and messaging channels at exactly **6:00 AM local time**.
+**GitaDaily** is a modern, high-polish spiritual companion application designed to cultivate daily discipline, mental clarity, and focus. In a fast-paced world filled with distractions, GitaDaily serves as your morning anchor, delivering a daily sacred verse from the Bhagavad Gita alongside advanced AI reflections directly to your inbox and web browser at exactly **6:00 AM local time**.
+
+Our flagship **Seek Divine Guidance** module allows users to type any life challenge, doubt, or emotional state and receive direct, personalized AI counsel matching their query to the perfect shloka from the Gita—proving that the Bhagavad Gita has solutions to every problem, big or small.
+
+---
+
+## ✨ Flagship Feature: Seek Divine Guidance (Reflect by Mood)
+
+The Gita has solutions to every human challenge. The **Seek Guidance** module brings this wisdom to life interactively:
+
+* **Describe Your Situation**: Users type their current struggle, query, or feeling (e.g., *"I feel burnt out at work"* or *"I am struggling to control my anger"*).
+* **AI Analysis & Verse Matching**: The server queries the local index of verses and directs **Gemini** to select the single most relevant shloka that answers their query.
+* **Personalized Counsel**: Gemini generates a custom-tailored counseling response in the user's selected language (English, Hindi, Telugu, or Kannada), linking the shloka's wisdom to their exact problem.
+* **Actionable Step**: Provides a single, clear action step for the user to practice immediately.
 
 ---
 
@@ -34,15 +47,17 @@ graph TD
     
     Broadcast -->|HTTP API| EmailJS_Broadcast[EmailJS HTTP API] -->|Daily Shloka Email| Inbox
     Broadcast -->|WebPush Protocol| Vercel_Push[Web Push Service Worker] -->|Browser Notification| Browser[Web Browser Toast]
-    Broadcast -->|Telegram HTTP API| Bot[Telegram Bot] -->|Direct Message| Telegram[Telegram Chat]
+
+    %% Seek Guidance Flow
+    UserGuidance[User Seek Guidance Query] -->|HTTP POST /api/guidance| Server
+    Server -->|Contextual Query + Shloka List| Gemini
+    Gemini -->|Pick Shloka & Generate Counsel| Server
+    Server -->|Render Customized Counsel Card| UserGuidance
 ```
 
 1. **User Authentication**: Secure, passwordless entry using EmailJS HTTP API to dispatch OTPs over TLS, preventing any SMTP port blocks on hosting environments like Render's free tier.
-2. **AI Reflection Engine**: Generates real-time localized analyses targeting:
-   - **Modern Relevance**: Translating cosmic truths into advice for relationships, technology, and contemporary life.
-   - **Emotional Well-being**: Guidelines for handling anxiety, stress, and preserving mental peace.
-   - **Career & Focus**: Actionable advice on professional duties, execution, leadership, and detachment from results (*Nishkama Karma*).
-3. **Multi-Channel Dispatcher**: Simultaneously broadcasts the verse, transliteration, and AI reflections to all active channels.
+2. **AI Guidance Engine**: Uses the high-performance `gemini-flash-latest` model to analyze user queries, match them to the most relevant verse in `gita_data.json`, and write contextual guidance.
+3. **Multi-Channel Dispatcher**: Simultaneously broadcasts the daily verse, transliteration, and AI reflections to all active channels.
 
 ---
 
@@ -62,7 +77,7 @@ The application pairs every daily verse with high-quality, inspiring devotional 
 * **Frontend**: React, TypeScript, Vite, Vanilla CSS (harmonious dark mode, glassmorphic cards, micro-animations, and background watermarks).
 * **Backend**: Node.js, Express.js.
 * **Email Delivery**: EmailJS API (HTTP port 443).
-* **AI Reflections**: Google Gemini AI.
+* **AI Reflections**: Google Gemini AI (`gemini-flash-latest`).
 * **Web Push**: VAPID & Web Push Protocol Service Workers.
 * **Telegram Service**: Node Telegram Polling (Dynamic status notice blocks when restricted).
 
