@@ -13,7 +13,9 @@ import {
   ArrowRight,
   KeyRound,
   Mail,
-  MessageCircle
+  MessageCircle,
+  Send,
+  Bell
 } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
@@ -55,6 +57,10 @@ function App() {
   const [editPhone, setEditPhone] = useState(phone);
   const [editPref, setEditPref] = useState(pref);
   const [editLang, setEditLang] = useState(lang);
+  // Web Push & Telegram configuration states
+  const [telegramBotUsername, setTelegramBotUsername] = useState('GitaDailyBot');
+  const [publicVapidKey, setPublicVapidKey] = useState('');
+  const [isPushSubscribed, setIsPushSubscribed] = useState(false);
   
   // Update edit states when profile loads
   useEffect(() => {
@@ -62,6 +68,42 @@ function App() {
     setEditPref(pref);
     setEditLang(lang);
   }, [phone, pref, lang]);
+  
+  // Fetch app configs and check Service Worker push subscription status on startup
+  useEffect(() => {
+    // 1. Fetch backend configuration
+    fetch(`${API_BASE}/config`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.telegramBotUsername) {
+          setTelegramBotUsername(data.telegramBotUsername);
+        }
+      })
+      .catch(err => console.error('Failed to fetch config', err));
+
+    // 2. Fetch VAPID Public Key
+    fetch(`${API_BASE}/push/public-key`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.publicKey) {
+          setPublicVapidKey(data.publicKey);
+        }
+      })
+      .catch(err => console.error('Failed to fetch VAPID key', err));
+
+    // 3. Check push subscription status
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+          console.log('Service Worker registered successfully');
+          return reg.pushManager.getSubscription();
+        })
+        .then(sub => {
+          setIsPushSubscribed(!!sub);
+        })
+        .catch(err => console.error('Service Worker / Push subscription error', err));
+    }
+  }, []);
   
   // Loading & Data States
   const [loading, setLoading] = useState(false);
@@ -166,16 +208,12 @@ function App() {
       alert('Please enter a valid email address.');
       return;
     }
-    if ((regPref === 'whatsapp' || regPref === 'both') && !regPhone) {
-      alert('Please enter your WhatsApp mobile number to select WhatsApp notifications.');
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: regEmail, phone: regPhone, pref: regPref, lang: regLang }),
+        body: JSON.stringify({ email: regEmail, phone: '', pref: regPref, lang: regLang }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -217,23 +255,17 @@ function App() {
 
   const handleSavePrefs = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((editPref === 'whatsapp' || editPref === 'both') && !editPhone) {
-      alert('Please enter your WhatsApp mobile number.');
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, phone: editPhone, pref: editPref, lang: editLang }),
+        body: JSON.stringify({ email, phone: '', pref: editPref, lang: editLang }),
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('gitadaily_phone', data.phone || '');
         localStorage.setItem('gitadaily_pref', data.pref || 'email');
         localStorage.setItem('gitadaily_lang', data.lang || 'english');
-        setPhone(data.phone || '');
         setPref(data.pref || 'email');
         setLang(data.lang || 'english');
         setIsEditingPrefs(false);
@@ -251,31 +283,88 @@ function App() {
     }
   };
 
-  const handleSendTestWhatsApp = async () => {
-    if (!phone) {
-      alert('Please subscribe with a WhatsApp phone number first!');
-      return;
-    }
+  const handleSendTestDelivery = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/test-whatsapp`, {
+      const res = await fetch(`${API_BASE}/test-delivery`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          phone, 
+          email, 
           chapter: dailyShloka?.chapter || 2, 
           verse: dailyShloka?.verse || 47 
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Test WhatsApp message triggered! Open the backend terminal window/logs to view the simulated output.');
+        alert('Test delivery triggered! Check your subscribed channels (Email, Telegram, or Web Push).');
       } else {
-        alert(data.error || 'Failed to trigger WhatsApp message.');
+        alert(data.error || 'Failed to trigger test delivery.');
       }
     } catch (err) {
       console.error(err);
       alert('Failed to connect to the server.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const urlBase64ToUint8Array = (base64String: string) => {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
+  const handleEnableNotifications = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert('Your browser does not support web push notifications.');
+      return;
+    }
+
+    if (!publicVapidKey) {
+      alert('VAPID public key not loaded from backend yet. Please wait a second.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        alert('Permission for notifications was denied.');
+        setLoading(false);
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      
+      const subscribeOptions = {
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+      };
+
+      const subscription = await registration.pushManager.subscribe(subscribeOptions);
+      
+      const res = await fetch(`${API_BASE}/push/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, subscription })
+      });
+
+      if (res.ok) {
+        setIsPushSubscribed(true);
+        alert('Browser notifications enabled successfully! 🔔');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to save push subscription on server.');
+      }
+    } catch (err: any) {
+      console.error('Error subscribing to push notifications:', err);
+      alert('Failed to subscribe: ' + (err.message || err));
     } finally {
       setLoading(false);
     }
@@ -434,54 +523,22 @@ function App() {
             </div>
           )}
 
-          {/* STEP 1: Entry — Enter email/phone + choose OTP method */}
+          {/* STEP 1: Entry — Enter email */}
           {authStep === 'entry' && (
             <form onSubmit={handleSendOTP}>
               <div className="form-group">
                 <label className="form-label">
-                  {authMode === 'signin' ? 'Sign in with your Email or WhatsApp Number' : 'Your Email or WhatsApp Number'}
+                  {authMode === 'signin' ? 'Sign in with your Email' : 'Your Email Address'}
                 </label>
                 <input
                   id="authIdentifier"
-                  type="text"
+                  type="email"
                   className="input-field"
-                  placeholder="email@example.com or +91XXXXXXXXXX"
+                  placeholder="email@example.com"
                   value={authIdentifier}
                   onChange={(e) => setAuthIdentifier(e.target.value)}
                   required
                 />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Send OTP via</label>
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMethod('email')}
-                    style={{
-                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
-                      padding: '0.6rem', borderRadius: '8px', border: `1.5px solid ${authMethod === 'email' ? 'var(--gold-primary)' : 'rgba(255,255,255,0.1)'}`,
-                      background: authMethod === 'email' ? 'rgba(250,204,21,0.1)' : 'transparent',
-                      color: authMethod === 'email' ? 'var(--gold-primary)' : 'var(--text-secondary)',
-                      cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem'
-                    }}
-                  >
-                    <Mail size={14} /> Email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMethod('whatsapp')}
-                    style={{
-                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
-                      padding: '0.6rem', borderRadius: '8px', border: `1.5px solid ${authMethod === 'whatsapp' ? '#25D366' : 'rgba(255,255,255,0.1)'}`,
-                      background: authMethod === 'whatsapp' ? 'rgba(37,211,102,0.1)' : 'transparent',
-                      color: authMethod === 'whatsapp' ? '#25D366' : 'var(--text-secondary)',
-                      cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem'
-                    }}
-                  >
-                    <MessageCircle size={14} /> WhatsApp
-                  </button>
-                </div>
               </div>
 
               {otpError && <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{otpError}</p>}
@@ -567,24 +624,23 @@ function App() {
                 <label className="form-label">Notification Preference</label>
                 <select id="regPref" className="input-field" value={regPref} onChange={(e) => setRegPref(e.target.value)}>
                   <option value="email">Email Only</option>
-                  <option value="whatsapp">WhatsApp Only</option>
-                  <option value="both">Both Email & WhatsApp</option>
+                  <option value="telegram">Telegram Only</option>
+                  <option value="push">Web Push Only</option>
+                  <option value="both">Both Email & Telegram</option>
+                  <option value="all">All Channels (Email, Telegram & Push)</option>
                 </select>
               </div>
 
-              {(regPref === 'whatsapp' || regPref === 'both') && (
-                <div className="form-group">
-                  <label className="form-label">WhatsApp Mobile Number</label>
-                  <input
-                    id="regPhone"
-                    type="tel"
-                    className="input-field"
-                    placeholder="+1234567890 (With country code)"
-                    value={regPhone}
-                    onChange={(e) => setRegPhone(e.target.value)}
-                    required
-                  />
-                </div>
+              {(regPref === 'telegram' || regPref === 'both' || regPref === 'all') && (
+                <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
+                  💡 Note: To receive Telegram messages, you'll click "Connect Telegram Bot" on the settings sidebar once logged in.
+                </p>
+              )}
+
+              {(regPref === 'push' || regPref === 'all') && (
+                <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
+                  🔔 Note: To receive push notifications, you'll click "Enable Browser Notifications" on the settings sidebar once logged in.
+                </p>
               )}
 
               <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.75rem' }}>
@@ -679,24 +735,12 @@ function App() {
                   onChange={(e) => setEditPref(e.target.value)}
                 >
                   <option value="email">Email Only</option>
-                  <option value="whatsapp">WhatsApp Only</option>
-                  <option value="both">Both</option>
+                  <option value="telegram">Telegram Only</option>
+                  <option value="push">Web Push Only</option>
+                  <option value="both">Both Email & Telegram</option>
+                  <option value="all">All Channels</option>
                 </select>
               </div>
-
-              {(editPref === 'whatsapp' || editPref === 'both') && (
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.7rem' }}>WhatsApp Phone</label>
-                  <input
-                    type="tel"
-                    className="input-field"
-                    style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem' }}
-                    value={editPhone}
-                    onChange={(e) => setEditPhone(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
 
               <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.25rem' }}>
                 <button type="submit" className="primary-btn" style={{ padding: '0.4rem', fontSize: '0.75rem', flexGrow: 1 }} disabled={loading}>
@@ -715,17 +759,10 @@ function App() {
               </div>
               <span className="user-email-text" style={{ fontSize: '0.8rem' }}>{email}</span>
               
-              {phone && (
-                <div style={{ marginTop: '0.25rem', display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>WhatsApp Phone:</span>
-                  <span className="user-email-text" style={{ fontSize: '0.8rem' }}>{phone}</span>
-                </div>
-              )}
-
               <div style={{ marginTop: '0.25rem', display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Language & Preferences:</span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--gold-primary)', textTransform: 'capitalize', fontWeight: '500' }}>
-                  {lang} — {pref === 'both' ? 'Email & WhatsApp' : pref}
+                  {lang} — {pref === 'both' ? 'Email & Telegram' : pref === 'all' ? 'All Channels' : pref === 'push' ? 'Web Push' : pref}
                 </span>
               </div>
 
@@ -738,17 +775,48 @@ function App() {
                   Edit Preferences
                 </button>
 
-                {phone && (pref === 'whatsapp' || pref === 'both') && (
-                  <button 
-                    onClick={handleSendTestWhatsApp} 
-                    className="primary-btn" 
-                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', justifyContent: 'center', background: 'linear-gradient(135deg, #25D366, #128C7E)', color: '#fff' }}
-                    disabled={loading}
+                {/* Telegram Bot Connector */}
+                {(pref === 'telegram' || pref === 'both' || pref === 'all') && (
+                  <a 
+                    href={`https://t.me/${telegramBotUsername}?start=${Array.from(email).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="primary-btn"
+                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', justifyContent: 'center', background: 'linear-gradient(135deg, #0088cc, #0077b5)', color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                   >
-                    <Sparkles size={12} />
-                    <span>Test Send WhatsApp</span>
-                  </button>
+                    <Send size={12} />
+                    <span>Connect Telegram Bot</span>
+                  </a>
                 )}
+
+                {/* Web Push Subscription Action */}
+                {(pref === 'push' || pref === 'all') && (
+                  isPushSubscribed ? (
+                    <div style={{ fontSize: '0.75rem', color: '#10B981', textAlign: 'center', padding: '0.3rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                      🔔 Browser Push Enabled
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={handleEnableNotifications} 
+                      className="primary-btn" 
+                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', justifyContent: 'center', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#000' }}
+                      disabled={loading}
+                    >
+                      <Bell size={12} />
+                      <span>Enable Browser Push</span>
+                    </button>
+                  )
+                )}
+
+                <button 
+                  onClick={handleSendTestDelivery} 
+                  className="primary-btn" 
+                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', justifyContent: 'center', background: 'linear-gradient(135deg, #fbbf24, #d97706)', color: '#000' }}
+                  disabled={loading}
+                >
+                  <Sparkles size={12} />
+                  <span>Test Send Insight</span>
+                </button>
 
                 <button onClick={handleLogout} className="secondary-btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', justifyContent: 'center', borderColor: 'rgba(239, 68, 68, 0.2)', color: 'var(--error)' }}>
                   <LogOut size={12} />

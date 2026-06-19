@@ -7,8 +7,10 @@ import { fileURLToPath } from 'url';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import cron from 'node-cron';
 import twilio from 'twilio';
+import webpush from 'web-push';
 import { generateOTP, verifyOTP } from './utils/otp.js';
-import { sendEmailOTP } from './utils/mailer.js';
+import { sendEmailOTP, sendDailyShlokaEmail } from './utils/mailer.js';
+import { sendTelegramShloka, startTelegramPolling } from './utils/telegram.js';
 
 dotenv.config();
 
@@ -17,6 +19,28 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+// Web Push configuration
+let vapidKeys = {
+  publicKey: process.env.VAPID_PUBLIC_KEY,
+  privateKey: process.env.VAPID_PRIVATE_KEY
+};
+
+if (!vapidKeys.publicKey || !vapidKeys.privateKey) {
+  console.log('[WebPush] VAPID keys not fully set in .env. Generating one-time keys...');
+  const generated = webpush.generateVAPIDKeys();
+  vapidKeys.publicKey = generated.publicKey;
+  vapidKeys.privateKey = generated.privateKey;
+  console.log(`[WebPush] PUBLIC KEY: ${vapidKeys.publicKey}`);
+  console.log(`[WebPush] PRIVATE KEY: ${vapidKeys.privateKey}`);
+  console.log('[WebPush] Save these in your backend .env to keep them persistent!');
+}
+
+webpush.setVapidDetails(
+  'mailto:sameer9032@gmail.com',
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -217,39 +241,24 @@ async function getGeminiReflection(shloka, language = 'english') {
 
 // 0a. Send OTP
 app.post('/api/auth/send-otp', async (req, res) => {
-  let { identifier, method } = req.body; // identifier = email or phone, method = 'email' | 'whatsapp'
-  if (!identifier) {
-    return res.status(400).json({ error: 'Email or phone number is required.' });
-  }
-
-  // Normalize the identifier if it is a phone number
-  if (!identifier.includes('@')) {
-    identifier = normalizePhoneNumber(identifier);
+  let { identifier } = req.body; // identifier = email
+  if (!identifier || !identifier.includes('@')) {
+    return res.status(400).json({ error: 'Valid email address is required.' });
   }
 
   const otp = generateOTP(identifier);
 
-  if (method === 'whatsapp') {
-    // Send via Twilio WhatsApp
-    const messageBody = `🪔 Your GitaDaily verification code is: *${otp}*\n\nThis code expires in 5 minutes.`;
-    const result = await sendWhatsAppMessage(identifier, messageBody);
-    if (!result.success && !result.simulated) {
-      return res.status(500).json({ error: 'Failed to send WhatsApp OTP.' });
-    }
-    return res.json({ message: 'OTP sent via WhatsApp', simulated: result.simulated || false });
-  } else {
-    // Send via Email
-    const result = await sendEmailOTP(identifier, otp);
-    if (!result.success && !result.simulated) {
-      return res.status(500).json({ error: 'Failed to send email OTP.' });
-    }
-    // In dev mode (no email configured), return the OTP directly for testing
-    if (result.simulated) {
-      console.log(`[DEV] OTP for ${identifier}: ${otp}`);
-      return res.json({ message: 'OTP simulated (no email config). Check server logs.', devOtp: otp });
-    }
-    return res.json({ message: 'OTP sent via Email' });
+  // Send via Email
+  const result = await sendEmailOTP(identifier, otp);
+  if (!result.success && !result.simulated) {
+    return res.status(500).json({ error: 'Failed to send email OTP.' });
   }
+  // In dev mode (no email configured), return the OTP directly for testing
+  if (result.simulated) {
+    console.log(`[DEV] OTP for ${identifier}: ${otp}`);
+    return res.json({ message: 'OTP simulated (no email config). Check server logs.', devOtp: otp });
+  }
+  return res.json({ message: 'OTP sent via Email' });
 });
 
 // 0b. Verify OTP
@@ -257,11 +266,6 @@ app.post('/api/auth/verify-otp', (req, res) => {
   let { identifier, otp } = req.body;
   if (!identifier || !otp) {
     return res.status(400).json({ error: 'Identifier and OTP are required.' });
-  }
-
-  // Normalize the identifier if it is a phone number
-  if (!identifier.includes('@')) {
-    identifier = normalizePhoneNumber(identifier);
   }
 
   const result = verifyOTP(identifier, otp);
@@ -272,9 +276,7 @@ app.post('/api/auth/verify-otp', (req, res) => {
   // Check if the user already exists
   const users = readData(USERS_PATH);
   const existing = users.find(u =>
-    typeof u === 'object' && u !== null &&
-    (u.email === identifier || u.phone === identifier ||
-     normalizePhoneNumber(u.phone) === identifier)
+    typeof u === 'object' && u !== null && u.email === identifier
   );
 
   if (existing) {
@@ -571,19 +573,20 @@ ${messageBody}
   }
 }
 
-// 9. Send Test WhatsApp
-app.post('/api/test-whatsapp', async (req, res) => {
-  const { phone, chapter, verse } = req.body;
-  if (!phone) {
-    return res.status(400).json({ error: 'Phone number is required.' });
+// 9. Send Test Delivery across active channels
+app.post('/api/test-delivery', async (req, res) => {
+  const { email, chapter, verse } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required.' });
   }
 
-  // Lookup language if user exists
   const users = readData(USERS_PATH);
-  const normalizedSearchPhone = normalizePhoneNumber(phone);
-  const user = users.find(u => u.phone === phone || normalizePhoneNumber(u.phone) === normalizedSearchPhone);
-  const language = user && user.lang ? user.lang : 'english';
+  const user = users.find(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
 
+  const language = user.lang || 'english';
   let shloka = gitaData[0];
   if (chapter && verse) {
     const found = gitaData.find(s => s.chapter === parseInt(chapter) && s.verse === parseInt(verse));
@@ -592,9 +595,69 @@ app.post('/api/test-whatsapp', async (req, res) => {
 
   const reflection = await getGeminiReflection(shloka, language);
   const messageText = formatShlokaMessage(shloka, reflection, language);
-  
-  const result = await sendWhatsAppMessage(phone, messageText, HEADER_IMAGE_URL);
-  res.json({ message: 'Test triggered', result });
+  const deliveryStatus = {};
+
+  // 1. Email Delivery
+  if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
+    const emailResult = await sendDailyShlokaEmail(user.email, shloka, reflection, language);
+    deliveryStatus.email = emailResult;
+  }
+
+  // 2. Telegram Delivery
+  if ((user.pref === 'telegram' || user.pref === 'both' || user.pref === 'all') && user.telegramChatId) {
+    const tgResult = await sendTelegramShloka(user.telegramChatId, messageText, HEADER_IMAGE_URL);
+    deliveryStatus.telegram = tgResult;
+  }
+
+  // 3. Web Push Delivery
+  if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
+    try {
+      const payload = JSON.stringify({
+        title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
+        body: reflection.translatedTranslation || shloka.translation,
+        image: HEADER_IMAGE_URL,
+        url: `/chapter/${shloka.chapter}/verse/${shloka.verse}`
+      });
+      await webpush.sendNotification(user.pushSubscription, payload);
+      deliveryStatus.push = { success: true };
+    } catch (err) {
+      console.error('[WebPush] Error sending test notification:', err);
+      deliveryStatus.push = { success: false, error: err.message };
+    }
+  }
+
+  res.json({ message: 'Test delivery triggered', status: deliveryStatus });
+});
+
+// 10. Web Push Subscription endpoint
+app.post('/api/push/subscribe', (req, res) => {
+  const { email, subscription } = req.body;
+  if (!email || !subscription) {
+    return res.status(400).json({ error: 'Email and subscription are required.' });
+  }
+
+  const users = readData(USERS_PATH);
+  const index = users.findIndex(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
+
+  if (index >= 0) {
+    users[index].pushSubscription = subscription;
+    writeData(USERS_PATH, users);
+    res.json({ message: 'Push subscription saved successfully.' });
+  } else {
+    res.status(404).json({ error: 'User not found.' });
+  }
+});
+
+// 11. Web Push Public Key endpoint
+app.get('/api/push/public-key', (req, res) => {
+  res.json({ publicKey: vapidKeys.publicKey });
+});
+
+// 12. App configuration endpoint
+app.get('/api/config', (req, res) => {
+  res.json({
+    telegramBotUsername: process.env.TELEGRAM_BOT_USERNAME || 'GitaDailyBot'
+  });
 });
 
 // Broadcast task
@@ -608,17 +671,48 @@ async function broadcastDailyShloka() {
   const index = dayOfYear % gitaData.length;
 
   const shloka = gitaData[index];
-
   const users = readData(USERS_PATH);
   let sentCount = 0;
 
   for (const user of users) {
-    if (typeof user === 'object' && user.phone && (user.pref === 'whatsapp' || user.pref === 'both')) {
+    if (typeof user === 'object' && user.email) {
       const language = user.lang || 'english';
       const reflection = await getGeminiReflection(shloka, language);
       const messageText = formatShlokaMessage(shloka, reflection, language);
-      await sendWhatsAppMessage(user.phone, messageText, HEADER_IMAGE_URL);
-      sentCount++;
+      
+      let sentToThisUser = false;
+
+      // 1. Email Channel
+      if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
+        await sendDailyShlokaEmail(user.email, shloka, reflection, language);
+        sentToThisUser = true;
+      }
+
+      // 2. Telegram Channel
+      if ((user.pref === 'telegram' || user.pref === 'both' || user.pref === 'all') && user.telegramChatId) {
+        await sendTelegramShloka(user.telegramChatId, messageText, HEADER_IMAGE_URL);
+        sentToThisUser = true;
+      }
+
+      // 3. Web Push Channel
+      if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
+        try {
+          const payload = JSON.stringify({
+            title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
+            body: reflection.translatedTranslation || shloka.translation,
+            image: HEADER_IMAGE_URL,
+            url: `/chapter/${shloka.chapter}/verse/${shloka.verse}`
+          });
+          await webpush.sendNotification(user.pushSubscription, payload);
+          sentToThisUser = true;
+        } catch (err) {
+          console.error(`[WebPush] Failed for ${user.email}:`, err.message);
+        }
+      }
+
+      if (sentToThisUser) {
+        sentCount++;
+      }
     }
   }
   console.log(`[Cron] Broadcast finished. Sent to ${sentCount} user(s).`);
@@ -630,7 +724,40 @@ cron.schedule('0 6 * * *', async () => {
   await broadcastDailyShloka();
 });
 
-// Start Server
+// Polling callback to subscribe a user via Telegram start deep link
+const handleTelegramSubscribe = async (email, chatId, triggerTest = false) => {
+  const users = readData(USERS_PATH);
+  
+  if (triggerTest) {
+    // If chatId triggered 'shloka' test command manually
+    const user = users.find(u => u.telegramChatId === chatId);
+    if (user) {
+      const shloka = gitaData[0];
+      const language = user.lang || 'english';
+      const reflection = await getGeminiReflection(shloka, language);
+      const messageText = formatShlokaMessage(shloka, reflection, language);
+      await sendTelegramShloka(chatId, messageText, HEADER_IMAGE_URL);
+    }
+    return true;
+  }
+
+  const index = users.findIndex(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
+  if (index >= 0) {
+    users[index].telegramChatId = chatId;
+    // Upgrade preferences to telegram or both
+    if (users[index].pref === 'email') {
+      users[index].pref = 'both';
+    } else if (users[index].pref !== 'both' && users[index].pref !== 'all') {
+      users[index].pref = 'telegram';
+    }
+    writeData(USERS_PATH, users);
+    return true;
+  }
+  return false;
+};
+
+// Start Server & start Telegram bot polling
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  startTelegramPolling(handleTelegramSubscribe);
 });
