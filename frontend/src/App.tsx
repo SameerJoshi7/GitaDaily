@@ -666,6 +666,11 @@ function App() {
             </form>
           )}
         </div>
+
+        {/* Made with Love Footer on Login page */}
+        <div style={{ marginTop: '2rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          Made with ❤️ by <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none', fontWeight: 500 }}>Sameer Joshi</a>
+        </div>
       </div>
     );
   }
