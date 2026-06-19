@@ -469,9 +469,9 @@ if (twilioSid && twilioAuthToken) {
 }
 
 const ARTWORKS = [
-  'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg',
-  'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/8/82/Gita_talk.jpg',
-  'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/d/df/Vishvarupa.jpg'
+  'https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/chariot.jpg',
+  'https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/discourse.jpg',
+  'https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/vishwaroopa.jpg'
 ];
 
 function getArtworkForShloka(shloka) {

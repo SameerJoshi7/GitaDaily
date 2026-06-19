@@ -688,7 +688,7 @@ function App() {
 
           <div className="sidebar-artwork" style={{ borderRadius: '8px', overflow: 'hidden', width: '100%', height: '110px', border: '1px solid rgba(255,255,255,0.05)', marginTop: '-0.75rem', marginBottom: '-0.5rem' }}>
             <img 
-              src="https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/e/e5/Krishna_and_Arjuna_on_the_chariot%2C_Mahabharata%2C_Kurukshetra_War.jpg" 
+              src="/images/chariot.jpg" 
               alt="Gita Sidebar Art" 
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
             />
