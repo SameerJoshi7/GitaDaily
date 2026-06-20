@@ -67,12 +67,12 @@ export const sendEmailOTP = async (toEmail, otp) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'GitaDaily <onboarding@resend.dev>',
+          from: 'Krishna Bodha <onboarding@resend.dev>',
           to: toEmail,
-          subject: 'Your GitaDaily Verification Code',
+          subject: 'Your Krishna Bodha Verification Code',
           html: `
             <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-              <h2>🪔 GitaDaily</h2>
+              <h2>🪔 Krishna Bodha</h2>
               <p>Your verification code is:</p>
               <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
               <p>This code will expire in 5 minutes.</p>
@@ -101,13 +101,13 @@ export const sendEmailOTP = async (toEmail, otp) => {
 
   try {
     const mailOptions = {
-      from: `"GitaDaily" <${process.env.EMAIL_USER}>`,
+      from: `"Krishna Bodha" <${process.env.EMAIL_USER}>`,
       to: toEmail,
-      subject: 'Your GitaDaily Verification Code',
-      text: `Your GitaDaily verification code is: ${otp}\n\nThis code will expire in 5 minutes.`,
+      subject: 'Your Krishna Bodha Verification Code',
+      text: `Your Krishna Bodha verification code is: ${otp}\n\nThis code will expire in 5 minutes.`,
       html: `
         <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-          <h2>🪔 GitaDaily</h2>
+          <h2>🪔 Krishna Bodha</h2>
           <p>Your verification code is:</p>
           <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
           <p>This code will expire in 5 minutes.</p>
@@ -132,11 +132,11 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   ];
   const activeArtwork = artworks[(shloka.chapter + shloka.verse) % artworks.length];
 
-  const subject = `🪔 GitaDaily Ch ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})`;
+  const subject = `🪔 Krishna Bodha Ch ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})`;
   const htmlContent = `
     <div style="max-width: 600px; margin: 0 auto; font-family: 'Outfit', 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #0a0b10; color: #e4e6eb; padding: 25px; border-radius: 12px; border: 1px solid #1f2937;">
       <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: #fbbf24; font-size: 24px; margin: 0; font-weight: 700; letter-spacing: 1px;">🪔 GitaDaily 🪔</h1>
+        <h1 style="color: #fbbf24; font-size: 24px; margin: 0; font-weight: 700; letter-spacing: 1px;">🪔 Krishna Bodha 🪔</h1>
         <p style="color: #9ca3af; font-size: 13px; margin: 5px 0 0 0;">Your Daily Dose of AI-Powered Reflection & Wisdom</p>
       </div>
       
@@ -176,7 +176,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
       </div>
 
       <div style="text-align: center; margin-top: 30px; font-size: 11px; color: #6b7280; border-top: 1px solid #1f2937; padding-top: 15px;">
-        <p style="margin: 0;">You received this because you subscribed to daily Gita reflections from GitaDaily.</p>
+        <p style="margin: 0;">You received this because you subscribed to daily reflections from Krishna Bodha.</p>
         <p style="margin: 5px 0 0 0;">Made with ❤️ by <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none; font-weight: 500;">Sameer Joshi</a> (<a href="https://github.com/SameerJoshi7" target="_blank" style="color: #fbbf24; text-decoration: none;">GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none;">LinkedIn</a>)</p>
         <p style="margin: 5px 0 0 0;">Have a blessed day! 🌸</p>
       </div>
@@ -236,7 +236,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'GitaDaily <onboarding@resend.dev>',
+          from: 'Krishna Bodha <onboarding@resend.dev>',
           to: toEmail,
           subject: subject,
           html: htmlContent
@@ -263,10 +263,10 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
 
   try {
     const mailOptions = {
-      from: `"GitaDaily" <${process.env.EMAIL_USER}>`,
+      from: `"Krishna Bodha" <${process.env.EMAIL_USER}>`,
       to: toEmail,
       subject: subject,
-      text: `GitaDaily Chapter ${shloka.chapter}, Verse ${shloka.verse}\n\nSanskrit:\n${shloka.sanskrit}\n\nTranslation:\n${reflection.translatedTranslation || shloka.translation}\n\nAI Reflection:\n${reflection.modernReflection}\n\nMindfulness Tip:\n${reflection.mindfulnessTip}`,
+      text: `Krishna Bodha Chapter ${shloka.chapter}, Verse ${shloka.verse}\n\nSanskrit:\n${shloka.sanskrit}\n\nTranslation:\n${reflection.translatedTranslation || shloka.translation}\n\nAI Reflection:\n${reflection.modernReflection}\n\nMindfulness Tip:\n${reflection.mindfulnessTip}`,
       html: htmlContent
     };
 

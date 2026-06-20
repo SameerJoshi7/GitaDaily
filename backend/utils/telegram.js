@@ -107,9 +107,9 @@ export const startTelegramPolling = (onSubscribe) => {
                     console.log(`[Telegram] Subscribing user ${email} with Chat ID ${chatId}`);
                     const success = await onSubscribe(email, chatId);
                     if (success) {
-                      await sendTelegramText(chatId, `🪔 *Welcome to GitaDaily!* 🪔\n\nYou have successfully subscribed to receive daily Gita wisdom and AI reflections directly in this chat at 6:00 AM every morning.\n\nType *shloka* at any time to receive a test shloka!`);
+                      await sendTelegramText(chatId, `🪔 *Welcome to Krishna Bodha!* 🪔\n\nYou have successfully subscribed to receive daily wisdom and AI reflections directly in this chat at 6:00 AM every morning.\n\nType *shloka* at any time to receive a test shloka!`);
                     } else {
-                      await sendTelegramText(chatId, `❌ *Subscription failed.*\n\nWe couldn't find a GitaDaily account for email: *${email}*. Please make sure you sign up on the website first!`);
+                      await sendTelegramText(chatId, `❌ *Subscription failed.*\n\nWe couldn't find a Krishna Bodha account for email: *${email}*. Please make sure you sign up on the website first!`);
                     }
                   }
                 } catch (e) {
@@ -117,7 +117,7 @@ export const startTelegramPolling = (onSubscribe) => {
                   await sendTelegramText(chatId, `❌ *Oops!* Something went wrong processing your subscription link. Please try again from the website.`);
                 }
               } else {
-                await sendTelegramText(chatId, `🪔 *Welcome to GitaDaily!* 🪔\n\nTo link this Telegram chat with your website account, please click the *"Connect Telegram Bot"* link on your website settings page.`);
+                await sendTelegramText(chatId, `🪔 *Welcome to Krishna Bodha!* 🪔\n\nTo link this Telegram chat with your website account, please click the *"Connect Telegram Bot"* link on your website settings page.`);
               }
             } else if (text.toLowerCase() === 'shloka') {
               // Trigger a manual test shloka

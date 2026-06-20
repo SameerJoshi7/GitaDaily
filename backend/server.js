@@ -562,7 +562,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
   const lang = (language || 'english').toLowerCase();
   
   // Custom headers based on language selection
-  let title = '🪔 *GitaDaily: Daily Wisdom & AI Reflection* 🪔';
+  let title = '🪔 *Krishna Bodha: Daily Wisdom & AI Reflection* 🪔';
   let chLabel = 'Chapter';
   let vLabel = 'Verse';
   let sansLabel = 'Sanskrit';
@@ -574,7 +574,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
   let footer = 'Have a blessed and focused day! 🌸';
 
   if (lang === 'hindi') {
-    title = '🪔 *गीताडेली: दैनिक ज्ञान और एआई चिंतन* 🪔';
+    title = '🪔 *कृष्णबोधः: दैनिक ज्ञान और एआई चिंतन* 🪔';
     chLabel = 'अध्याय';
     vLabel = 'श्लोक';
     transLabel = 'अनुवाद';
@@ -582,7 +582,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
     mindLabel = 'आज का अभ्यास';
     footer = 'आपका दिन शुभ और मंगलमय हो! 🌸';
   } else if (lang === 'telugu') {
-    title = '🪔 *గీతాడైలీ: దినసరి జ్ఞానం మరియు ఎఐ విశ్లేషణ* 🪔';
+    title = '🪔 *కృష్ణబోధః: దినసరి జ్ఞానం మరియు ఎఐ విశ్లేషణ* 🪔';
     chLabel = 'అధ్యాయం';
     vLabel = 'శ్లోకం';
     transLabel = 'అనువాదం';
@@ -590,7 +590,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
     mindLabel = 'నేటి సాధన';
     footer = 'ఈ రోజు మీకు ప్రశాంతంగా మరియు విజయవంతంగా సాగాలని కోరుకుంటున్నాము! 🌸';
   } else if (lang === 'kannada') {
-    title = '🪔 *ಗೀತಾದೈನಿಕ: ದಿನನಿತ್ಯದ ಜ್ಞಾನ ಮತ್ತು ಎಐ ವಿಶ್ಲೇಷಣೆ* 🪔';
+    title = '🪔 *ಕೃಷ್ಣಬೋಧಃ: ದಿನನಿತ್ಯದ ಜ್ಞಾನ ಮತ್ತು ಎಐ ವಿಶ್ಲೇಷಣೆ* 🪔';
     chLabel = 'ಅಧ್ಯಾಯ';
     vLabel = 'ಶ್ಲೋಕ';
     transLabel = 'ಅನುವಾದ';
