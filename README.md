@@ -30,6 +30,18 @@ Spiritual growth and mental fortitude do not happen by chance; they are forged t
 
 ---
 
+## 🎵 Immersive Experience: Meditative Flute & Deep Routing
+
+Krishna Bodha is designed to be an immersive, peaceful sanctuary:
+
+* **Divine Bansuri Player**: Features a floating glassmorphic player capsule at the bottom-right corner of the screen playing whisper-soft classical bansuri (flute) melodies at a gentle 2% volume. Users can easily toggle playback, mute, and switch between multiple tracks:
+  * *Playful Krishna* (Carnatic flute by Dr. N. Ramani) — celebrating Lord Krishna's playful Vrindavan pastimes.
+  * *Vrindavan Meditations* (Hinstustani classical bansuri by Pt. Hariprasad Chaurasia) — a live recital captured at the Ramakrishna Mission.
+* **Bypassing Autoplay Blockers**: Automatically starts playing upon the user's first click, keypress, or touch on the screen, adhering to modern browser security policies while feeling seamless. State preferences are persisted locally.
+* **Deep-Link Shloka Routing**: URL hashes update dynamically as you browse (e.g. `#/browse/chapter/2/verse/8`). Deep-linking or reloading the page directly opens the selected verse in the Browse Chapters tab, allowing easy sharing of specific shlokas.
+
+---
+
 ## 🛠️ System Architecture & Data Flow
 
 Krishna Bodha operates on a secure, serverless-ready multi-channel architecture:
