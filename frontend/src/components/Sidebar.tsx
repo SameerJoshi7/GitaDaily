@@ -58,6 +58,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <ul className="nav-links">
+        <li className="nav-item" style={{ marginBottom: '0.4rem' }}>
+          <button
+            onClick={() => { window.location.hash = '#/guidance'; }}
+            className={`nav-button ${activeTab === 'guidance' ? 'active' : ''}`}
+            style={activeTab === 'guidance' ? {} : {
+              border: '1px dashed rgba(212, 175, 55, 0.4)',
+              background: 'rgba(212, 175, 55, 0.03)',
+              boxShadow: '0 0 10px rgba(212, 175, 55, 0.05)'
+            }}
+          >
+            <Sparkles size={18} style={{ color: 'var(--gold-primary)', filter: 'drop-shadow(0 0 4px var(--gold-glow))' }} />
+            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{T.nav.seekGuidance}</span>
+            <span style={{
+              fontSize: '0.6rem',
+              background: 'linear-gradient(135deg, #fbbf24, #d97706)',
+              color: '#000',
+              padding: '1px 6px',
+              borderRadius: '10px',
+              marginLeft: 'auto',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>{T.nav.newBadge}</span>
+          </button>
+        </li>
         <li className="nav-item">
           <button
             onClick={() => {
@@ -98,31 +123,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Bookmark size={18} />
             <span>{T.nav.myBookmarks}</span>
-          </button>
-        </li>
-        <li className="nav-item" style={{ marginTop: '0.4rem' }}>
-          <button
-            onClick={() => { window.location.hash = '#/guidance'; }}
-            className={`nav-button ${activeTab === 'guidance' ? 'active' : ''}`}
-            style={activeTab === 'guidance' ? {} : {
-              border: '1px dashed rgba(212, 175, 55, 0.4)',
-              background: 'rgba(212, 175, 55, 0.03)',
-              boxShadow: '0 0 10px rgba(212, 175, 55, 0.05)'
-            }}
-          >
-            <Sparkles size={18} style={{ color: 'var(--gold-primary)', filter: 'drop-shadow(0 0 4px var(--gold-glow))' }} />
-            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{T.nav.seekGuidance}</span>
-            <span style={{
-              fontSize: '0.6rem',
-              background: 'linear-gradient(135deg, #fbbf24, #d97706)',
-              color: '#000',
-              padding: '1px 6px',
-              borderRadius: '10px',
-              marginLeft: 'auto',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>{T.nav.newBadge}</span>
           </button>
         </li>
         <li className="nav-item">

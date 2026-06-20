@@ -19,7 +19,7 @@ function App() {
   const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
   const [pref, setPref] = useState<string>(() => localStorage.getItem('gitadaily_pref') || 'email');
   const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
-  const [activeTab, setActiveTab] = useState<Tab>('daily');
+  const [activeTab, setActiveTab] = useState<Tab>('guidance');
   
   // Seek Guidance States
   const [guidanceQuery, setGuidanceQuery] = useState('');
@@ -472,7 +472,7 @@ function App() {
         setActiveTab('about');
       } else {
         // Default route
-        window.location.hash = '#/dailyinsights';
+        window.location.hash = '#/guidance';
       }
     };
 
