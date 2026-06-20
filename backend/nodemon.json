@@ -1,0 +1,8 @@
+{
+  "ignore": [
+    "data/*.json",
+    "gita_data.json",
+    "gita_test.json",
+    "*.log"
+  ]
+}
