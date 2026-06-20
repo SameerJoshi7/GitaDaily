@@ -718,7 +718,7 @@ app.post('/api/guidance', async (req, res) => {
         "translatedTranslation": "Direct translation of the selected shloka into the language: ${lang}",
         "translatedTransliteration": "Phonetic transliteration of the selected shloka written in the script of the chosen language: ${lang}",
         "theme": "A brief theme or title for this verse (e.g. 'Karma Yoga', 'Dhyana Yoga')",
-        "modernCounsel": "A detailed, comforting analysis (3-4 sentences) linking the shloka directly to their specific query, written in the language: ${lang}.",
+        "modernCounsel": "A detailed, comforting analysis (3-4 sentences) explaining exactly how the selected shloka relates to their specific query and how applying its wisdom solves their problem. You must explicitly bridge the connection between the shloka's meaning and the user's situation so they understand why this shloka was suggested.",
         "wellbeingInsight": "Practical mental-health and stress advice (2 sentences) addressing their situation, written in the language: ${lang}.",
         "actionStep": "One actionable, practical step they can take today inspired by the shloka to start solving this challenge, written in the language: ${lang}."
       }
@@ -770,9 +770,21 @@ app.post('/api/guidance', async (req, res) => {
         // Topic matches
         if (shloka.topics && Array.isArray(shloka.topics)) {
           for (const topic of shloka.topics) {
+            // De-prioritize Chapter 8 Verse 5 for general focus queries
+            if (shloka.chapter === 8 && shloka.verse === 5 && topic === 'focus') {
+              continue;
+            }
             if (queryLower.includes(topic.toLowerCase())) {
               score += 10;
             }
+          }
+        }
+        
+        // Give Ch 6 Verse 5 a massive boost for focus/mind queries
+        if (shloka.chapter === 6 && shloka.verse === 5) {
+          const mindKeywords = ['focus', 'concentration', 'attention', 'distracted', 'study', 'concentrate', 'mind', 'stress', 'anxious', 'anxiety', 'depression'];
+          if (mindKeywords.some(kw => queryLower.includes(kw))) {
+            score += 50;
           }
         }
         
