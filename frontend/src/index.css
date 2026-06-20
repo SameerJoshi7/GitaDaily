@@ -121,6 +121,27 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+.brand-name-sanskrit {
+  font-family: 'Yatra One', 'Rozha One', var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, var(--gold-secondary) 0%, var(--gold-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.15));
+}
+
+.brand-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
 .nav-links {
   display: flex;
   flex-direction: row;

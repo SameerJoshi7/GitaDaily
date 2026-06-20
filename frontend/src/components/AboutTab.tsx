@@ -8,7 +8,7 @@ export const AboutTab: React.FC<AboutTabProps> = ({ onSeekGuidanceClick }) => {
   return (
     <div>
       <div className="dashboard-header">
-        <h2 className="dashboard-title">About Gita Daily</h2>
+        <h2 className="dashboard-title">About Krishna Bodha</h2>
         <span className="dashboard-subtitle">Ancient wisdom contextualized for the modern world.</span>
       </div>
 
@@ -59,7 +59,7 @@ export const AboutTab: React.FC<AboutTabProps> = ({ onSeekGuidanceClick }) => {
           
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', margin: 0 }}>
             In a fast-paced world filled with continuous digital notifications and workplace pressures, 
-            maintaining mental clarity and emotional focus is harder than ever. <strong>Gita Daily</strong> was built to be 
+            maintaining mental clarity and emotional focus is harder than ever. <strong>Krishna Bodha</strong> was built to be 
             your spiritual anchor, helping you establish a strict, daily habit of morning reflection (<em>Sadhana</em>) 
             grounded in the eternal guidelines of the Bhagavad Gita.
           </p>
@@ -147,7 +147,7 @@ export const AboutTab: React.FC<AboutTabProps> = ({ onSeekGuidanceClick }) => {
       }}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--text-primary)', marginTop: 0, marginBottom: '0.5rem' }}>Tech Stack & Systems</h3>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.4' }}>
-          Gita Daily leverages modern web technologies to ensure zero-friction, robust delivery and instant AI computation.
+          Krishna Bodha leverages modern web technologies to ensure zero-friction, robust delivery and instant AI computation.
         </p>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>

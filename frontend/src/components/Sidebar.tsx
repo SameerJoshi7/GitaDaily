@@ -30,9 +30,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="sidebar">
       {/* Top Header Row for mobile / Standard brand alignment for desktop */}
       <div className="sidebar-header-row">
-        <a href="#/dailyinsights" onClick={(e) => { e.preventDefault(); window.location.hash = '#/dailyinsights'; }} className="brand">
+        <a href="#/dailyinsights" onClick={(e) => { e.preventDefault(); window.location.hash = '#/dailyinsights'; }} className="brand" style={{ gap: '0.6rem' }}>
           <span className="brand-icon">🪔</span>
-          <span className="brand-name">GitaDaily</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.0 }}>
+            <span className="brand-name-sanskrit">कृष्णबोधः</span>
+            <span className="brand-subtitle">Krishna Bodha</span>
+          </div>
         </a>
 
         {/* Mobile Preferences Trigger */}
