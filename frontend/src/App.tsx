@@ -9,6 +9,7 @@ import { BrowseTab } from './components/BrowseTab';
 import type { Chapter } from './components/BrowseTab';
 import { BookmarksTab } from './components/BookmarksTab';
 import { t } from './i18n';
+import { Bell, Send, Sparkles, LogOut } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
 
@@ -34,9 +35,9 @@ function App() {
   const [guidanceError, setGuidanceError] = useState<string | null>(null);
   
   // Edit Prefs States
-  const [isEditingPrefs, setIsEditingPrefs] = useState(false);
   const [editPref, setEditPref] = useState(pref);
   const [editLang, setEditLang] = useState(lang);
+  const [isPrefsModalOpen, setIsPrefsModalOpen] = useState(false);
   // In-app toast notification
   const [toast, setToast] = useState<string | null>(null);
   const showToast = (msg: string) => {
@@ -123,7 +124,6 @@ function App() {
     setLang('english');
     setDailyShloka(null);
     setBookmarks([]);
-    setIsEditingPrefs(false);
   };
 
   const handleSavePrefs = async (e: React.FormEvent) => {
@@ -141,7 +141,6 @@ function App() {
         localStorage.setItem('gitadaily_lang', data.lang || 'english');
         setPref(data.pref || 'email');
         setLang(data.lang || 'english');
-        setIsEditingPrefs(false);
         // Refresh daily shloka in new language
         fetchDailyShloka();
         // Show translated success toast (uses the NEW lang the user just selected)
@@ -527,159 +526,393 @@ function App() {
         </div>
       )}
       {/* Sidebar Navigation */}
+      {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
         email={email}
         lang={lang}
-        pref={pref}
-        isEditingPrefs={isEditingPrefs}
-        setIsEditingPrefs={setIsEditingPrefs}
-        editLang={editLang}
-        setEditLang={setEditLang}
-        editPref={editPref}
-        setEditPref={setEditPref}
-        loading={loading}
-        isPushSubscribed={isPushSubscribed}
-        telegramBotUsername={telegramBotUsername}
-        onSavePrefs={handleSavePrefs}
-        onEnableNotifications={handleEnableNotifications}
-        onSendTestDelivery={handleSendTestDelivery}
-        onLogout={handleLogout}
         onRefreshDaily={fetchDailyShloka}
-        onChangeLang={handleGuestLangChange}
-        onGuestSubscribe={handleGuestSubscribe}
+        onOpenPrefs={() => setIsPrefsModalOpen(true)}
       />
 
       {/* Main Panel */}
-      <main className="main-content">
-        {activeTab === 'daily' && (
-          <div>
-            <div className="dashboard-header">
-              <h2 className="dashboard-title">{T.daily.pageTitle}</h2>
-              <span className="dashboard-subtitle">{T.daily.pageSubtitle}</span>
-            </div>
-
-            {/* Seek Guidance Promo Banner */}
-            <div
-              onClick={() => { window.location.hash = '#/guidance'; }}
-              style={{
-                cursor: 'pointer',
-                background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.08) 0%, rgba(79, 70, 229, 0.03) 100%)',
-                border: '1px solid rgba(212, 175, 55, 0.2)',
-                borderRadius: '12px',
-                padding: '1rem 1.25rem',
-                marginBottom: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '1rem',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ fontSize: '1.5rem' }}>🪔</div>
-                <div>
-                  <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gold-secondary)', fontWeight: 600 }}>{T.daily.challengeBannerTitle}</h4>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{T.daily.challengeBannerDesc}</p>
-                </div>
+      <main className="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 100px)', justifyContent: 'space-between' }}>
+        <div style={{ flexGrow: 1 }}>
+          {activeTab === 'daily' && (
+            <div>
+              <div className="dashboard-header">
+                <h2 className="dashboard-title">{T.daily.pageTitle}</h2>
+                <span className="dashboard-subtitle">{T.daily.pageSubtitle}</span>
               </div>
-              <button
-                className="primary-btn"
+
+              {/* Seek Guidance Promo Banner */}
+              <div
+                onClick={() => { window.location.hash = '#/guidance'; }}
                 style={{
-                  padding: '0.3rem 0.75rem',
-                  fontSize: '0.75rem',
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#000',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.08) 0%, rgba(79, 70, 229, 0.03) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.2)',
+                  borderRadius: '12px',
+                  padding: '1rem 1.25rem',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '1rem',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
                 }}
               >
-                {T.daily.seekSolutions}
-              </button>
-            </div>
-
-            {loading ? (
-              <div className="loading-container">
-                <div className="spinner" />
-                <span style={{ color: 'var(--gold-primary)', fontWeight: 500, letterSpacing: 1 }}>{T.daily.loadingReflection}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ fontSize: '1.5rem' }}>🪔</div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gold-secondary)', fontWeight: 600 }}>{T.daily.challengeBannerTitle}</h4>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{T.daily.challengeBannerDesc}</p>
+                  </div>
+                </div>
+                <button
+                  className="primary-btn"
+                  style={{
+                    padding: '0.3rem 0.75rem',
+                    fontSize: '0.75rem',
+                    background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {T.daily.seekSolutions}
+                </button>
               </div>
-            ) : dailyShloka ? (
-              <ShlokaCard
-                shloka={dailyShloka}
-                isBookmarked={bookmarks.some(b => b.chapter === dailyShloka.chapter && b.verse === dailyShloka.verse)}
-                onToggleBookmark={() => handleToggleBookmark(dailyShloka)}
-                lang={lang}
-              />
+
+              {loading ? (
+                <div className="loading-container">
+                  <div className="spinner" />
+                  <span style={{ color: 'var(--gold-primary)', fontWeight: 500, letterSpacing: 1 }}>{T.daily.loadingReflection}</span>
+                </div>
+              ) : dailyShloka ? (
+                <ShlokaCard
+                  shloka={dailyShloka}
+                  isBookmarked={bookmarks.some(b => b.chapter === dailyShloka.chapter && b.verse === dailyShloka.verse)}
+                  onToggleBookmark={() => handleToggleBookmark(dailyShloka)}
+                  lang={lang}
+                />
+              ) : (
+                <div className="empty-state">
+                  <p>{T.daily.noShloka}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'browse' && (
+            <BrowseTab
+              chapters={chapters}
+              lang={lang}
+              bookmarks={bookmarks}
+              onToggleBookmark={handleToggleBookmark}
+              email={email}
+              apiBase={API_BASE}
+            />
+          )}
+
+          {activeTab === 'search' && (
+            <SearchTab
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              searchResults={searchResults}
+              activeTopic={activeTopic}
+              topics={topics}
+              onTopicClick={handleTopicClick}
+              onSearchSubmit={handleSearch}
+              onVerseSelect={(chapter, verse) => {
+                window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
+              }}
+              lang={lang}
+            />
+          )}
+
+          {activeTab === 'bookmarks' && (
+            <BookmarksTab
+              bookmarks={bookmarks}
+              onToggleBookmark={handleToggleBookmark}
+              onBookmarkSelect={(chapter, verse) => {
+                window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
+              }}
+              lang={lang}
+            />
+          )}
+
+          {activeTab === 'guidance' && (
+            <GuidanceTab
+              guidanceQuery={guidanceQuery}
+              setGuidanceQuery={setGuidanceQuery}
+              guidanceLoading={guidanceLoading}
+              guidanceResult={guidanceResult}
+              guidanceError={guidanceError}
+              onSubmit={handleSeekGuidance}
+              bookmarks={bookmarks}
+              onToggleBookmark={handleToggleBookmark}
+              lang={lang}
+            />
+          )}
+          
+          {activeTab === 'about' && (
+            <AboutTab
+              onSeekGuidanceClick={() => {
+                window.location.hash = '#/guidance';
+              }}
+            />
+          )}
+        </div>
+
+        {/* Global Footer with Made with Love & Collapsible Developer Details */}
+        <footer style={{
+          marginTop: '4rem',
+          paddingTop: '2rem',
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1rem',
+          fontSize: '0.8rem',
+          color: 'var(--text-secondary)'
+        }}>
+          <details style={{ width: '100%', maxWidth: '400px' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--gold-primary)', textAlign: 'center', listStyle: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+              ℹ️ {T.sidebar.developerDetails}
+            </summary>
+            <div style={{ marginTop: '0.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', lineHeight: '1.5', border: '1px solid rgba(255,255,255,0.03)', textAlign: 'left' }}>
+              <strong>{T.sidebar.developer}:</strong> Sameer Joshi<br />
+              <strong>{T.sidebar.stack}:</strong> React, Node.js, Express, Gemini Flash (gemini-flash-latest), Web Push, EmailJS API<br />
+              <strong>{T.sidebar.links}:</strong> <a href="https://github.com/SameerJoshi7" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>LinkedIn</a>
+            </div>
+          </details>
+
+          <div>
+            {T.sidebar.madeWith} <a href="https://github.com/SameerJoshi7" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none', fontWeight: 500 }}>Sameer Joshi</a>
+          </div>
+        </footer>
+      </main>
+
+      {/* Preferences / Subscription Modal */}
+      {isPrefsModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsPrefsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setIsPrefsModalOpen(false)}>×</button>
+            
+            {!email ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+                <h3 style={{ color: 'var(--gold-primary)', margin: 0, fontFamily: 'var(--font-display)', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  {T.sidebar.guestWelcome}
+                </h3>
+                
+                {/* Guest Language Dropdown */}
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label">{T.sidebar.appLanguageLabel}</label>
+                  <select
+                    className="input-field"
+                    value={lang}
+                    onChange={(e) => {
+                      handleGuestLangChange(e.target.value);
+                    }}
+                  >
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi (हिन्दी)</option>
+                    <option value="telugu">Telugu (తెలుగు)</option>
+                    <option value="kannada">Kannada (ಕನ್ನಡ)</option>
+                  </select>
+                </div>
+
+                <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '0.5rem 0' }} />
+
+                {/* Guest Subscribe Form */}
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const target = e.target as any;
+                  const emailVal = target.elements.guestEmail.value;
+                  const prefVal = target.elements.guestPref.value;
+                  handleGuestSubscribe(emailVal, prefVal);
+                  setIsPrefsModalOpen(false);
+                }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <h4 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '0.95rem' }}>
+                    {T.sidebar.guestSubscribeTitle}
+                  </h4>
+                  <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.8rem', lineHeight: 1.4 }}>
+                    {T.sidebar.guestSubscribeDesc}
+                  </p>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <input
+                      name="guestEmail"
+                      type="email"
+                      className="input-field"
+                      placeholder="email@example.com"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <select name="guestPref" className="input-field">
+                      <option value="email">{T.sidebar.emailOnly}</option>
+                      <option value="telegram">{T.sidebar.telegramOnly}</option>
+                      <option value="push">{T.sidebar.webPushOnly}</option>
+                      <option value="both">{T.sidebar.bothEmailTelegram}</option>
+                      <option value="all">{T.sidebar.allChannels}</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="primary-btn"
+                    style={{ background: 'linear-gradient(135deg, #fbbf24, #d97706)', color: '#000', padding: '0.6rem', justifyContent: 'center' }}
+                    disabled={loading}
+                  >
+                    {T.sidebar.subscribeButton}
+                  </button>
+                </form>
+              </div>
             ) : (
-              <div className="empty-state">
-                <p>{T.daily.noShloka}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+                <h3 style={{ color: 'var(--gold-primary)', margin: 0, fontFamily: 'var(--font-display)', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  {T.sidebar.editPreferences}
+                </h3>
+                
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  {T.sidebar.subscribedAs} <strong style={{ color: 'var(--text-primary)' }}>{email}</strong>
+                </div>
+
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleSavePrefs(e);
+                  setIsPrefsModalOpen(false);
+                }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">{T.sidebar.language}</label>
+                    <select
+                      className="input-field"
+                      value={editLang}
+                      onChange={(e) => setEditLang(e.target.value)}
+                    >
+                      <option value="english">English</option>
+                      <option value="hindi">Hindi (हिन्दी)</option>
+                      <option value="telugu">Telugu (తెలుగు)</option>
+                      <option value="kannada">Kannada (ಕನ್ನಡ)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">{T.sidebar.notifications}</label>
+                    <select
+                      className="input-field"
+                      value={editPref}
+                      onChange={(e) => setEditPref(e.target.value)}
+                    >
+                      <option value="email">{T.sidebar.emailOnly}</option>
+                      <option value="telegram">{T.sidebar.telegramOnly}</option>
+                      <option value="push">{T.sidebar.webPushOnly}</option>
+                      <option value="both">{T.sidebar.bothEmailTelegram}</option>
+                      <option value="all">{T.sidebar.allChannels}</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="primary-btn"
+                    style={{ padding: '0.6rem', justifyContent: 'center' }}
+                    disabled={loading}
+                  >
+                    {T.sidebar.save}
+                  </button>
+                </form>
+
+                <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '0.25rem 0' }} />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {/* Telegram Connection */}
+                  {(pref === 'telegram' || pref === 'both' || pref === 'all') && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                      <button
+                        disabled
+                        className="primary-btn"
+                        style={{
+                          padding: '0.5rem',
+                          justifyContent: 'center',
+                          background: 'linear-gradient(135deg, #555, #777)',
+                          color: '#bbb',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          cursor: 'not-allowed',
+                          opacity: 0.7,
+                          border: 'none'
+                        }}
+                      >
+                        <Send size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />
+                        <span>{T.sidebar.connectTelegram}</span>
+                      </button>
+                      <div style={{
+                        fontSize: '0.7rem',
+                        color: '#ef4444',
+                        textAlign: 'center',
+                        padding: '0.4rem',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        lineHeight: '1.2'
+                      }}>
+                        {T.sidebar.telegramUnavailable(telegramBotUsername)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Web Push Subscription Action */}
+                  {(pref === 'push' || pref === 'all') && (
+                    isPushSubscribed ? (
+                      <div style={{ fontSize: '0.75rem', color: '#10B981', textAlign: 'center', padding: '0.4rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                        {T.sidebar.browserPushEnabled}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleEnableNotifications}
+                        className="primary-btn"
+                        style={{ padding: '0.5rem', justifyContent: 'center', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                        disabled={loading}
+                      >
+                        <Bell size={12} />
+                        <span>{T.sidebar.enableBrowserPush}</span>
+                      </button>
+                    )
+                  )}
+
+                  <button
+                    onClick={handleSendTestDelivery}
+                    className="primary-btn"
+                    style={{ padding: '0.5rem', justifyContent: 'center', background: 'linear-gradient(135deg, #fbbf24, #d97706)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                    disabled={loading}
+                  >
+                    <Sparkles size={12} />
+                    <span>{T.sidebar.testSendInsight}</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsPrefsModalOpen(false);
+                    }}
+                    className="secondary-btn"
+                    style={{ padding: '0.5rem', justifyContent: 'center', borderColor: 'rgba(239, 68, 68, 0.2)', color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                  >
+                    <LogOut size={12} />
+                    <span>{T.sidebar.signOut}</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
-        )}
-
-        {activeTab === 'browse' && (
-          <BrowseTab
-            chapters={chapters}
-            lang={lang}
-            bookmarks={bookmarks}
-            onToggleBookmark={handleToggleBookmark}
-            email={email}
-            apiBase={API_BASE}
-          />
-        )}
-
-        {activeTab === 'search' && (
-          <SearchTab
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            searchResults={searchResults}
-            activeTopic={activeTopic}
-            topics={topics}
-            onTopicClick={handleTopicClick}
-            onSearchSubmit={handleSearch}
-            onVerseSelect={(chapter, verse) => {
-              window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
-            }}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'bookmarks' && (
-          <BookmarksTab
-            bookmarks={bookmarks}
-            onToggleBookmark={handleToggleBookmark}
-            onBookmarkSelect={(chapter, verse) => {
-              window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
-            }}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'guidance' && (
-          <GuidanceTab
-            guidanceQuery={guidanceQuery}
-            setGuidanceQuery={setGuidanceQuery}
-            guidanceLoading={guidanceLoading}
-            guidanceResult={guidanceResult}
-            guidanceError={guidanceError}
-            onSubmit={handleSeekGuidance}
-            bookmarks={bookmarks}
-            onToggleBookmark={handleToggleBookmark}
-            lang={lang}
-          />
-        )}
-        
-        {activeTab === 'about' && (
-          <AboutTab
-            onSeekGuidanceClick={() => {
-              window.location.hash = '#/guidance';
-            }}
-          />
-        )}
-      </main>
+        </div>
+      )}
     </div>
   );
 }
