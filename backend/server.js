@@ -697,35 +697,27 @@ app.post('/api/guidance', async (req, res) => {
   }
 
   try {
-    // Format a lightweight list of shlokas for the prompt
-    const shlokaList = gitaData.map(s => ({
-      chapter: s.chapter,
-      verse: s.verse,
-      translation: s.translation,
-      theme: s.theme,
-      topics: s.topics
-    }));
-
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const prompt = `
       You are an enlightened guide analyzing the Bhagavad Gita for modern-day challenges.
       The user is facing the following life challenge, feeling, or query:
       "${query}"
       
-      Below is a list of Bhagavad Gita shlokas with their theme and translation:
-      ${JSON.stringify(shlokaList, null, 2)}
-      
       Your tasks:
       1. Analyze the user's challenge.
-      2. Choose the SINGLE most relevant and comforting shloka from the list above that directly addresses or resolves their problem.
+      2. Choose the SINGLE most relevant and comforting shloka from the ENTIRE Bhagavad Gita (all 18 chapters and 700 verses) that directly addresses or resolves their problem.
       3. Generate a highly personalized counsel in the following language: ${lang}. Address the user's specific query directly, applying the wisdom of the selected shloka.
       
       Respond STRICTLY in JSON format with the following schema:
       {
-        "selectedChapter": [chapter number of the shloka you selected],
+        "selectedChapter": [chapter number of the shloka you selected, 1-18],
         "selectedVerse": [verse number of the shloka you selected],
+        "sanskrit": "The original Sanskrit text of the selected shloka in Devanagari script",
+        "transliteration": "The standard English/Roman transliteration (IAST style) of the Sanskrit shloka",
+        "translation": "The direct English translation of the selected shloka",
         "translatedTranslation": "Direct translation of the selected shloka into the language: ${lang}",
         "translatedTransliteration": "Phonetic transliteration of the selected shloka written in the script of the chosen language: ${lang}",
+        "theme": "A brief theme or title for this verse (e.g. 'Karma Yoga', 'Dhyana Yoga')",
         "modernCounsel": "A detailed, comforting analysis (3-4 sentences) linking the shloka directly to their specific query, written in the language: ${lang}.",
         "wellbeingInsight": "Practical mental-health and stress advice (2 sentences) addressing their situation, written in the language: ${lang}.",
         "actionStep": "One actionable, practical step they can take today inspired by the shloka to start solving this challenge, written in the language: ${lang}."
@@ -743,19 +735,19 @@ app.post('/api/guidance', async (req, res) => {
     const responseText = result.response.text();
     const parsed = JSON.parse(responseText);
 
-    // Retrieve the full original shloka to get Sanskrit, etc.
-    const originalShloka = gitaData.find(s => s.chapter === parsed.selectedChapter && s.verse === parsed.selectedVerse) || gitaData[0];
+    // Retrieve the full original shloka to get Sanskrit, etc. if it exists locally
+    const originalShloka = gitaData.find(s => s.chapter === parsed.selectedChapter && s.verse === parsed.selectedVerse);
 
     res.json({
       success: true,
       query,
       shloka: {
-        chapter: originalShloka.chapter,
-        verse: originalShloka.verse,
-        sanskrit: originalShloka.sanskrit,
-        transliteration: parsed.translatedTransliteration || originalShloka.transliteration,
-        translation: parsed.translatedTranslation || originalShloka.translation,
-        theme: originalShloka.theme,
+        chapter: parsed.selectedChapter,
+        verse: parsed.selectedVerse,
+        sanskrit: originalShloka ? originalShloka.sanskrit : parsed.sanskrit,
+        transliteration: parsed.translatedTransliteration || (originalShloka ? originalShloka.transliteration : parsed.transliteration),
+        translation: parsed.translatedTranslation || (originalShloka ? originalShloka.translation : parsed.translation),
+        theme: originalShloka ? originalShloka.theme : parsed.theme,
       },
       counsel: {
         modernCounsel: parsed.modernCounsel,
