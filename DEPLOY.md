@@ -1,6 +1,6 @@
-# GitaDaily Deployment Guide
+# Krishna Bodha Deployment Guide
 
-This document explains how to deploy the full-stack **GitaDaily** application to production hosting platforms for free.
+This document explains how to deploy the full-stack **Krishna Bodha** application to production hosting platforms for free.
 
 ---
 
@@ -22,7 +22,7 @@ You can deploy the backend to platforms like **Render**, **Railway**, or **Zeabu
    * `TWILIO_ACCOUNT_SID`: `your_twilio_sid`
    * `TWILIO_AUTH_TOKEN`: `your_twilio_auth_token`
    * `TWILIO_WHATSAPP_NUMBER`: `whatsapp:+14155238886`
-6. Click **Create Web Service**. Render will provision a free URL (e.g. `https://gitadaily-backend.onrender.com`).
+6. Click **Create Web Service**. Render will provision a free URL (e.g. `https://krishnabodha-backend.onrender.com`).
 
 ---
 
@@ -33,7 +33,7 @@ You can deploy the frontend to **Vercel** or **Netlify** for free.
 1. In your frontend directory `GitaDaily/frontend`, update [App.tsx](file:///C:/Users/samee/.gemini/antigravity-ide/scratch/GitaDaily/frontend/src/App.tsx):
    Change `const API_BASE = 'http://localhost:5005/api';` to point to your live Render backend URL:
    ```typescript
-   const API_BASE = 'https://gitadaily-backend.onrender.com/api';
+   const API_BASE = 'https://krishnabodha-backend.onrender.com/api';
    ```
 2. Install the Vercel CLI or link your repository directly on [Vercel.com](https://vercel.com).
 3. Connect your repository and configure the project details:
@@ -41,7 +41,7 @@ You can deploy the frontend to **Vercel** or **Netlify** for free.
    * **Root Directory**: `GitaDaily/frontend`
    * **Build Command**: `npm run build`
    * **Output Directory**: `dist`
-4. Click **Deploy**. Vercel will output a fast, SSL-secured production URL (e.g., `https://gitadaily.vercel.app`).
+4. Click **Deploy**. Vercel will output a fast, SSL-secured production URL (e.g., `https://krishnabodha.vercel.app`).
 
 ---
 

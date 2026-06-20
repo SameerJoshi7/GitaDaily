@@ -16,6 +16,8 @@ interface BrowseTabProps {
   onToggleBookmark: (shloka: Shloka) => void;
   email: string;
   apiBase: string;
+  browseChapterNumber?: number | null;
+  browseVerseNumber?: number | null;
 }
 
 export const BrowseTab: React.FC<BrowseTabProps> = ({
@@ -24,7 +26,9 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
   bookmarks = [],
   onToggleBookmark,
   email,
-  apiBase
+  apiBase,
+  browseChapterNumber,
+  browseVerseNumber
 }) => {
   const T = t(lang);
 
@@ -43,6 +47,28 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
   const [shloka, setShloka] = useState<Shloka | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync state with url-based routing props
+  useEffect(() => {
+    if (browseChapterNumber !== null && browseChapterNumber !== undefined) {
+      if (chapters.length > 0) {
+        const found = chapters.find((ch) => ch.chapterNumber === browseChapterNumber);
+        if (found) {
+          setSelectedChapter(found);
+          if (browseVerseNumber !== null && browseVerseNumber !== undefined) {
+            setCurrentVerse(browseVerseNumber);
+          } else {
+            setCurrentVerse(1);
+          }
+        }
+      }
+    } else {
+      setSelectedChapter(null);
+      setCurrentVerse(1);
+      setShloka(null);
+      setError(null);
+    }
+  }, [browseChapterNumber, browseVerseNumber, chapters]);
 
   // Fetch specific verse details from the API
   useEffect(() => {
@@ -76,32 +102,31 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
 
   // Handle chapter selection
   const handleChapterClick = (chapter: Chapter) => {
-    setSelectedChapter(chapter);
-    setCurrentVerse(1);
+    window.location.hash = `#/browse/chapter/${chapter.chapterNumber}/verse/1`;
   };
 
   // Navigation handlers
   const handleNext = () => {
     if (!selectedChapter) return;
     if (currentVerse < selectedChapter.verses.length) {
-      setCurrentVerse((prev) => prev + 1);
+      window.location.hash = `#/browse/chapter/${selectedChapter.chapterNumber}/verse/${currentVerse + 1}`;
     }
   };
 
   const handlePrev = () => {
+    if (!selectedChapter) return;
     if (currentVerse > 1) {
-      setCurrentVerse((prev) => prev - 1);
+      window.location.hash = `#/browse/chapter/${selectedChapter.chapterNumber}/verse/${currentVerse - 1}`;
     }
   };
 
   const handleVerseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrentVerse(parseInt(e.target.value));
+    if (!selectedChapter) return;
+    window.location.hash = `#/browse/chapter/${selectedChapter.chapterNumber}/verse/${e.target.value}`;
   };
 
   const handleBackToChapters = () => {
-    setSelectedChapter(null);
-    setShloka(null);
-    setError(null);
+    window.location.hash = '#/browsechapters';
   };
 
   const isBookmarked = shloka

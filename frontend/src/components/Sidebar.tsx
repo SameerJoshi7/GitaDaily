@@ -32,7 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="sidebar-header-row">
         <a href="#/dailyinsights" onClick={(e) => { e.preventDefault(); window.location.hash = '#/dailyinsights'; }} className="brand" style={{ gap: '0.6rem' }}>
           <span className="brand-icon">🪔</span>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.3 }}>
             <span className="brand-name-sanskrit">कृष्णबोधः</span>
             <span className="brand-subtitle">Krishna Bodha</span>
           </div>
@@ -134,7 +134,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className={`nav-button ${activeTab === 'about' ? 'active' : ''}`}
           >
             <Info size={18} />
-            <span>{T.nav.aboutGitaDaily}</span>
+            <span>{T.nav.aboutKrishnaBodha}</span>
           </button>
         </li>
       </ul>

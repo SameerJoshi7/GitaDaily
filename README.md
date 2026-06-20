@@ -1,10 +1,10 @@
-# 🪔 GitaDaily — Daily Bhagavad Gita Wisdom & Seek Divine Guidance
+# 🪔 Krishna Bodha — Daily Bhagavad Gita Wisdom & Seek Divine Guidance
 
 > *"Perform your duty equipoised, O Arjuna, abandoning all attachment to success or failure. Such equanimity is called Yoga."* — **Bhagavad Gita (2.48)**
 
 ![Vishwaroopa Artwork](https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/vishwaroopa.jpg)
 
-**GitaDaily** is a modern, high-polish spiritual companion application designed to cultivate daily discipline, mental clarity, and focus. In a fast-paced world filled with distractions, GitaDaily serves as your morning anchor, delivering a daily sacred verse from the Bhagavad Gita alongside advanced AI reflections directly to your inbox and web browser at exactly **6:00 AM local time**.
+**Krishna Bodha** is a modern, high-polish spiritual companion application designed to cultivate daily discipline, mental clarity, and focus. In a fast-paced world filled with distractions, Krishna Bodha serves as your morning anchor, delivering a daily sacred verse from the Bhagavad Gita alongside advanced AI reflections directly to your inbox and web browser at exactly **6:00 AM local time**.
 
 Our flagship **Seek Divine Guidance** module allows users to type any life challenge, doubt, or emotional state and receive direct, personalized AI counsel matching their query to the perfect shloka from the Gita—proving that the Bhagavad Gita has solutions to every problem, big or small.
 
@@ -23,7 +23,7 @@ The Gita has solutions to every human challenge. The **Seek Guidance** module br
 
 ## 🌅 The Power of Daily Discipline (Sadhana)
 
-Spiritual growth and mental fortitude do not happen by chance; they are forged through consistent, daily discipline (*Sadhana*). GitaDaily is designed with a strict disciplinary structure:
+Spiritual growth and mental fortitude do not happen by chance; they are forged through consistent, daily discipline (*Sadhana*). Krishna Bodha is designed with a strict disciplinary structure:
 * **The 6:00 AM Commitment**: Every morning, before your workday begins, you are greeted with a sacred shloka. This forces a moment of silence, reflection, and setting high intentions before the chaos of the day takes over.
 * **No Delays, No Dev Modes**: Authentication is secured through real email OTP delivery. Access is earned through presence, ensuring your spiritual dashboard is a focused sanctuary.
 * **Modern Integration**: The teachings are not kept abstract. Our AI model contextualizes the shlokas specifically for modern-day work pressures, emotional health, and focused action, turning ancient wisdom into a daily system of rules for life.
@@ -32,7 +32,7 @@ Spiritual growth and mental fortitude do not happen by chance; they are forged t
 
 ## 🛠️ System Architecture & Data Flow
 
-GitaDaily operates on a secure, serverless-ready multi-channel architecture:
+Krishna Bodha operates on a secure, serverless-ready multi-channel architecture:
 
 ```mermaid
 graph TD

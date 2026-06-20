@@ -16,7 +16,7 @@ export interface Translations {
     searchTopics: string;
     myBookmarks: string;
     seekGuidance: string;
-    aboutGitaDaily: string;
+    aboutKrishnaBodha: string;
     newBadge: string;
   };
 
@@ -161,7 +161,7 @@ const en: Translations = {
     searchTopics: 'Search Topics',
     myBookmarks: 'My Bookmarks',
     seekGuidance: 'Seek Guidance',
-    aboutGitaDaily: 'About Krishna Bodha',
+    aboutKrishnaBodha: 'About Krishna Bodha',
     newBadge: 'New',
   },
   auth: {
@@ -297,7 +297,7 @@ const hi: Translations = {
     searchTopics: 'विषय खोजें',
     myBookmarks: 'मेरे बुकमार्क',
     seekGuidance: 'मार्गदर्शन लें',
-    aboutGitaDaily: 'कृष्ण बोध के बारे में',
+    aboutKrishnaBodha: 'कृष्ण बोध के बारे में',
     newBadge: 'नया',
   },
   auth: {
@@ -430,7 +430,7 @@ const te: Translations = {
     searchTopics: 'విషయాలు వెతకండి',
     myBookmarks: 'నా బుక్‌మార్క్‌లు',
     seekGuidance: 'మార్గదర్శనం కోరండి',
-    aboutGitaDaily: 'కృష్ణ బోధ గురించి',
+    aboutKrishnaBodha: 'కృష్ణ బోధ గురించి',
     newBadge: 'కొత్తది',
   },
   auth: {
@@ -563,7 +563,7 @@ const kn: Translations = {
     searchTopics: 'ವಿಷಯಗಳನ್ನು ಹುಡುಕಿ',
     myBookmarks: 'ನನ್ನ ಬುಕ್‌ಮಾರ್ಕ್‌ಗಳು',
     seekGuidance: 'ಮಾರ್ಗದರ್ಶನ ಪಡೆಯಿರಿ',
-    aboutGitaDaily: 'ಕೃಷ್ಣ ಬೋಧ ಬಗ್ಗೆ',
+    aboutKrishnaBodha: 'ಕೃಷ್ಣ ಬೋಧ ಬಗ್ಗೆ',
     newBadge: 'ಹೊಸದು',
   },
   auth: {
