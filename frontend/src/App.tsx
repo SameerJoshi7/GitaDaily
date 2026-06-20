@@ -401,7 +401,7 @@ function App() {
     if (!email) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/shloka/daily?email=${encodeURIComponent(email)}`);
+      const res = await fetch(`${API_BASE}/shloka/daily?email=${encodeURIComponent(email)}&lang=${lang}`);
       if (res.ok) {
         const data = await res.json();
         setDailyShloka(data);
@@ -415,7 +415,7 @@ function App() {
 
   const fetchChapters = async () => {
     try {
-      const res = await fetch(`${API_BASE}/chapters`);
+      const res = await fetch(`${API_BASE}/chapters?email=${encodeURIComponent(email)}&lang=${lang}`);
       if (res.ok) {
         const data = await res.json();
         setChapters(data);
@@ -442,7 +442,7 @@ function App() {
     if (!email) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/shloka/${chapter}/${verse}?email=${encodeURIComponent(email)}`);
+      const res = await fetch(`${API_BASE}/shloka/${chapter}/${verse}?email=${encodeURIComponent(email)}&lang=${lang}`);
       if (res.ok) {
         const data = await res.json();
 

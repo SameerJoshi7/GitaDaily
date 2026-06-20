@@ -312,10 +312,25 @@ app.post('/api/register', (req, res) => {
 });
 
 // Helper to look up user language
-function getUserLanguage(email) {
+function getUserLanguage(email, req) {
+  if (req && req.query && req.query.lang) {
+    return req.query.lang.toLowerCase();
+  }
+  if (req && req.body && req.body.lang) {
+    return req.body.lang.toLowerCase();
+  }
   if (!email) return 'english';
+  const emailLower = email.toLowerCase();
   const users = readData(USERS_PATH);
-  const user = users.find(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
+  const user = users.find(u => {
+    if (typeof u === 'object' && u !== null && u.email) {
+      return u.email.toLowerCase() === emailLower;
+    }
+    if (typeof u === 'string') {
+      return u.toLowerCase() === emailLower;
+    }
+    return false;
+  });
   return user && user.lang ? user.lang : 'english';
 }
 
@@ -326,7 +341,7 @@ app.get('/api/shloka/daily', async (req, res) => {
   }
 
   const { email } = req.query;
-  const language = getUserLanguage(email);
+  const language = getUserLanguage(email, req);
 
   // Calculate day-based index
   const startOfYear = new Date(new Date().getFullYear(), 0, 0);
@@ -349,7 +364,7 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
   const chapter = parseInt(req.params.chapter);
   const verse = parseInt(req.params.verse);
   const { email } = req.query;
-  const language = getUserLanguage(email);
+  const language = getUserLanguage(email, req);
 
   let shloka = gitaData.find(s => s.chapter === chapter && s.verse === verse);
   
@@ -427,7 +442,7 @@ const GITA_CHAPTERS_INFO = [
 // 4. Get Chapters List
 app.get('/api/chapters', (req, res) => {
   const { email } = req.query;
-  const lang = getUserLanguage(email).toLowerCase();
+  const lang = getUserLanguage(email, req).toLowerCase();
   
   const chapters = GITA_CHAPTERS_INFO.map(ch => {
     let themeText = ch.theme;

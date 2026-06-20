@@ -56,7 +56,7 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
       setError(null);
       try {
         const res = await fetch(
-          `${apiBase}/shloka/${selectedChapter.chapterNumber}/${currentVerse}?email=${encodeURIComponent(email)}`
+          `${apiBase}/shloka/${selectedChapter.chapterNumber}/${currentVerse}?email=${encodeURIComponent(email)}&lang=${lang}`
         );
         if (!res.ok) {
           throw new Error('Failed to retrieve shloka details. Please try again.');
