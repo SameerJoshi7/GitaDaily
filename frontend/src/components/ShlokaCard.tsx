@@ -1,5 +1,6 @@
 import React from 'react';
 import { Bookmark, Sparkles, Brain, Heart, Briefcase } from 'lucide-react';
+import { t } from '../i18n';
 
 export interface Reflection {
   modernReflection: string;
@@ -23,13 +24,16 @@ interface ShlokaCardProps {
   shloka: Shloka;
   isBookmarked: boolean;
   onToggleBookmark: () => void;
+  lang?: string;
 }
 
 export const ShlokaCard: React.FC<ShlokaCardProps> = ({
   shloka,
   isBookmarked,
   onToggleBookmark,
+  lang = 'english',
 }) => {
+  const T = t(lang);
   const { reflection } = shloka;
 
   const artworks = [
@@ -42,7 +46,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
   return (
     <div className="shloka-card" style={{ position: 'relative', overflow: 'hidden' }}>
       {/* Subtle background image watermark */}
-      <div 
+      <div
         style={{
           position: 'absolute',
           top: 0,
@@ -57,17 +61,19 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
           zIndex: 0,
           borderRadius: '20px',
           filter: 'blur(1px)'
-        }} 
+        }}
       />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div className="shloka-card-header">
-          <span className="shloka-meta" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>Chapter {shloka.chapter}, Verse {shloka.verse}</span>
-          <button 
-            onClick={onToggleBookmark} 
+          <span className="shloka-meta" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+            {T.card.chapterVerse(shloka.chapter, shloka.verse)}
+          </span>
+          <button
+            onClick={onToggleBookmark}
             className={`bookmark-icon-btn ${isBookmarked ? 'active' : ''}`}
-            title={isBookmarked ? 'Remove Bookmark' : 'Bookmark Shloka'}
-            aria-label={isBookmarked ? 'Remove Bookmark' : 'Bookmark Shloka'}
+            title={isBookmarked ? T.card.removeBookmark : T.card.addBookmark}
+            aria-label={isBookmarked ? T.card.removeBookmark : T.card.addBookmark}
           >
             <Bookmark size={22} fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
@@ -77,7 +83,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
         <div className="shloka-transliteration" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>{shloka.transliteration}</div>
 
         <div className="shloka-translation-box" style={{ background: 'rgba(25, 28, 43, 0.45)', backdropFilter: 'blur(4px)' }}>
-          <div className="shloka-translation-label">English Translation</div>
+          <div className="shloka-translation-label">{T.card.translationLabel}</div>
           <p className="shloka-translation" style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{shloka.translation}</p>
         </div>
 
@@ -85,14 +91,16 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
           <div className="ai-section">
             <div className="ai-header">
               <Sparkles size={20} style={{ color: 'var(--gold-primary)' }} />
-              <h3 className="ai-header-title" style={{ color: 'var(--gold-primary)', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>AI Deep Understanding</h3>
+              <h3 className="ai-header-title" style={{ color: 'var(--gold-primary)', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                {T.card.aiDeepUnderstanding}
+              </h3>
             </div>
 
             <div className="reflection-grid">
               <div className="reflection-card" style={{ background: 'rgba(18, 20, 31, 0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="reflection-title" style={{ color: 'var(--gold-secondary)' }}>
                   <Brain size={16} />
-                  <span>Modern Relevance</span>
+                  <span>{T.card.modernRelevance}</span>
                 </div>
                 <p className="reflection-text" style={{ color: '#e5e7eb' }}>{reflection.modernReflection}</p>
               </div>
@@ -100,7 +108,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
               <div className="reflection-card" style={{ background: 'rgba(18, 20, 31, 0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="reflection-title" style={{ color: 'var(--gold-secondary)' }}>
                   <Heart size={16} />
-                  <span>Emotional Well-being</span>
+                  <span>{T.card.emotionalWellbeing}</span>
                 </div>
                 <p className="reflection-text" style={{ color: '#e5e7eb' }}>{reflection.emotionalWellbeing}</p>
               </div>
@@ -108,7 +116,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
               <div className="reflection-card" style={{ background: 'rgba(18, 20, 31, 0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="reflection-title" style={{ color: 'var(--gold-secondary)' }}>
                   <Briefcase size={16} />
-                  <span>Career & Focus</span>
+                  <span>{T.card.careerFocus}</span>
                 </div>
                 <p className="reflection-text" style={{ color: '#e5e7eb' }}>{reflection.careerApplication}</p>
               </div>
@@ -117,7 +125,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
             <div className="mindfulness-banner" style={{ background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.1), rgba(79, 70, 229, 0.05))', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
               <span className="mindfulness-banner-icon">🧘</span>
               <div className="mindfulness-content">
-                <span className="mindfulness-title" style={{ color: 'var(--gold-secondary)' }}>Mindful Practice for Today</span>
+                <span className="mindfulness-title" style={{ color: 'var(--gold-secondary)' }}>{T.card.mindfulPractice}</span>
                 <span className="mindfulness-desc" style={{ color: '#ffffff', fontStyle: 'italic' }}>"{reflection.mindfulnessTip}"</span>
               </div>
             </div>

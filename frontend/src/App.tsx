@@ -9,6 +9,7 @@ import { SearchTab } from './components/SearchTab';
 import { BrowseTab } from './components/BrowseTab';
 import type { Chapter } from './components/BrowseTab';
 import { BookmarksTab } from './components/BookmarksTab';
+import { t } from './i18n';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
 
@@ -51,6 +52,12 @@ function App() {
   const [isEditingPrefs, setIsEditingPrefs] = useState(false);
   const [editPref, setEditPref] = useState(pref);
   const [editLang, setEditLang] = useState(lang);
+  // In-app toast notification
+  const [toast, setToast] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  };
   // Web Push & Telegram configuration states
   const [telegramBotUsername, setTelegramBotUsername] = useState('GitaDailyBot');
   const [publicVapidKey, setPublicVapidKey] = useState('');
@@ -255,13 +262,14 @@ function App() {
         setIsEditingPrefs(false);
         // Refresh daily shloka in new language
         fetchDailyShloka();
-        alert('Preferences updated successfully!');
+        // Show translated success toast (uses the NEW lang the user just selected)
+        showToast(t(data.lang || 'english').sidebar.prefsUpdated);
       } else {
-        alert(data.error || 'Failed to update preferences');
+        showToast(data.error || 'Failed to update preferences');
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to connect to the server.');
+      showToast('Failed to connect to the server.');
     } finally {
       setLoading(false);
     }
@@ -541,12 +549,16 @@ function App() {
   };
 
   if (!email) {
+    // On the landing page, use the reg language selection if in register step,
+    // otherwise fall back to English (user hasn't logged in yet).
+    const authLang = authStep === 'register' ? regLang : 'english';
+    const TA = t(authLang);
     return (
       <div className="hero-section" style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', margin: 0, borderRadius: 0, border: 'none' }}>
-        <span className="hero-subtitle">Sacred Wisdom & AI Reflections</span>
+        <span className="hero-subtitle">{TA.auth.heroSubtitle}</span>
         <h1 className="hero-title" style={{ fontSize: '3rem', fontFamily: 'var(--font-display)' }}>GitaDaily</h1>
         <p className="hero-description" style={{ maxWidth: '650px', lineHeight: '1.6' }}>
-          Start your morning with ancient wisdom, or <strong>seek direct counsel for any life problem</strong>. Describe your challenge, and get instant, personalized AI reflections rooted in the eternal truths of the Bhagavad Gita.
+          {TA.auth.heroDescription}
         </p>
 
         <div className="auth-card">
@@ -561,7 +573,7 @@ function App() {
                   background: authMode === 'signin' ? 'var(--gold-primary)' : 'transparent',
                   color: authMode === 'signin' ? '#0a0b10' : 'var(--text-secondary)',
                 }}
-              >Sign In</button>
+              >{TA.auth.signIn}</button>
               <button
                 type="button"
                 onClick={() => { setAuthMode('signup'); setOtpError(''); }}
@@ -570,7 +582,7 @@ function App() {
                   background: authMode === 'signup' ? 'var(--gold-primary)' : 'transparent',
                   color: authMode === 'signup' ? '#0a0b10' : 'var(--text-secondary)',
                 }}
-              >Sign Up</button>
+              >{TA.auth.signUp}</button>
             </div>
           )}
 
@@ -579,13 +591,13 @@ function App() {
             <form onSubmit={handleSendOTP}>
               <div className="form-group">
                 <label className="form-label">
-                  {authMode === 'signin' ? 'Sign in with your Email' : 'Your Email Address'}
+                  {authMode === 'signin' ? TA.auth.signInEmailLabel : TA.auth.emailLabel}
                 </label>
                 <input
                   id="authIdentifier"
                   type="email"
                   className="input-field"
-                  placeholder="email@example.com"
+                  placeholder={TA.auth.emailPlaceholder}
                   value={authIdentifier}
                   onChange={(e) => setAuthIdentifier(e.target.value)}
                   required
@@ -595,7 +607,7 @@ function App() {
               {otpError && <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{otpError}</p>}
 
               <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.25rem' }}>
-                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : <><KeyRound size={16}/> Send OTP</>}
+                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : <><KeyRound size={16}/> {TA.auth.sendOtp}</>}
               </button>
             </form>
           )}
@@ -606,16 +618,16 @@ function App() {
               <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
                 <KeyRound size={32} style={{ color: 'var(--gold-primary)', marginBottom: '0.5rem' }} />
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  OTP sent to <strong style={{ color: 'var(--gold-primary)' }}>{authIdentifier}</strong> via Email.
+                  {TA.auth.otpSentTo} <strong style={{ color: 'var(--gold-primary)' }}>{authIdentifier}</strong>
                 </p>
               </div>
               <div className="form-group">
-                <label className="form-label">Enter 6-digit OTP</label>
+                <label className="form-label">{TA.auth.enterOtp}</label>
                 <input
                   id="otpInput"
                   type="text"
                   className="input-field"
-                  placeholder="_ _ _ _ _ _"
+                  placeholder={TA.auth.otpPlaceholder}
                   maxLength={6}
                   value={otpInput}
                   onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
@@ -627,10 +639,10 @@ function App() {
               {otpError && <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{otpError}</p>}
 
               <button type="submit" className="primary-btn" disabled={loading} style={{ marginBottom: '0.75rem' }}>
-                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : 'Verify OTP'}
+                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : TA.auth.verifyOtp}
               </button>
               <button type="button" className="secondary-btn" onClick={resetAuth} style={{ justifyContent: 'center' }}>
-                ← Back
+                {TA.auth.back}
               </button>
             </form>
           )}
@@ -639,12 +651,12 @@ function App() {
           {authStep === 'register' && (
             <form onSubmit={handleRegister}>
               <div style={{ marginBottom: '1rem' }}>
-                <h3 style={{ color: 'var(--gold-primary)', margin: 0 }}>Complete Your Profile</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>Identity verified! Set up your preferences.</p>
+                <h3 style={{ color: 'var(--gold-primary)', margin: 0 }}>{TA.auth.completeProfile}</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>{TA.auth.identityVerified}</p>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Email Address</label>
+                <label className="form-label">{TA.auth.emailAddress}</label>
                 <input
                   id="regEmail"
                   type="email"
@@ -657,7 +669,7 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Preferred Language</label>
+                <label className="form-label">{TA.auth.preferredLanguage}</label>
                 <select id="regLang" className="input-field" value={regLang} onChange={(e) => setRegLang(e.target.value)}>
                   <option value="english">English</option>
                   <option value="hindi">Hindi (हिन्दी)</option>
@@ -667,30 +679,30 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Notification Preference</label>
+                <label className="form-label">{TA.auth.notificationPref}</label>
                 <select id="regPref" className="input-field" value={regPref} onChange={(e) => setRegPref(e.target.value)}>
-                  <option value="email">Email Only</option>
-                  <option value="telegram">Telegram Only</option>
-                  <option value="push">Web Push Only</option>
-                  <option value="both">Both Email & Telegram</option>
-                  <option value="all">All Channels (Email, Telegram & Push)</option>
+                  <option value="email">{TA.auth.emailOnly}</option>
+                  <option value="telegram">{TA.auth.telegramOnly}</option>
+                  <option value="push">{TA.auth.webPushOnly}</option>
+                  <option value="both">{TA.auth.bothEmailTelegram}</option>
+                  <option value="all">{TA.auth.allChannels}</option>
                 </select>
               </div>
 
               {(regPref === 'telegram' || regPref === 'both' || regPref === 'all') && (
                 <p style={{ fontSize: '0.75rem', color: '#ef4444', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
-                  ⚠️ Note: Telegram Bot connection is temporarily unavailable due to service restrictions in India. Please use Email or Web Push instead.
+                  {TA.auth.telegramWarning}
                 </p>
               )}
 
               {(regPref === 'push' || regPref === 'all') && (
                 <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
-                  🔔 Note: To receive push notifications, you'll click "Enable Browser Notifications" on the settings sidebar once logged in.
+                  {TA.auth.pushNote}
                 </p>
               )}
 
               <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.75rem' }}>
-                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : 'Begin Spiritual Journey'}
+                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : TA.auth.beginJourney}
               </button>
             </form>
           )}
@@ -698,15 +710,40 @@ function App() {
 
         {/* Made with Love Footer on Login page */}
         <div style={{ marginTop: '2rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          Made with ❤️ by <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none', fontWeight: 500 }}>Sameer Joshi</a>
+          {TA.auth.madeWith} <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none', fontWeight: 500 }}>Sameer Joshi</a>
         </div>
       </div>
     );
   }
 
 
+  const T = t(lang);
   return (
     <div className="app-container">
+      {/* Global In-App Toast */}
+      {toast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '1.5rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'linear-gradient(135deg, rgba(18,20,31,0.98), rgba(30,33,52,0.98))',
+          border: '1px solid rgba(212, 175, 55, 0.35)',
+          borderRadius: '12px',
+          padding: '0.75rem 1.5rem',
+          color: 'var(--text-primary)',
+          fontSize: '0.9rem',
+          fontWeight: 500,
+          zIndex: 9999,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          animation: 'fadeIn 0.3s ease-out',
+          backdropFilter: 'blur(12px)',
+          maxWidth: '90vw',
+          textAlign: 'center',
+        }}>
+          {toast}
+        </div>
+      )}
       {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
@@ -734,12 +771,12 @@ function App() {
         {activeTab === 'daily' && (
           <div>
             <div className="dashboard-header">
-              <h2 className="dashboard-title">Today's Wisdom</h2>
-              <span className="dashboard-subtitle">A daily dose of wisdom to ground your mind and actions.</span>
+              <h2 className="dashboard-title">{T.daily.pageTitle}</h2>
+              <span className="dashboard-subtitle">{T.daily.pageSubtitle}</span>
             </div>
 
             {/* Seek Guidance Promo Banner */}
-            <div 
+            <div
               onClick={() => { window.location.hash = '#/guidance'; }}
               style={{
                 cursor: 'pointer',
@@ -759,40 +796,41 @@ function App() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <div style={{ fontSize: '1.5rem' }}>🪔</div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gold-secondary)', fontWeight: 600 }}>Facing a specific challenge today?</h4>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Type your problem or mood and let the Gita guide you with customized solutions.</p>
+                  <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gold-secondary)', fontWeight: 600 }}>{T.daily.challengeBannerTitle}</h4>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{T.daily.challengeBannerDesc}</p>
                 </div>
               </div>
-              <button 
-                className="primary-btn" 
-                style={{ 
-                  padding: '0.3rem 0.75rem', 
-                  fontSize: '0.75rem', 
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', 
-                  color: '#000', 
-                  border: 'none', 
+              <button
+                className="primary-btn"
+                style={{
+                  padding: '0.3rem 0.75rem',
+                  fontSize: '0.75rem',
+                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                  color: '#000',
+                  border: 'none',
                   borderRadius: '6px',
                   cursor: 'pointer'
                 }}
               >
-                Seek Solutions
+                {T.daily.seekSolutions}
               </button>
             </div>
 
             {loading ? (
               <div className="loading-container">
                 <div className="spinner" />
-                <span style={{ color: 'var(--gold-primary)', fontWeight: 500, letterSpacing: 1 }}>Seeking AI Reflection...</span>
+                <span style={{ color: 'var(--gold-primary)', fontWeight: 500, letterSpacing: 1 }}>{T.daily.loadingReflection}</span>
               </div>
             ) : dailyShloka ? (
-              <ShlokaCard 
-                shloka={dailyShloka} 
+              <ShlokaCard
+                shloka={dailyShloka}
                 isBookmarked={bookmarks.some(b => b.chapter === dailyShloka.chapter && b.verse === dailyShloka.verse)}
                 onToggleBookmark={() => handleToggleBookmark(dailyShloka)}
+                lang={lang}
               />
             ) : (
               <div className="empty-state">
-                <p>No Shloka active. Click Daily Insight above to fetch.</p>
+                <p>{T.daily.noShloka}</p>
               </div>
             )}
           </div>
@@ -804,6 +842,7 @@ function App() {
             onVerseSelect={(chapterNumber, verse) => {
               window.location.hash = `#/chapter/${chapterNumber}/verse/${verse}`;
             }}
+            lang={lang}
           />
         )}
 
@@ -819,6 +858,7 @@ function App() {
             onVerseSelect={(chapter, verse) => {
               window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
             }}
+            lang={lang}
           />
         )}
 
@@ -829,6 +869,7 @@ function App() {
             onBookmarkSelect={(chapter, verse) => {
               window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
             }}
+            lang={lang}
           />
         )}
 
@@ -842,6 +883,7 @@ function App() {
             onSubmit={handleSeekGuidance}
             bookmarks={bookmarks}
             onToggleBookmark={handleToggleBookmark}
+            lang={lang}
           />
         )}
         
