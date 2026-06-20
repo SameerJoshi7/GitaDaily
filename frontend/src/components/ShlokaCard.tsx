@@ -7,6 +7,8 @@ export interface Reflection {
   emotionalWellbeing: string;
   careerApplication: string;
   mindfulnessTip: string;
+  translatedTranslation?: string;
+  translatedTransliteration?: string;
 }
 
 export interface Shloka {

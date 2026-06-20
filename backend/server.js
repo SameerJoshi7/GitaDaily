@@ -351,9 +351,49 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
   const { email } = req.query;
   const language = getUserLanguage(email);
 
-  const shloka = gitaData.find(s => s.chapter === chapter && s.verse === verse);
+  let shloka = gitaData.find(s => s.chapter === chapter && s.verse === verse);
+  
   if (!shloka) {
-    return res.status(404).json({ error: 'Shloka not found.' });
+    if (!genAI) {
+      return res.status(500).json({ error: 'Gemini AI is not configured to fetch this verse.' });
+    }
+    
+    try {
+      console.log(`[Dynamic Shloka] Fetching details for Ch ${chapter}, Verse ${verse} from Gemini`);
+      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      const prompt = `
+        You are a scholar of the Bhagavad Gita.
+        Provide the precise details for Bhagavad Gita Chapter ${chapter}, Verse ${verse}.
+        
+        Respond STRICTLY in JSON format with the following schema:
+        {
+          "chapter": ${chapter},
+          "verse": ${verse},
+          "sanskrit": "The original Sanskrit text of this specific shloka in Devanagari script",
+          "transliteration": "The standard English/Roman transliteration (IAST style) of the Sanskrit shloka",
+          "translation": "The direct English translation of this shloka",
+          "theme": "A brief theme or title for this verse (e.g. 'Karma Yoga', 'Dhyana Yoga')"
+        }
+      `;
+      
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      });
+      
+      const responseText = result.response.text();
+      shloka = JSON.parse(responseText);
+    } catch (err) {
+      console.error(`[Dynamic Shloka] Error fetching verse Ch ${chapter} V ${verse}:`, err);
+      shloka = {
+        chapter,
+        verse,
+        sanskrit: "॥ श्रीभगवदुवाच ॥",
+        transliteration: "Loading...",
+        translation: "Unable to retrieve the shloka text offline. Please check your internet connection.",
+        theme: "Bhagavad Gita Wisdom"
+      };
+    }
   }
 
   const reflection = await getGeminiReflection(shloka, language);
@@ -363,22 +403,47 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
   });
 });
 
+const GITA_CHAPTERS_INFO = [
+  { chapterNumber: 1, versesCount: 47, theme: "The Dilemma of Life (Arjuna Vishada Yoga)", localThemes: { hindi: "अर्जुनविषादयोग (जीवन की दुविधा)", telugu: "అర్జునవిషాద యోగం (జీవిత సందిగ్ధత)", kannada: "ಅರ್ಜುನವಿಷಾದ ಯೋಗ (ಜೀವನದ ಸಂದಿಗ್ಧತೆ)" } },
+  { chapterNumber: 2, versesCount: 72, theme: "Transcendental Knowledge (Sankhya Yoga)", localThemes: { hindi: "सांख्ययोग (परम ज्ञान)", telugu: "సాంఖ్య యోగం (ఆత్మ జ్ఞానం)", kannada: "ಸಾಂಖ್ಯ ಯೋಗ (ಆತ್ಮ ಜ್ಞಾನ)" } },
+  { chapterNumber: 3, versesCount: 43, theme: "Path of Selfless Action (Karma Yoga)", localThemes: { hindi: "कर्मयोग (निःस्वार्थ कर्म)", telugu: "కర్మ యోగం (నిష్కామ కర్మ)", kannada: "ಕರ್ಮ ಯೋಗ (ನಿಷ್ಕಾಮ ಕರ್ಮ)" } },
+  { chapterNumber: 4, versesCount: 42, theme: "Path of Knowledge & Action (Jnana Karma Sanyasa Yoga)", localThemes: { hindi: "ज्ञानकर्मसंन्यासयोग (ज्ञान और कर्म)", telugu: "జ్ఞానకర్మసన్యాస యోగం (జ్ఞానము మరియు కర్మ)", kannada: "ಜ್ಞಾನಕರ್ಮಸನ್ಯಾಸ ಯೋಗ (ಜ್ಞಾನ ಮತ್ತು ಕರ್ಮ)" } },
+  { chapterNumber: 5, versesCount: 29, theme: "Path of Renunciation (Karma Sanyasa Yoga)", localThemes: { hindi: "कर्मसंन्यासयोग (कर्मों का संन्यास)", telugu: "కర్మసన్యాస యోగం (కర్మ సన్యాసము)", kannada: "ಕರ್ಮಸನ್ಯಾಸ ಯೋಗ (ಕರ್ಮ ಸನ್ಯಾಸ)" } },
+  { chapterNumber: 6, versesCount: 47, theme: "Path of Meditation (Dhyana Yoga)", localThemes: { hindi: "आत्मसंयमयोग (ध्यान और संयम)", telugu: "ఆత్మసంయమ యోగం (ధ్యాన యోగము)", kannada: "ಆತ್ಮಸಂಯಮ ಯೋಗ (ಧ್ಯಾನ ಯೋಗ)" } },
+  { chapterNumber: 7, versesCount: 30, theme: "Knowledge of the Ultimate (Jnana Vijnana Yoga)", localThemes: { hindi: "ज्ञानविज्ञानयोग (परम सत्य का ज्ञान)", telugu: "జ్ఞానవిజ్ఞాన యోగం (పరమాత్మ జ్ఞానము)", kannada: "ಜ್ಞಾನವಿజ్ఞಾನ ಯೋಗ (ಪರಮಾತ್ಮ ಜ್ಞಾನ)" } },
+  { chapterNumber: 8, versesCount: 28, theme: "Path of the Eternal (Akshara Brahma Yoga)", localThemes: { hindi: "अक्षरब्रह्मयोग (अविनाशी ब्रह्म)", telugu: "అక్షరబ్రహ్మ యోగం (అక్షర పరబ్రహ్మ యోగము)", kannada: "ಅಕ್ಷರಬ್ರಹ್ಮ ಯೋಗ (ಅಕ್ಷರ ಪರಬ್ರಹ್ಮ ಯೋಗ)" } },
+  { chapterNumber: 9, versesCount: 34, theme: "The King of Secrets (Raja Vidya Raja Guhya Yoga)", localThemes: { hindi: "राजविद्याराजगुह्ययोग (परम गुह्य ज्ञान)", telugu: "రాజవిద్యారాజగుహ్య యోగం (రాజవిద్య యోగము)", kannada: "ರಾಜವಿದ್ಯಾರಾಜಗುಹ್ಯ ಯೋಗ (ರಾಜವಿದ್ಯ ಯೋಗ)" } },
+  { chapterNumber: 10, versesCount: 42, theme: "Infinite Splendors (Vibhuti Yoga)", localThemes: { hindi: "विभूतियोग (दिव्य विभूतियाँ)", telugu: "విభూతి యోగం (దివ్య విభూతులు)", kannada: "ವಿಭೂತಿ ಯೋಗ (ವಿವಿದ್ ವಿಭೂತಿಗಳು)" } },
+  { chapterNumber: 11, versesCount: 55, theme: "The Vision of the Cosmic Form (Viswarupa Darshana Yoga)", localThemes: { hindi: "विश्वरूपदर्शनयोग (विश्वरूप दर्शन)", telugu: "విశ్వరూపదర్శన యోగం (విశ్వరూప దర్శనము)", kannada: "ವಿಶ್ವರೂಪದರ್ಶನ ಯೋಗ (ವಿಶ್ವರೂಪ ದರ್ಶನ)" } },
+  { chapterNumber: 12, versesCount: 20, theme: "Path of Devotion (Bhakti Yoga)", localThemes: { hindi: "भक्तियोग (भक्ति मार्ग)", telugu: "భక్తి యోగం (భక్తి మార్గము)", kannada: "ಭಕ್ತಿ ಯೋಗ (ಭಕ್ತಿ ಮಾರ್ಗ)" } },
+  { chapterNumber: 13, versesCount: 35, theme: "The Field & Knower of the Field (Kshetra Kshetrajna Vibhaga Yoga)", localThemes: { hindi: "क्षेत्रक्षेत्रज्ञविभागयोग (क्षेत्र और क्षेत्रज्ञ)", telugu: "క్షేత్రక్షేత్రజ్ఞవిభాగ యోగం (క్షేత్ర క్షేత్రజ్ఞ విభాగము)", kannada: "ಕ್ಷೇತ್ರಕ್ಷೇತ್ರಜ್ಞವಿಭಾಗ ಯೋಗ (ಕ್ಷೇತ್ರ ಕ್ಷೇತ್ರಜ್ಞ ವಿಭಾಗ)" } },
+  { chapterNumber: 14, versesCount: 27, theme: "The Three Modes of Nature (Gunatraya Vibhaga Yoga)", localThemes: { hindi: "गुणत्रयविभागयोग (प्रकृति के तीन गुण)", telugu: "గుణత్రయవిభాగ యోగం (త్రిగుణ విభాగము)", kannada: "ಗುಣತ್ರಯವಿಭಾಗ ಯೋಗ (ತ್ರಿಗುಣ ವಿಭಾಗ)" } },
+  { chapterNumber: 15, versesCount: 20, theme: "The Supreme Person (Purushottama Yoga)", localThemes: { hindi: "पुरुषोत्तमयोग (परम पुरुष)", telugu: "పురుషోత్తమ యోగం (పురుషోత్తಮ ಪ್ರಾಪ್ಟಿ)", kannada: "ಪುರುಷೋತ್ತಮ ಯೋಗ (ಪುರುಷೋತ್ತಮ ಪ್ರಾಪ್ತಿ)" } },
+  { chapterNumber: 16, versesCount: 24, theme: "Divine & Demoniac Natures (Daivasura Sampad Vibhaga Yoga)", localThemes: { hindi: "दैवासुरसम्पद्विभागयोग (दैवी और आसुरी स्वभाव)", telugu: "దైవాసురసంపద్విభాగ యోగం (దైవాసుర సంపద్విభాగము)", kannada: "ದೈವಾಸುರಸಂಪದ್ವಿಭಾಗ ಯೋಗ (ದೈವಾಸುರ ಸಂಪದ್ವಿಭಾಗ)" } },
+  { chapterNumber: 17, versesCount: 28, theme: "The Divisions of Faith (Shraddhatraya Vibhaga Yoga)", localThemes: { hindi: "श्रद्धात्रयविभागयोग (श्रद्धा के तीन प्रकार)", telugu: "శ్రద్ధాత్రయవిభాగ యోగం (శ్రద్ధాత్రయ విభాగము)", kannada: "ಶ್ರದ್ಧಾತ್ರಯವಿಭಾಗ ಯೋಗ (ಶ್ರದ್ಧಾತ್ರಯ ವಿಭಾಗ)" } },
+  { chapterNumber: 18, versesCount: 78, theme: "Final Liberation & Renunciation (Moksha Sanyasa Yoga)", localThemes: { hindi: "मोक्षसंन्यासयोग (परम मोक्ष)", telugu: "మోక్షసన్యాస యోగం (మోక్ష సన్యాసము)", kannada: "ಮೋಕ್ಷಸನ್ಯಾಸ ಯೋಗ (ಮೋಕ್ಷ ಸನ್ಯಾಸ)" } }
+];
+
 // 4. Get Chapters List
 app.get('/api/chapters', (req, res) => {
-  // Group verses by chapter
-  const chaptersMap = {};
-  gitaData.forEach(s => {
-    if (!chaptersMap[s.chapter]) {
-      chaptersMap[s.chapter] = {
-        chapterNumber: s.chapter,
-        theme: s.theme,
-        verses: []
-      };
+  const { email } = req.query;
+  const lang = getUserLanguage(email).toLowerCase();
+  
+  const chapters = GITA_CHAPTERS_INFO.map(ch => {
+    let themeText = ch.theme;
+    if (ch.localThemes && ch.localThemes[lang]) {
+      themeText = ch.localThemes[lang];
     }
-    chaptersMap[s.chapter].verses.push(s.verse);
+    
+    const verses = Array.from({ length: ch.versesCount }, (_, i) => i + 1);
+    
+    return {
+      chapterNumber: ch.chapterNumber,
+      theme: themeText,
+      verses
+    };
   });
-
-  const chapters = Object.values(chaptersMap).sort((a, b) => a.chapterNumber - b.chapterNumber);
+  
   res.json(chapters);
 });
 

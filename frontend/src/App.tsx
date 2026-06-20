@@ -839,10 +839,11 @@ function App() {
         {activeTab === 'browse' && (
           <BrowseTab
             chapters={chapters}
-            onVerseSelect={(chapterNumber, verse) => {
-              window.location.hash = `#/chapter/${chapterNumber}/verse/${verse}`;
-            }}
             lang={lang}
+            bookmarks={bookmarks}
+            onToggleBookmark={handleToggleBookmark}
+            email={email}
+            apiBase={API_BASE}
           />
         )}
 
