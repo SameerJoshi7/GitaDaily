@@ -143,6 +143,11 @@ export interface Translations {
     bothEmailTelegram: string;
     allChannels: string;
     prefsUpdated: string;
+    guestSubscribeTitle: string;
+    guestSubscribeDesc: string;
+    subscribeButton: string;
+    appLanguageLabel: string;
+    guestWelcome: string;
   };
 }
 
@@ -274,6 +279,11 @@ const en: Translations = {
     bothEmailTelegram: 'Email & Telegram',
     allChannels: 'All Channels',
     prefsUpdated: '✅ Preferences saved! App is now in your language.',
+    guestSubscribeTitle: 'Subscribe to Daily Wisdom',
+    guestSubscribeDesc: 'Receive daily morning shlokas via Email or Telegram.',
+    subscribeButton: 'Subscribe',
+    appLanguageLabel: 'App Language',
+    guestWelcome: 'Welcome, Seeker',
   },
 };
 
@@ -402,6 +412,11 @@ const hi: Translations = {
     bothEmailTelegram: 'ईमेल और टेलीग्राम',
     allChannels: 'सभी चैनल',
     prefsUpdated: '✅ प्राथमिकताएं सहेजी गईं! ऐप अब आपकी भाषा में है।',
+    guestSubscribeTitle: 'दैनिक ज्ञान की सदस्यता लें',
+    guestSubscribeDesc: 'ईमेल या टेलीग्राम के माध्यम से दैनिक सुबह के श्लोक प्राप्त करें।',
+    subscribeButton: 'सदस्यता लें',
+    appLanguageLabel: 'ऐप की भाषा',
+    guestWelcome: 'आपका स्वागत है, साधक',
   },
 };
 
@@ -530,6 +545,11 @@ const te: Translations = {
     bothEmailTelegram: 'ఇమెయిల్ మరియు టెలిగ్రామ్',
     allChannels: 'అన్ని ఛానెల్‌లు',
     prefsUpdated: '✅ ప్రాధాన్యతలు సేవ్ చేయబడ్డాయి! యాప్ ఇప్పుడు మీ భాషలో ఉంది.',
+    guestSubscribeTitle: 'దినసరి జ్ఞానానికి చందా పొందండి',
+    guestSubscribeDesc: 'ఇమెయిల్ లేదా టెలిగ్రామ్ ద్వారా ప్రతిరోజూ ఉదయం శ్లోకాలను పొందండి.',
+    subscribeButton: 'చందా పొందండి',
+    appLanguageLabel: 'యాప్ భాష',
+    guestWelcome: 'స్వాగతం, సాధకుడు',
   },
 };
 
@@ -658,6 +678,11 @@ const kn: Translations = {
     bothEmailTelegram: 'ಇಮೇಲ್ ಮತ್ತು ಟೆಲಿಗ್ರಾಮ್',
     allChannels: 'ಎಲ್ಲಾ ಚಾನೆಲ್‌ಗಳು',
     prefsUpdated: '✅ ಆದ್ಯತೆಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ! ಅಪ್ಲಿಕೇಶನ್ ಈಗ ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿದೆ.',
+    guestSubscribeTitle: 'ದೈನಂದಿನ ಜ್ಞಾನಕ್ಕೆ ಚಂದಾದಾರರಾಗಿ',
+    guestSubscribeDesc: 'ಇಮೇಲ್ ಅಥವಾ ಟೆಲಿಗ್ರಾಮ್ ಮೂಲಕ ಪ್ರತಿದಿನ ಬೆಳಿಗ್ಗೆ ಶ್ಲೋಕಗಳನ್ನು ಪಡೆಯಿರಿ.',
+    subscribeButton: 'ಚಂದಾದಾರರಾಗಿ',
+    appLanguageLabel: 'ಅಪ್ಲಿಕೇಶನ್ ಭಾಷೆ',
+    guestWelcome: 'ಸ್ವಾಗತ, ಸಾಧಕ',
   },
 };
 

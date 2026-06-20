@@ -32,6 +32,8 @@ interface SidebarProps {
   onSendTestDelivery: () => void;
   onLogout: () => void;
   onRefreshDaily: () => void;
+  onChangeLang?: (newLang: string) => void;
+  onGuestSubscribe?: (email: string, pref: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -52,9 +54,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onEnableNotifications,
   onSendTestDelivery,
   onLogout,
-  onRefreshDaily
+  onRefreshDaily,
+  onChangeLang,
+  onGuestSubscribe
 }) => {
   const T = t(lang);
+  const [guestEmail, setGuestEmail] = React.useState('');
+  const [guestPref, setGuestPref] = React.useState('email');
 
   // Human-readable pref label in the current language
   const prefLabel = (p: string) => {
@@ -164,8 +170,97 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </ul>
       </div>
 
-      <div className="user-profile-widget" style={{ gap: isEditingPrefs ? '0.75rem' : '0.5rem' }}>
-        {isEditingPrefs ? (
+      <div className="user-profile-widget" style={{ gap: !email || isEditingPrefs ? '0.75rem' : '0.5rem' }}>
+        {!email ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--gold-primary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              {T.sidebar.guestWelcome}
+            </div>
+
+            {/* Inline Language Selector */}
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.7rem' }}>{T.sidebar.appLanguageLabel}</label>
+              <select
+                className="input-field"
+                style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem' }}
+                value={lang}
+                onChange={(e) => onChangeLang && onChangeLang(e.target.value)}
+              >
+                <option value="english">English</option>
+                <option value="hindi">Hindi (हिन्दी)</option>
+                <option value="telugu">Telugu (తెలుగు)</option>
+                <option value="kannada">Kannada (ಕನ್ನಡ)</option>
+              </select>
+            </div>
+
+            <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '0.25rem 0' }} />
+
+            {/* Subscribe Form */}
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (onGuestSubscribe) {
+                onGuestSubscribe(guestEmail, guestPref);
+              }
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-primary)' }}>
+                {T.sidebar.guestSubscribeTitle}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.3 }}>
+                {T.sidebar.guestSubscribeDesc}
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <input
+                  type="email"
+                  className="input-field"
+                  style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem' }}
+                  placeholder="email@example.com"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <select
+                  className="input-field"
+                  style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem' }}
+                  value={guestPref}
+                  onChange={(e) => setGuestPref(e.target.value)}
+                >
+                  <option value="email">{T.sidebar.emailOnly}</option>
+                  <option value="telegram">{T.sidebar.telegramOnly}</option>
+                  <option value="push">{T.sidebar.webPushOnly}</option>
+                  <option value="both">{T.sidebar.bothEmailTelegram}</option>
+                  <option value="all">{T.sidebar.allChannels}</option>
+                </select>
+              </div>
+
+              {(guestPref === 'telegram' || guestPref === 'both' || guestPref === 'all') && (
+                <div style={{
+                  fontSize: '0.7rem',
+                  color: '#ef4444',
+                  padding: '0.3rem',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  lineHeight: '1.2'
+                }}>
+                  {T.auth.telegramWarning}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="primary-btn"
+                style={{ padding: '0.4rem', fontSize: '0.8rem', justifyContent: 'center', background: 'linear-gradient(135deg, #fbbf24, #d97706)', color: '#000' }}
+                disabled={loading}
+              >
+                {loading ? <div className="spinner" style={{ width: 14, height: 14 }} /> : T.sidebar.subscribeButton}
+              </button>
+            </form>
+          </div>
+        ) : isEditingPrefs ? (
           <form onSubmit={onSavePrefs} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', width: '100%' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--gold-primary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               {T.sidebar.editPreferences}

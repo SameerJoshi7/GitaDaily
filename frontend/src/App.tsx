@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ShlokaCard } from './components/ShlokaCard';
 import type { Shloka } from './components/ShlokaCard';
-import { KeyRound } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { AboutTab } from './components/AboutTab';
 import { GuidanceTab } from './components/GuidanceTab';
@@ -14,25 +13,11 @@ import { t } from './i18n';
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
 
 type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'about';
-type AuthStep = 'entry' | 'otp' | 'register';
-type AuthMode = 'signin' | 'signup';
 
 function App() {
   const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
   const [pref, setPref] = useState<string>(() => localStorage.getItem('gitadaily_pref') || 'email');
   const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
-  
-  // --- OTP Auth States ---
-  const [authMode, setAuthMode] = useState<AuthMode>('signup');
-  const [authStep, setAuthStep] = useState<AuthStep>('entry');
-  const [authIdentifier, setAuthIdentifier] = useState(''); // email or phone
-  const [otpInput, setOtpInput] = useState('');
-  const [otpError, setOtpError] = useState('');
-
-  // Registration form states (shown after OTP verified for new user)
-  const [regEmail, setRegEmail] = useState('');
-  const [regPref, setRegPref] = useState('email');
-  const [regLang, setRegLang] = useState('english');
   const [activeTab, setActiveTab] = useState<Tab>('daily');
   
   // Seek Guidance States
@@ -119,72 +104,6 @@ function App() {
   
   const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
 
-  // --- Auth Handlers ---
-
-  // Step 1: Send OTP
-  const handleSendOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!authIdentifier.trim()) {
-      setOtpError('Please enter your email or phone number.');
-      return;
-    }
-    setOtpError('');
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/auth/send-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: authIdentifier }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setAuthStep('otp');
-      } else {
-        setOtpError(data.error || 'Failed to send OTP. Please try again.');
-      }
-    } catch {
-      setOtpError('Cannot connect to server. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Step 2: Verify OTP
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otpInput.length !== 6) {
-      setOtpError('Please enter the 6-digit OTP.');
-      return;
-    }
-    setOtpError('');
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/auth/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: authIdentifier, otp: otpInput }),
-      });
-      const data = await res.json();
-      if (res.ok && data.verified) {
-        if (!data.isNewUser && data.user) {
-          // Existing user - log them in directly
-          loginUser(data.user);
-        } else {
-          // New user - proceed to registration form
-          // Pre-fill email from identifier
-          if (authIdentifier.includes('@')) setRegEmail(authIdentifier);
-          setAuthStep('register');
-        }
-      } else {
-        setOtpError(data.error || 'Invalid or expired OTP.');
-      }
-    } catch {
-      setOtpError('Cannot connect to server. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Helper: save user to localStorage and state
   const loginUser = (userData: { email: string; pref: string; lang: string }) => {
     localStorage.setItem('gitadaily_email', userData.email);
@@ -193,41 +112,6 @@ function App() {
     setEmail(userData.email);
     setPref(userData.pref || 'email');
     setLang(userData.lang || 'english');
-  };
-
-  // Step 3 (new users only): Complete Registration
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!regEmail || !regEmail.includes('@')) {
-      alert('Please enter a valid email address.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: regEmail, phone: '', pref: regPref, lang: regLang }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        loginUser(data);
-        fetchDailyShloka();
-      } else {
-        alert(data.error || 'Registration failed');
-      }
-    } catch {
-      alert('Could not connect to the server.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetAuth = () => {
-    setAuthStep('entry');
-    setOtpInput('');
-    setOtpError('');
-    setAuthIdentifier('');
   };
 
   const handleLogout = () => {
@@ -240,8 +124,6 @@ function App() {
     setDailyShloka(null);
     setBookmarks([]);
     setIsEditingPrefs(false);
-    resetAuth();
-    setAuthMode('signin');
   };
 
   const handleSavePrefs = async (e: React.FormEvent) => {
@@ -397,11 +279,65 @@ function App() {
   };
 
   // Fetch functions
-  const fetchDailyShloka = async () => {
-    if (!email) return;
+  const handleGuestSubscribe = async (subEmail: string, subPref: string) => {
+    if (!subEmail || !subEmail.includes('@')) {
+      alert('Please enter a valid email address.');
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/shloka/daily?email=${encodeURIComponent(email)}&lang=${lang}`);
+      const res = await fetch(`${API_BASE}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: subEmail, phone: '', pref: subPref, lang }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        loginUser(data);
+        
+        // Sync local storage bookmarks to backend database
+        const localBookmarksStr = localStorage.getItem('gitadaily_local_bookmarks') || '[]';
+        const localBookmarks: Shloka[] = JSON.parse(localBookmarksStr);
+        if (localBookmarks.length > 0) {
+          for (const shloka of localBookmarks) {
+            try {
+              await fetch(`${API_BASE}/bookmarks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: data.email, chapter: shloka.chapter, verse: shloka.verse }),
+              });
+            } catch (syncErr) {
+              console.error('Failed to sync bookmark', shloka, syncErr);
+            }
+          }
+          localStorage.removeItem('gitadaily_local_bookmarks');
+        }
+        
+        fetchChapters();
+        fetchBookmarks();
+        fetchDailyShloka();
+        
+        showToast(t(data.lang || 'english').sidebar.prefsUpdated);
+      } else {
+        alert(data.error || 'Subscription failed');
+      }
+    } catch {
+      alert('Could not connect to the server.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuestLangChange = (newLang: string) => {
+    localStorage.setItem('gitadaily_lang', newLang);
+    setLang(newLang);
+  };
+
+  // Fetch functions
+  const fetchDailyShloka = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/shloka/daily?email=${encodeURIComponent(email || '')}&lang=${lang}`);
       if (res.ok) {
         const data = await res.json();
         setDailyShloka(data);
@@ -415,7 +351,7 @@ function App() {
 
   const fetchChapters = async () => {
     try {
-      const res = await fetch(`${API_BASE}/chapters?email=${encodeURIComponent(email)}&lang=${lang}`);
+      const res = await fetch(`${API_BASE}/chapters?email=${encodeURIComponent(email || '')}&lang=${lang}`);
       if (res.ok) {
         const data = await res.json();
         setChapters(data);
@@ -426,7 +362,11 @@ function App() {
   };
 
   const fetchBookmarks = async () => {
-    if (!email) return;
+    if (!email) {
+      const local = localStorage.getItem('gitadaily_local_bookmarks');
+      setBookmarks(local ? JSON.parse(local) : []);
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/bookmarks?email=${encodeURIComponent(email)}`);
       if (res.ok) {
@@ -439,10 +379,9 @@ function App() {
   };
 
   const fetchSpecificShloka = async (chapter: number, verse: number) => {
-    if (!email) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/shloka/${chapter}/${verse}?email=${encodeURIComponent(email)}&lang=${lang}`);
+      const res = await fetch(`${API_BASE}/shloka/${chapter}/${verse}?email=${encodeURIComponent(email || '')}&lang=${lang}`);
       if (res.ok) {
         const data = await res.json();
 
@@ -476,6 +415,20 @@ function App() {
 
   // Toggle bookmark API
   const handleToggleBookmark = async (shloka: Shloka) => {
+    if (!email) {
+      const localBookmarksStr = localStorage.getItem('gitadaily_local_bookmarks') || '[]';
+      let localBookmarks: Shloka[] = JSON.parse(localBookmarksStr);
+      const isBookmarked = localBookmarks.some(b => b.chapter === shloka.chapter && b.verse === shloka.verse);
+      if (isBookmarked) {
+        localBookmarks = localBookmarks.filter(b => !(b.chapter === shloka.chapter && b.verse === shloka.verse));
+      } else {
+        localBookmarks.push(shloka);
+      }
+      localStorage.setItem('gitadaily_local_bookmarks', JSON.stringify(localBookmarks));
+      setBookmarks(localBookmarks);
+      return;
+    }
+
     const isBookmarked = bookmarks.some(b => b.chapter === shloka.chapter && b.verse === shloka.verse);
     const method = isBookmarked ? 'DELETE' : 'POST';
     
@@ -495,8 +448,6 @@ function App() {
 
   // Run initial fetches on email state change
   useEffect(() => {
-    if (!email) return;
-
     const handleHashChange = () => {
       const hash = window.location.hash;
       const matchSpecific = hash.match(/#\/chapter\/(\d+)\/verse\/(\d+)/);
@@ -533,7 +484,7 @@ function App() {
     fetchBookmarks();
 
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [email]);
+  }, [email, lang]);
 
   // Handle topic click
   const handleTopicClick = (topic: string) => {
@@ -547,175 +498,6 @@ function App() {
       setSearchResults([]);
     }
   };
-
-  if (!email) {
-    // On the landing page, use the reg language selection if in register step,
-    // otherwise fall back to English (user hasn't logged in yet).
-    const authLang = authStep === 'register' ? regLang : 'english';
-    const TA = t(authLang);
-    return (
-      <div className="hero-section" style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', margin: 0, borderRadius: 0, border: 'none' }}>
-        <span className="hero-subtitle">{TA.auth.heroSubtitle}</span>
-        <h1 className="hero-title" style={{ fontSize: '3rem', fontFamily: 'var(--font-display)' }}>GitaDaily</h1>
-        <p className="hero-description" style={{ maxWidth: '650px', lineHeight: '1.6' }}>
-          {TA.auth.heroDescription}
-        </p>
-
-        <div className="auth-card">
-          {/* Sign In / Sign Up Toggle */}
-          {authStep === 'entry' && (
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px' }}>
-              <button
-                type="button"
-                onClick={() => { setAuthMode('signin'); setOtpError(''); }}
-                style={{
-                  flex: 1, padding: '0.5rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s',
-                  background: authMode === 'signin' ? 'var(--gold-primary)' : 'transparent',
-                  color: authMode === 'signin' ? '#0a0b10' : 'var(--text-secondary)',
-                }}
-              >{TA.auth.signIn}</button>
-              <button
-                type="button"
-                onClick={() => { setAuthMode('signup'); setOtpError(''); }}
-                style={{
-                  flex: 1, padding: '0.5rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s',
-                  background: authMode === 'signup' ? 'var(--gold-primary)' : 'transparent',
-                  color: authMode === 'signup' ? '#0a0b10' : 'var(--text-secondary)',
-                }}
-              >{TA.auth.signUp}</button>
-            </div>
-          )}
-
-          {/* STEP 1: Entry — Enter email */}
-          {authStep === 'entry' && (
-            <form onSubmit={handleSendOTP}>
-              <div className="form-group">
-                <label className="form-label">
-                  {authMode === 'signin' ? TA.auth.signInEmailLabel : TA.auth.emailLabel}
-                </label>
-                <input
-                  id="authIdentifier"
-                  type="email"
-                  className="input-field"
-                  placeholder={TA.auth.emailPlaceholder}
-                  value={authIdentifier}
-                  onChange={(e) => setAuthIdentifier(e.target.value)}
-                  required
-                />
-              </div>
-
-              {otpError && <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{otpError}</p>}
-
-              <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.25rem' }}>
-                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : <><KeyRound size={16}/> {TA.auth.sendOtp}</>}
-              </button>
-            </form>
-          )}
-
-          {/* STEP 2: OTP Verification */}
-          {authStep === 'otp' && (
-            <form onSubmit={handleVerifyOTP}>
-              <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-                <KeyRound size={32} style={{ color: 'var(--gold-primary)', marginBottom: '0.5rem' }} />
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  {TA.auth.otpSentTo} <strong style={{ color: 'var(--gold-primary)' }}>{authIdentifier}</strong>
-                </p>
-              </div>
-              <div className="form-group">
-                <label className="form-label">{TA.auth.enterOtp}</label>
-                <input
-                  id="otpInput"
-                  type="text"
-                  className="input-field"
-                  placeholder={TA.auth.otpPlaceholder}
-                  maxLength={6}
-                  value={otpInput}
-                  onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                  style={{ textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.4rem', fontWeight: 700 }}
-                  required
-                />
-              </div>
-
-              {otpError && <p style={{ color: 'var(--error)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{otpError}</p>}
-
-              <button type="submit" className="primary-btn" disabled={loading} style={{ marginBottom: '0.75rem' }}>
-                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : TA.auth.verifyOtp}
-              </button>
-              <button type="button" className="secondary-btn" onClick={resetAuth} style={{ justifyContent: 'center' }}>
-                {TA.auth.back}
-              </button>
-            </form>
-          )}
-
-          {/* STEP 3: New User Registration (only shown after OTP verified for first time) */}
-          {authStep === 'register' && (
-            <form onSubmit={handleRegister}>
-              <div style={{ marginBottom: '1rem' }}>
-                <h3 style={{ color: 'var(--gold-primary)', margin: 0 }}>{TA.auth.completeProfile}</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>{TA.auth.identityVerified}</p>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">{TA.auth.emailAddress}</label>
-                <input
-                  id="regEmail"
-                  type="email"
-                  className="input-field"
-                  placeholder="name@example.com"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">{TA.auth.preferredLanguage}</label>
-                <select id="regLang" className="input-field" value={regLang} onChange={(e) => setRegLang(e.target.value)}>
-                  <option value="english">English</option>
-                  <option value="hindi">Hindi (हिन्दी)</option>
-                  <option value="telugu">Telugu (తెలుగు)</option>
-                  <option value="kannada">Kannada (ಕನ್ನಡ)</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">{TA.auth.notificationPref}</label>
-                <select id="regPref" className="input-field" value={regPref} onChange={(e) => setRegPref(e.target.value)}>
-                  <option value="email">{TA.auth.emailOnly}</option>
-                  <option value="telegram">{TA.auth.telegramOnly}</option>
-                  <option value="push">{TA.auth.webPushOnly}</option>
-                  <option value="both">{TA.auth.bothEmailTelegram}</option>
-                  <option value="all">{TA.auth.allChannels}</option>
-                </select>
-              </div>
-
-              {(regPref === 'telegram' || regPref === 'both' || regPref === 'all') && (
-                <p style={{ fontSize: '0.75rem', color: '#ef4444', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
-                  {TA.auth.telegramWarning}
-                </p>
-              )}
-
-              {(regPref === 'push' || regPref === 'all') && (
-                <p style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', marginTop: '-0.25rem', marginBottom: '0.75rem', lineHeight: '1.4' }}>
-                  {TA.auth.pushNote}
-                </p>
-              )}
-
-              <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '0.75rem' }}>
-                {loading ? <div className="spinner" style={{ width: 20, height: 20 }} /> : TA.auth.beginJourney}
-              </button>
-            </form>
-          )}
-        </div>
-
-        {/* Made with Love Footer on Login page */}
-        <div style={{ marginTop: '2rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          {TA.auth.madeWith} <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none', fontWeight: 500 }}>Sameer Joshi</a>
-        </div>
-      </div>
-    );
-  }
-
 
   const T = t(lang);
   return (
@@ -764,6 +546,8 @@ function App() {
         onSendTestDelivery={handleSendTestDelivery}
         onLogout={handleLogout}
         onRefreshDaily={fetchDailyShloka}
+        onChangeLang={handleGuestLangChange}
+        onGuestSubscribe={handleGuestSubscribe}
       />
 
       {/* Main Panel */}
