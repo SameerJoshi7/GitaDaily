@@ -699,14 +699,14 @@ app.post('/api/guidance', async (req, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const prompt = `
-      You are an enlightened guide analyzing the Bhagavad Gita for modern-day challenges.
-      The user is facing the following life challenge, feeling, or query:
+      You are a warm, wise, and compassionate friend who knows the Bhagavad Gita by heart.
+      The user is coming to you for personal advice on a challenge, feeling, or query they are facing:
       "${query}"
       
       Your tasks:
-      1. Analyze the user's challenge.
-      2. Choose the SINGLE most relevant and comforting shloka from the ENTIRE Bhagavad Gita (all 18 chapters and 700 verses) that directly addresses or resolves their problem.
-      3. Generate a highly personalized counsel in the following language: ${lang}. Address the user's specific query directly, applying the wisdom of the selected shloka.
+      1. Listen deeply to the user's challenge.
+      2. Search the entire Bhagavad Gita (all 18 chapters and 700 verses) to select the absolute best shloka that precisely speaks to their situation and guides them forward.
+      3. Write a comforting response in a highly personal, warm, and conversational tone, speaking directly to them like a close friend who wants their betterment (use terms like "I understand how you feel...", "We all face times when...", "You've got this..."). Avoid dry, analytical, or textbook explanations.
       
       Respond STRICTLY in JSON format with the following schema:
       {
@@ -718,9 +718,9 @@ app.post('/api/guidance', async (req, res) => {
         "translatedTranslation": "Direct translation of the selected shloka into the language: ${lang}",
         "translatedTransliteration": "Phonetic transliteration of the selected shloka written in the script of the chosen language: ${lang}",
         "theme": "A brief theme or title for this verse (e.g. 'Karma Yoga', 'Dhyana Yoga')",
-        "modernCounsel": "A detailed, comforting analysis (3-4 sentences) explaining exactly how the selected shloka relates to their specific query and how applying its wisdom solves their problem. You must explicitly bridge the connection between the shloka's meaning and the user's situation so they understand why this shloka was suggested.",
-        "wellbeingInsight": "Practical mental-health and stress advice (2 sentences) addressing their situation, written in the language: ${lang}.",
-        "actionStep": "One actionable, practical step they can take today inspired by the shloka to start solving this challenge, written in the language: ${lang}."
+        "modernCounsel": "Write a warm, empathetic, and friendly counsel (3-4 sentences) in the language: ${lang}. Speak to them as a supportive friend, explaining naturally how this shloka relates to their specific problem and how it can help them overcome it. Speak in a caring, conversational style.",
+        "wellbeingInsight": "A gentle piece of comfort or advice (2 sentences) for their emotional well-being, written as a caring friend in the language: ${lang}.",
+        "actionStep": "One simple, practical step they can take today inspired by the shloka to help them make progress, written in a warm, encouraging tone in the language: ${lang}."
       }
     `;
 
@@ -834,36 +834,36 @@ app.post('/api/guidance', async (req, res) => {
       const fallbackContent = {
         english: {
           mind: {
-            modernCounsel: "The Gita guides us to conquer our own mind, as it can be our greatest friend or our worst enemy. True strength comes from self-control and directing our thoughts positively. Do not let temporary failures or negative thoughts pull you down.",
-            wellbeingInsight: "Observe your thoughts without judgment. Breathe deeply and remember that your current state of mind does not define your future.",
-            actionStep: "Spend 5 minutes in silence or meditation today to observe and calm your thoughts."
+            modernCounsel: "I know how exhausting it feels when your mind is racing and you can't stay focused. In this verse, Krishna reminds us that our mind can either be our greatest ally or our toughest enemy, depending on how we treat it. Don't be too hard on yourself when you drift; instead, gently bring your attention back like a friend guiding you home.",
+            wellbeingInsight: "Your mind is just tired, and that's completely okay. Take a deep breath right now, let go of the pressure to be perfect, and remember you are doing great.",
+            actionStep: "Whenever you feel distracted today, just pause, take one deep breath, and do one small thing at a time with your full presence."
           },
           duty: {
-            modernCounsel: "This verse reminds us that we only have control over our efforts, not the outcomes. When facing anxiety about results, focus entirely on performing your current task to the best of your ability. Trust that your sincere actions will bear their own fruits in due time.",
-            wellbeingInsight: "Release the burden of predicting the future. Focus on the present moment and what is under your control right now.",
-            actionStep: "List three immediate tasks you can do today, and complete them mindfully without worrying about the final grade or outcome."
+            modernCounsel: "It's so easy to get anxious when we are constantly worrying about how things will turn out. This beautiful verse is a gentle reminder that we only own our efforts, not the final results. Focus all your energy on doing your best right now, and leave the rest to unfold naturally—you'll feel a huge weight lift off your shoulders.",
+            wellbeingInsight: "Let go of the need to control the future. You only have to handle this exact moment, and you are fully capable of doing that.",
+            actionStep: "Write down what you need to do next, do it sincerely, and promise yourself not to worry about the final grade or outcome."
           },
           general: {
-            modernCounsel: "This sacred verse teaches us to seek inner peace by aligning our consciousness with the eternal truth. Every challenge we face in the material world is temporary. Stand strong in your righteousness and trust the divine order.",
-            wellbeingInsight: "Take a step back from the situation and view it from a broader perspective. You are stronger than the challenges you face.",
-            actionStep: "Reflect on one positive lesson this challenge is teaching you, and write it down."
+            modernCounsel: "Whatever you are walking through right now, please know that you are not alone and this phase is only temporary. This verse reminds us to anchor ourselves in inner peace and trust the bigger journey of life. Stand strong in your values, and believe that things will align for your betterment.",
+            wellbeingInsight: "Give yourself credit for how far you've come. You are much stronger and more resilient than any temporary challenge in front of you.",
+            actionStep: "Think of one thing you are grateful for today, write it down, and let that warmth guide your next step."
           }
         },
         hindi: {
           mind: {
-            modernCounsel: "गीता हमें अपने मन को जीतने का मार्गदर्शन देती है, क्योंकि यह हमारा सबसे अच्छा मित्र या सबसे बड़ा शत्रु हो सकता है। सच्ची शक्ति आत्म-नियंत्रण और विचारों को सकारात्मक दिशा देने से आती है। अस्थायी असफलताओं या नकारात्मक विचारों को खुद पर हावी न होने दें।",
-            wellbeingInsight: "बिना किसी निर्णय के अपने विचारों को देखें। गहरी सांस लें और याद रखें कि आपके मन की वर्तमान स्थिति आपके भविष्य को तय नहीं करती।",
-            actionStep: "अपने विचारों को शांत करने और देखने के लिए आज 5 मिनट मौन या ध्यान में बिताएं।"
+            modernCounsel: "मैं समझ सकता हूँ कि जब मन भटकता है और ध्यान लगाना मुश्किल होता है, तो कितना बुरा लगता है। इस श्लोक में कृष्ण हमें समझाते हैं कि हमारा मन ही हमारा सबसे अच्छा दोस्त या सबसे बड़ा दुश्मन बन सकता है। जब आपका ध्यान भटके, तो खुद पर गुस्सा करने के बजाय बड़े प्यार से अपने मन को वापस काम पर लाएं।",
+            wellbeingInsight: "आपका मन बस थोड़ा थक गया है और ऐसा होना सामान्य है। एक लंबी सांस लें, खुद पर से दबाव हटाएँ और याद रखें कि आप बहुत अच्छा कर रहे हैं।",
+            actionStep: "आज जब भी ध्यान भटके, बस एक गहरी सांस लें और बिना किसी हड़बड़ी के अपना ध्यान वर्तमान काम पर केंद्रित करें।"
           },
           duty: {
-            modernCounsel: "यह श्लोक हमें याद दिलाता है कि हमारा नियंत्रण केवल हमारे प्रयासों पर है, परिणामों पर नहीं। जब परिणामों को लेकर चिंता हो, तो अपना पूरा ध्यान वर्तमान कार्य को सर्वोत्तम तरीके से करने पर लगाएं। विश्वास रखें कि आपके सच्चे कर्मों का फल समय आने पर अवश्य मिलेगा।",
-            wellbeingInsight: "भविष्य की चिंता का बोझ छोड़ दें। वर्तमान क्षण पर ध्यान केंद्रित करें और जो अभी आपके नियंत्रण में है, उस पर काम करें।",
-            actionStep: "आज ही किए जाने वाले तीन महत्वपूर्ण कार्यों की सूची बनाएं और अंतिम परिणाम की चिंता किए बिना उन्हें ध्यानपूर्वक पूरा करें।"
+            modernCounsel: "हम अक्सर इस चिंता में डूबे रहते हैं कि आगे क्या होगा, जिससे तनाव बढ़ जाता है। यह प्यारा श्लोक हमें याद दिलाता है कि हमारा अधिकार केवल अपनी मेहनत पर है, उसके नतीजे पर नहीं। आज अपना पूरा ध्यान सिर्फ कर्म करने पर लगाएं और परिणाम की चिंता छोड़ दें, इससे आप बहुत हल्का महसूस करेंगे।",
+            wellbeingInsight: "भविष्य को नियंत्रित करने की कोशिश में खुद को न थकाएँ। आपको बस इस पल को संभालना है, और आप इसमें पूरी तरह सक्षम हैं।",
+            actionStep: "अपने आज के काम की सूची बनाएं, उसे पूरी ईमानदारी से पूरा करें और नतीजे की फिक्र करना बिल्कुल छोड़ दें।"
           },
           general: {
-            modernCounsel: "यह पवित्र श्लोक हमें अपनी चेतना को शाश्वत सत्य के साथ जोड़कर आंतरिक शांति प्राप्त करना सिखाता है। भौतिक संसार में हम जिस भी चुनौती का सामना करते हैं वह अस्थायी है। अपने धर्म में दृढ़ रहें और ईश्वरीय न्याय पर भरोसा रखें।",
-            wellbeingInsight: "स्थिति से थोड़ा पीछे हटें और इसे व्यापक दृष्टिकोण से देखें। आप अपने सामने आने वाली चुनौतियों से कहीं अधिक मजबूत हैं।",
-            actionStep: "इस चुनौती से आपको जो एक सकारात्मक सीख मिल रही है, उस पर विचार करें और उसे लिख लें।"
+            modernCounsel: "आप आज जिस भी दौर से गुजर रहे हैं, याद रखें कि आप अकेले नहीं हैं और यह वक्त भी गुजर जाएगा। यह श्लोक हमें सिखाता है कि हमें अपनी अंतरात्मा को शांत रखना चाहिए और जीवन की यात्रा पर भरोसा करना चाहिए। अपने अच्छे इरादों पर डटे रहें, सब ठीक हो जाएगा।",
+            wellbeingInsight: "अपनी ताकत को पहचानें। आप अपनी मुश्किलों से कहीं ज्यादा मजबूत हैं, खुद पर भरोसा रखें।",
+            actionStep: "आज किसी एक अच्छी बात के बारे में सोचें जिसके लिए आप आभारी हैं, और उसी सकारात्मक ऊर्जा के साथ आगे बढ़ें।"
           }
         },
         telugu: {
