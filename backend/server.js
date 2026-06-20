@@ -764,8 +764,172 @@ app.post('/api/guidance', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[Guidance] Error fetching Gita counsel:', error);
-    res.status(500).json({ error: 'Failed to seek divine guidance. Please try again.' });
+    console.error('[Guidance] Error fetching Gita counsel, using offline fallback:', error);
+    try {
+      const queryLower = query.toLowerCase();
+      
+      // Basic scoring of shlokas offline
+      let bestShloka = gitaData[0];
+      let bestScore = -1;
+      
+      for (const shloka of gitaData) {
+        let score = 0;
+        
+        // Topic matches
+        if (shloka.topics && Array.isArray(shloka.topics)) {
+          for (const topic of shloka.topics) {
+            if (queryLower.includes(topic.toLowerCase())) {
+              score += 10;
+            }
+          }
+        }
+        
+        // Theme matches
+        if (shloka.theme && queryLower.includes(shloka.theme.toLowerCase())) {
+          score += 5;
+        }
+        
+        // Translation word matches (minimum 4 letters)
+        if (shloka.translation) {
+          const words = shloka.translation.toLowerCase().split(/\W+/);
+          for (const word of words) {
+            if (word.length > 3 && queryLower.includes(word)) {
+              score += 1;
+            }
+          }
+        }
+        
+        if (score > bestScore) {
+          bestScore = score;
+          bestShloka = shloka;
+        }
+      }
+      
+      // If we couldn't match anything well, decide a default based on keywords
+      if (bestScore <= 0) {
+        const stressKeywords = [
+          'anxious', 'stress', 'fear', 'mind', 'worry', 'depression', 'sad', 'anxiety', 'anger',
+          'मन', 'डर', 'चिंता', 'तनाव', 'क्रोध', 'दुख', 'पस्तचाप', 'पश्चाताप', 'गलत', 'ग़लत',
+          'ఆందోళన', 'భయం', 'కోపం', 'మనస్సు',
+          'ಮನಸ್ಸು', 'ಭಯ', 'ಕೋಪ', 'ಚಿಂತೆ'
+        ];
+        const isStress = stressKeywords.some(keyword => queryLower.includes(keyword));
+        if (isStress) {
+          // Chapter 6, Verse 5 (Self-control & mind)
+          bestShloka = gitaData.find(s => s.chapter === 6 && s.verse === 5) || gitaData[0];
+        } else {
+          // Chapter 2, Verse 47 (Karma / Duty)
+          bestShloka = gitaData.find(s => s.chapter === 2 && s.verse === 47) || gitaData[0];
+        }
+      }
+
+      // Determine counsel content based on the selected shloka topic/theme
+      const selectedTheme = (bestShloka.chapter === 6 && bestShloka.verse === 5) ? 'mind' : 
+                            (bestShloka.chapter === 2 && bestShloka.verse === 47) ? 'duty' : 'general';
+
+      const fallbackContent = {
+        english: {
+          mind: {
+            modernCounsel: "The Gita guides us to conquer our own mind, as it can be our greatest friend or our worst enemy. True strength comes from self-control and directing our thoughts positively. Do not let temporary failures or negative thoughts pull you down.",
+            wellbeingInsight: "Observe your thoughts without judgment. Breathe deeply and remember that your current state of mind does not define your future.",
+            actionStep: "Spend 5 minutes in silence or meditation today to observe and calm your thoughts."
+          },
+          duty: {
+            modernCounsel: "This verse reminds us that we only have control over our efforts, not the outcomes. When facing anxiety about results, focus entirely on performing your current task to the best of your ability. Trust that your sincere actions will bear their own fruits in due time.",
+            wellbeingInsight: "Release the burden of predicting the future. Focus on the present moment and what is under your control right now.",
+            actionStep: "List three immediate tasks you can do today, and complete them mindfully without worrying about the final grade or outcome."
+          },
+          general: {
+            modernCounsel: "This sacred verse teaches us to seek inner peace by aligning our consciousness with the eternal truth. Every challenge we face in the material world is temporary. Stand strong in your righteousness and trust the divine order.",
+            wellbeingInsight: "Take a step back from the situation and view it from a broader perspective. You are stronger than the challenges you face.",
+            actionStep: "Reflect on one positive lesson this challenge is teaching you, and write it down."
+          }
+        },
+        hindi: {
+          mind: {
+            modernCounsel: "गीता हमें अपने मन को जीतने का मार्गदर्शन देती है, क्योंकि यह हमारा सबसे अच्छा मित्र या सबसे बड़ा शत्रु हो सकता है। सच्ची शक्ति आत्म-नियंत्रण और विचारों को सकारात्मक दिशा देने से आती है। अस्थायी असफलताओं या नकारात्मक विचारों को खुद पर हावी न होने दें।",
+            wellbeingInsight: "बिना किसी निर्णय के अपने विचारों को देखें। गहरी सांस लें और याद रखें कि आपके मन की वर्तमान स्थिति आपके भविष्य को तय नहीं करती।",
+            actionStep: "अपने विचारों को शांत करने और देखने के लिए आज 5 मिनट मौन या ध्यान में बिताएं।"
+          },
+          duty: {
+            modernCounsel: "यह श्लोक हमें याद दिलाता है कि हमारा नियंत्रण केवल हमारे प्रयासों पर है, परिणामों पर नहीं। जब परिणामों को लेकर चिंता हो, तो अपना पूरा ध्यान वर्तमान कार्य को सर्वोत्तम तरीके से करने पर लगाएं। विश्वास रखें कि आपके सच्चे कर्मों का फल समय आने पर अवश्य मिलेगा।",
+            wellbeingInsight: "भविष्य की चिंता का बोझ छोड़ दें। वर्तमान क्षण पर ध्यान केंद्रित करें और जो अभी आपके नियंत्रण में है, उस पर काम करें।",
+            actionStep: "आज ही किए जाने वाले तीन महत्वपूर्ण कार्यों की सूची बनाएं और अंतिम परिणाम की चिंता किए बिना उन्हें ध्यानपूर्वक पूरा करें।"
+          },
+          general: {
+            modernCounsel: "यह पवित्र श्लोक हमें अपनी चेतना को शाश्वत सत्य के साथ जोड़कर आंतरिक शांति प्राप्त करना सिखाता है। भौतिक संसार में हम जिस भी चुनौती का सामना करते हैं वह अस्थायी है। अपने धर्म में दृढ़ रहें और ईश्वरीय न्याय पर भरोसा रखें।",
+            wellbeingInsight: "स्थिति से थोड़ा पीछे हटें और इसे व्यापक दृष्टिकोण से देखें। आप अपने सामने आने वाली चुनौतियों से कहीं अधिक मजबूत हैं।",
+            actionStep: "इस चुनौती से आपको जो एक सकारात्मक सीख मिल रही है, उस पर विचार करें और उसे लिख लें।"
+          }
+        },
+        telugu: {
+          mind: {
+            modernCounsel: "మనస్సు మనకు పరమ మిత్రుడు లేదా పరమ శత్రువు కావచ్చు కనుక, దానిని జయించాలని గీత మనకు మార్గదర్శనం చేస్తుంది. ఆత్మనిగ్రహం మరియు ఆలోచనలను సకారాత్మకంగా మలచుకోవడం ద్వారానే నిజమైన శక్తి లభిస్తుంది. తాత్కాలిక వైఫల్యాలు లేదా ప్రతికూల ఆలోచనలు మిమ్మల్ని కృంగదీయనివ్వకండి.",
+            wellbeingInsight: "మీ ఆలోచనలను ఎటువంటి తీర్పులు లేకుండా గమనించండి. ప్రశాంతంగా శ్వాస తీసుకోండి మరియు మీ ప్రస్తుత మానసిక స్థితి మీ భవిష్యత్తును నిర్ణయించదని గుర్తుంచుకోండి.",
+            actionStep: "ఈరోజు మీ ఆలోచనలను గమనించడానికి మరియు ప్రశాంతపరుచుకోవడానికి 5 నిమిషాల పాటు మౌనంగా లేదా ధ్యానంలో గడపండి."
+          },
+          duty: {
+            modernCounsel: "మన ప్రయత్నాలపై మాత్రమే మనకు నియంత్రణ ఉంటుందని, ఫలితాలపై కాదని ఈ శ్లోకం మనకు గుర్తుచేస్తుంది. ఫలితాల గురించి ఆందోళన కలిగినప్పుడు, మీ ప్రస్తుత పనిని ఉత్తమంగా చేయడంపైనే దృష్టి పెట్టండి. మీ నిజాయితీతో కూడిన పనులు తగిన సమయంలో ఫలితాన్ని ఇస్తాయని నమ్మండి.",
+            wellbeingInsight: "భవిష్యత్తును అంచనా వేసే భారాన్ని వదిలేయండి. వర్తమాన క్షణంపై మరియు ప్రస్తుతం మీ నియంత్రణలో ఉన్నదానిపై దృష్టి పెట్టండి.",
+            actionStep: "ఈరోజు మీరు చేయవలసిన మూడు తక్షణ పనులను జాబితా చేయండి మరియు చివరి ఫలితం గురించి ఆందోళన చెందకుండా వాటిని శ్రద్ధగా పూర్తి చేయండి."
+          },
+          general: {
+            modernCounsel: "మన చేతనను శాశ్వత సత్యంతో అనుసంధానించడం ద్వారా అంతర్గత ప్రశాంతతను ఎలా పొందాలో ఈ పవిత్ర శ్లోకం మనకు నేర్పుతుంది. భౌతిక ప్రపంచంలో మనం ఎదుర్కొనే ప్రతి సవాలు తాత్కాలికమే. మీ ధర్మంలో స్థిరంగా నిలబడండి మరియు దైవ నిర్ణయంపై నమ్మకం ఉంచండి.",
+            wellbeingInsight: "పరిస్థితి నుండి కొంచెం వెనక్కి తగ్గి విస్తృత కోణంలో చూడండి. మీరు ఎదుర్కొంటున్న సవాళ్ల కంటే మీరు చాలా శక్తివంతులు.",
+            actionStep: "ఈ సవాలు మీకు నేర్పుతున్న ఒక సానుకూల పాఠం గురించి ఆలోచించి, దానిని రాసుకోండి."
+          }
+        },
+        kannada: {
+          mind: {
+            modernCounsel: "ಮನಸ್ಸು ನಮಗೆ ಪರಮ ಮಿತ್ರ ಅಥವಾ ಪರಮ ಶತ್ರು ಆಗಬಲ್ಲದು, ಆದ್ದರಿಂದ ಅದನ್ನು ಗೆಲ್ಲಬೇಕೆಂದು ಗೀತೆಯು ನಮಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತದೆ. ಆತ್ಮನಿಗ್ರಹ ಮತ್ತು ಧನಾತ್ಮಕ ಆಲೋಚನೆಗಳಿಂದಲೇ ನಿಜವಾದ ಶಕ್ತಿ ಸಿಗುತ್ತದೆ. ತಾತ್ಕಾಲಿಕ ವೈಫಲ್ಯಗಳು ಅಥವಾ ನಕಾರಾತ್ಮಕ ಆಲೋಚನೆಗಳು ನಿಮ್ಮನ್ನು ಕುಗ್ಗಿಸದಂತೆ ನೋಡಿಕೊಳ್ಳಿ.",
+            wellbeingInsight: "ಯಾವುದೇ ಪೂರ್ವಗ್ರಹವಿಲ್ಲದೆ ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಗಮನಿಸಿ. ಆಳವಾಗಿ ಉಸಿರಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಮಾನಸಿಕ ಸ್ಥಿತಿಯು ನಿಮ್ಮ ಭವಿಷ್ಯವನ್ನು ನಿರ್ಧರಿಸುವುದಿಲ್ಲ ಎಂಬುದನ್ನು ನೆನಪಿಡಿ.",
+            actionStep: "ಇಂದು ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಗಮನಿಸಲು ಮತ್ತು ಶಾಂತಗೊಳಿಸಲು 5 ನಿಮಿಷಗಳ ಕಾಲ ಮೌನವಾಗಿ ಅಥವಾ ಧ್ಯಾನದಲ್ಲಿ ಕಳೆಯಿರಿ."
+          },
+          duty: {
+            modernCounsel: "ನಮ್ಮ ಪ್ರಯತ್ನಗಳ ಮೇಲೆ ಮಾತ್ರ ನಮಗೆ ನಿಯಂತ್ರಣವಿದೆ, ಫಲಿತಾಂಶಗಳ ಮೇಲಲ್ಲ ಎಂಬುದನ್ನು ಈ ಶ್ಲೋಕವು ನಮಗೆ ನೆನಪಿಸುತ್ತದೆ. ಫಲಿತಾಂಶಗಳ ಬಗ್ಗೆ ಆತಂಕವಿದ್ದಾಗ, ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಕೆಲಸವನ್ನು ಉತ್ತಮವಾಗಿ ಮಾಡುವುದರ ಕಡೆಗೇ ಗಮನ ಹರಿಸಿ. ನಿಮ್ಮ ಪ್ರಾಮಾಣಿಕ ಪ್ರಯತ್ನಗಳು ಸೂಕ್ತ ಸಮಯದಲ್ಲಿ ಉತ್ತಮ ಫಲವನ್ನು ನೀಡುತ್ತವೆ ಎಂದು ನಂಬಿರಿ.",
+            wellbeingInsight: "ಭವಿಷ್ಯತ್ತನ್ನು ಊಹಿಸುವ ಹೊರೆಯನ್ನು ಬಿಟ್ಟುಬಿಡಿ. ವರ್ತಮಾನದ ಕ್ಷಣ ಮತ್ತು ನಿಮ್ಮ ನಿಯಂತ್ರಣದಲ್ಲಿರುವ ವಿಷಯಗಳ ಮೇಲೆ ಗಮನ ಹರಿಸಿ.",
+            actionStep: "ಇಂದು ನೀವು ಮಾಡಬೇಕಾದ ಮೂರು ಪ್ರಮುಖ ಕೆಲಸಗಳನ್ನು ಪಟ್ಟಿ ಮಾಡಿ ಮತ್ತು ಅಂತಿಮ ಫಲಿತಾಂಶದ ಬಗ್ಗೆ ಚಿಂತಿಸದೆ ಅವುಗಳನ್ನು ಏಕಾಗ್ರತೆಯಿಂದ ಪೂರ್ಣಗೊಳಿಸಿ."
+          },
+          general: {
+            modernCounsel: "ನಮ್ಮ ಪ್ರಜ್ಞೆಯನ್ನು ಶಾಶ್ವತ ಸತ್ಯದೊಂದಿಗೆ ಜೋಡಿಸುವ ಮೂಲಕ ಆಂತರಿಕ ಶಾಂತಿಯನ್ನು ಪಡೆಯುವುದನ್ನು ಈ ಪವಿತ್ರ ಶ್ಲೋಕವು ನಮಗೆ ಕಲಿಸುತ್ತದೆ. ಭೌತಿಕ ಜಗತ್ತಿನಲ್ಲಿ ನಾವು ಎದುರಿಸುವ ಪ್ರತಿಯೊಂದು ಸವಾಲು ತಾತ್ಕಾಲಿಕವಾಗಿದೆ. ನಿಮ್ಮ ಧರ್ಮದಲ್ಲಿ ದೃಢವಾಗಿ ನಿಲ್ಲಿ ಮತ್ತು ದೈವಿಕ ನಿರ್ಧಾರದಲ್ಲಿ ನಂಬಿಕೆಯಿಡಿ.",
+            wellbeingInsight: "ಪರಿಸ್ಥಿತಿಯಿಂದ ಸ್ವಲ್ಪ ದೂರ ಸರಿದು ವಿಶಾಲ ದೃಷ್ಟಿಕೋನದಿಂದ ನೋಡಿ. ನೀವು ಎದುರಿಸುತ್ತಿರುವ ಸವಾಲುಗಳಿಗಿಂತಲೂ ನೀವು ಬಲಿಷ್ಠರಾಗಿದ್ದೀರಿ.",
+            actionStep: "ಈ ಸವಾಲು ನಿಮಗೆ ಕಲಿಸುತ್ತಿರುವ ಒಂದು ಧನಾತ್ಮಕ ಪಾಠದ ಬಗ್ಗೆ ಯೋಚಿಸಿ, ಅದನ್ನು ಬರೆದಿಟ್ಟುಕೊಳ್ಳಿ."
+          }
+        }
+      };
+
+      const langKey = fallbackContent[lang] ? lang : 'english';
+      const counselData = fallbackContent[langKey][selectedTheme];
+
+      // Retrieve translations / localizations for the shloka itself
+      let trans = bestShloka.translation;
+      let translit = bestShloka.transliteration;
+      if (bestShloka.localizations && bestShloka.localizations[lang]) {
+        trans = bestShloka.localizations[lang].translation;
+        translit = bestShloka.localizations[lang].transliteration;
+      }
+
+      res.json({
+        success: true,
+        query,
+        shloka: {
+          chapter: bestShloka.chapter,
+          verse: bestShloka.verse,
+          sanskrit: bestShloka.sanskrit,
+          transliteration: translit,
+          translation: trans,
+          theme: bestShloka.theme,
+        },
+        counsel: {
+          modernCounsel: counselData.modernCounsel,
+          wellbeingInsight: counselData.wellbeingInsight,
+          actionStep: counselData.actionStep
+        }
+      });
+    } catch (fallbackErr) {
+      console.error('[Guidance] Critical failure in guidance offline fallback:', fallbackErr);
+      res.status(500).json({ error: 'Failed to seek divine guidance. Please try again.' });
+    }
   }
 });
 
