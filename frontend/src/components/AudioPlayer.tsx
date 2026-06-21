@@ -39,7 +39,7 @@ export const AudioPlayer: React.FC = () => {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.muted = isMuted;
-      audioRef.current.volume = 0.02; // Set extremely soft, whisper background volume (2%)
+      audioRef.current.volume = 0.005; // Set extremely soft, whisper background volume (0.5%)
     }
     localStorage.setItem('gitadaily_music_muted', String(isMuted));
   }, [isMuted]);
@@ -49,7 +49,7 @@ export const AudioPlayer: React.FC = () => {
     if (audioRef.current) {
       audioRef.current.src = tracks[currentTrackIndex].url;
       audioRef.current.load();
-      audioRef.current.volume = 0.02; // Maintain soft volume on load
+      audioRef.current.volume = 0.005; // Maintain soft volume on load
       localStorage.setItem('gitadaily_music_track', String(currentTrackIndex));
       if (isPlaying) {
         audioRef.current.play()
@@ -70,7 +70,7 @@ export const AudioPlayer: React.FC = () => {
       // Autoplay only if user hasn't explicitly paused it previously
       const isExplicitlyPaused = localStorage.getItem('gitadaily_music_playing') === 'false';
       if (!isExplicitlyPaused && audioRef.current && !isPlaying) {
-        audioRef.current.volume = 0.02;
+        audioRef.current.volume = 0.005;
         audioRef.current.play()
           .then(() => {
             setIsPlaying(true);
@@ -105,7 +105,7 @@ export const AudioPlayer: React.FC = () => {
       setIsPlaying(false);
       localStorage.setItem('gitadaily_music_playing', 'false');
     } else {
-      audioRef.current.volume = 0.02;
+      audioRef.current.volume = 0.005;
       audioRef.current.play()
         .then(() => {
           setIsPlaying(true);
