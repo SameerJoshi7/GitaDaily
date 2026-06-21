@@ -777,6 +777,63 @@ app.post('/api/guidance', async (req, res) => {
   }
 
   try {
+    // 1. Local candidate lookup (RAG search)
+    const queryLower = query.toLowerCase();
+    const scoredShlokas = gitaData.map(shloka => {
+      let score = 0;
+      
+      // Topic matches (exact word matches)
+      if (shloka.topics && Array.isArray(shloka.topics)) {
+        for (const topic of shloka.topics) {
+          const topicLower = topic.toLowerCase();
+          if (queryLower.includes(topicLower)) {
+            score += 15;
+          }
+        }
+      }
+      
+      // Theme matches
+      if (shloka.theme && queryLower.includes(shloka.theme.toLowerCase())) {
+        score += 8;
+      }
+      
+      // Word matches in translation
+      if (shloka.translation) {
+        const words = shloka.translation.toLowerCase().split(/\W+/);
+        for (const word of words) {
+          if (word.length > 3 && queryLower.includes(word)) {
+            score += 2;
+          }
+        }
+      }
+      
+      return { shloka, score };
+    });
+
+    // Sort and select top candidates
+    let candidates = scoredShlokas
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(item => item.shloka)
+      .slice(0, 8);
+
+    // Fallback to diverse default set if no keywords matched
+    if (candidates.length === 0) {
+      const defaultVerses = [
+        { chapter: 2, verse: 47 }, // Duty / Action
+        { chapter: 6, verse: 5 },  // Mind control
+        { chapter: 2, verse: 62 }, // Anger / Desire
+        { chapter: 18, verse: 66 },// Devotion / Surrender
+        { chapter: 4, verse: 7 },  // Dharma / Protection
+        { chapter: 2, verse: 14 }, // Tolerance / Change
+        { chapter: 9, verse: 22 }, // Faith / Peace
+        { chapter: 12, verse: 13 } // Equanimity / Kindness
+      ];
+      candidates = defaultVerses.map(v => 
+        gitaData.find(s => s.chapter === v.chapter && s.verse === v.verse)
+      ).filter(Boolean);
+    }
+
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const prompt = `
       You are a warm, wise, and deeply compassionate spiritual mentor and close friend who knows the Bhagavad Gita by heart.
@@ -785,19 +842,28 @@ app.post('/api/guidance', async (req, res) => {
       
       Your tasks:
       1. Listen deeply to the user's challenge. Validate their feelings with genuine empathy.
-      2. Search the entire Bhagavad Gita (all 18 chapters and 700 verses) to select the absolute best shloka that precisely speaks to their situation and guides them forward.
+      2. Choose the single best shloka from the candidate list below that most accurately addresses and solves the user's specific challenge. You MUST select the shloka from this list:
+      
+      ${candidates.map((c, i) => `
+      Candidate #${i+1}:
+      Chapter: ${c.chapter}, Verse: ${c.verse}
+      Sanskrit: "${c.sanskrit}"
+      Translation: "${c.translation}"
+      Topics: ${c.topics ? c.topics.join(', ') : 'None'}
+      `).join('\n')}
+      
       3. Write a comforting response in a highly personal, warm, and conversational tone. Speak directly to them like a close friend who is right beside them, offering wise guidance. Avoid dry, academic, or generic textbook explanations.
       
       Respond STRICTLY in JSON format with the following schema:
       {
-        "selectedChapter": [chapter number of the shloka you selected, 1-18],
+        "selectedChapter": [chapter number of the shloka you selected],
         "selectedVerse": [verse number of the shloka you selected],
-        "sanskrit": "The original Sanskrit text of the selected shloka in Devanagari script",
-        "transliteration": "The standard English/Roman transliteration (IAST style) of the Sanskrit shloka",
-        "translation": "The direct English translation of the selected shloka",
-        "translatedTranslation": "Direct translation of the selected shloka into the language: ${lang}",
+        "sanskrit": "Sanskrit text of the selected shloka",
+        "transliteration": "Transliteration of the selected shloka",
+        "translation": "English translation of the selected shloka",
+        "translatedTranslation": "Translation of the selected shloka into the language: ${lang}",
         "translatedTransliteration": "Phonetic transliteration of the selected shloka written in the script of the chosen language: ${lang}",
-        "theme": "A brief theme or title for this verse (e.g. 'Karma Yoga', 'Dhyana Yoga')",
+        "theme": "A brief theme or title for this verse",
         "modernCounsel": "Write a deeply comforting, detailed, and warm counsel (8-10 sentences) in the language: ${lang}. Start by acknowledging their specific challenge (\"${query}\") with friendship and care. Then, explain in clear, friendly, and practical terms how the selected shloka directly addresses and solves this specific issue. Break down the shloka's wisdom, showing how it guides them out of their current dilemma. You MUST include a concrete, relatable real-life example to illustrate how they can apply this wisdom in their daily life. Keep the tone loving, conversational, and highly reassuring, as if speaking to a beloved sibling.",
         "wellbeingInsight": "A gentle, deeply comforting piece of advice (3-4 sentences) focusing on their emotional healing and mental peace, written as a caring friend in the language: ${lang}. Reassure them that they are doing well and that their peace is valuable.",
         "actionStep": "One clear, practical, and simple step they can take today inspired by the shloka to help them make progress, written in a warm, encouraging tone in the language: ${lang}."
