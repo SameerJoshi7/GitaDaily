@@ -152,7 +152,7 @@ function App() {
         </div>
 
         {/* Global Footer */}
-        <Footer lang={lang} />
+        <Footer />
       </main>
 
       {/* Preferences / Subscription Modal */}

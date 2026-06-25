@@ -99,7 +99,7 @@ export function PreferencesModal({
                 onClose();
               }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                 <h4 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '0.95rem' }}>
-                  {T.sidebar.guestSubscribeTitle}
+                  Subscribe to Daily Wisdom
                 </h4>
                 <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.8rem', lineHeight: 1.4 }}>
                   Join us to unlock personalized guidance! It's completely free - we never charge for sharing the knowledge, all we need is your email just to personalise your experience.
@@ -117,9 +117,9 @@ export function PreferencesModal({
 
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <select name="guestPref" className="input-field">
-                    <option value="email">{T.sidebar.emailOnly}</option>
-                    <option value="push">{T.sidebar.webPushOnly}</option>
-                    <option value="all">Email & Push Notifications</option>
+                    <option value="email">Email Only</option>
+                    <option value="push">Web Push</option>
+                    <option value="all">Email &amp; Push Notifications</option>
                   </select>
                 </div>
 
@@ -129,7 +129,7 @@ export function PreferencesModal({
                   style={{ background: 'linear-gradient(135deg, #fbbf24, #d97706)', color: '#000', padding: '0.6rem', justifyContent: 'center' }}
                   disabled={loading}
                 >
-                  {T.sidebar.subscribeButton}
+                  Subscribe
                 </button>
                 <div style={{ marginTop: '0.2rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   <span style={{ color: 'var(--gold-primary)' }}>🔒</span> We value your privacy. Your email will never be spammed or shared.
