@@ -867,6 +867,38 @@ app.post('/api/guidance', async (req, res) => {
     clientIp = req.headers['x-forwarded-for'].split(',')[0].trim();
   }
 
+  // Helper to log query with geolocation asynchronously
+  const logQueryInBackground = async (suggestedChapter, suggestedVerse) => {
+    try {
+      let location = 'unknown';
+      if (clientIp !== 'unknown' && clientIp !== '127.0.0.1' && clientIp !== '::1') {
+        try {
+          const geoRes = await fetch(`http://ip-api.com/json/${clientIp}?fields=status,city,country`);
+          if (geoRes.ok) {
+            const geo = await geoRes.json();
+            if (geo.status === 'success') {
+              location = `${geo.city}, ${geo.country}`;
+            }
+          }
+        } catch (e) {
+          console.error('[Geo] Error:', e.message);
+        }
+      }
+      const logEntry = {
+        query,
+        language: lang,
+        suggestedChapter,
+        suggestedVerse,
+        ipAddress: clientIp,
+        location
+      };
+      if (userId) logEntry.userId = userId;
+      await QueryLog.create(logEntry);
+    } catch (err) {
+      console.error('[Guidance] Failed to log query:', err);
+    }
+  };
+
   if (!userId) {
     try {
       const guestCount = await QueryLog.countDocuments({ ipAddress: clientIp, userId: { $exists: false } });
@@ -946,16 +978,7 @@ app.post('/api/guidance', async (req, res) => {
     const selectedCandidate = candidates[0];
 
     // Async log the query to MongoDB
-    const logEntry = {
-      query,
-      language: lang,
-      suggestedChapter: selectedCandidate.chapter,
-      suggestedVerse: selectedCandidate.verse,
-      ipAddress: clientIp
-    };
-    if (userId) logEntry.userId = userId;
-
-    QueryLog.create(logEntry).catch(err => console.error('[Guidance] Failed to log query:', err));
+    logQueryInBackground(selectedCandidate.chapter, selectedCandidate.verse);
 
     const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `
@@ -1151,9 +1174,7 @@ app.post('/api/guidance', async (req, res) => {
         actionStep = `1. ಈ ನಿರ್ದಿಷ್ಟ ಶ್ಲೋಕವನ್ನು ವಿರಾಮಗೊಳಿಸಲು ಮತ್ತು ಪ್ರತಿಬಿಂಬಿಸಲು ಇಂದು ಸ್ವಲ್ಪ ಸಮಯ ತೆಗೆದುಕೊಳ್ಳಿ.\n2. ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಪರಿಸ್ಥಿತಿಗೆ ಈ ಬುದ್ಧಿವಂತಿಕೆಯನ್ನು ಅನ್ವಯಿಸುವ ಒಂದು ಸಣ್ಣ, ಕಾರ್ಯಸಾಧ್ಯವಾದ ಮಾರ್ಗವನ್ನು ಬರೆಯಿರಿ.`;
       }
 
-      const logEntry = { query, language: lang, suggestedChapter: bestShloka.chapter, suggestedVerse: bestShloka.verse, ipAddress: clientIp };
-      if (userId) logEntry.userId = userId;
-      QueryLog.create(logEntry).catch(() => { });
+      logQueryInBackground(bestShloka.chapter, bestShloka.verse);
 
       res.json({
         success: true,

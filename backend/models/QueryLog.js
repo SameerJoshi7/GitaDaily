@@ -12,6 +12,9 @@ const queryLogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  location: {
+    type: String,
+  },
   language: {
     type: String,
     default: 'english',
