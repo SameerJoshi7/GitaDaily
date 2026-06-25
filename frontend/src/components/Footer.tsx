@@ -25,7 +25,7 @@ export function Footer({ lang }: FooterProps) {
         </summary>
         <div style={{ marginTop: '0.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', lineHeight: '1.5', border: '1px solid rgba(255,255,255,0.03)', textAlign: 'left' }}>
           <strong>{T.sidebar.developer}:</strong> Sameer Joshi<br />
-          <strong>{T.sidebar.stack}:</strong> React, Node.js, Express, Gemini Flash (gemini-flash-latest), Web Push, EmailJS API<br />
+          <strong>{T.sidebar.stack}:</strong> React, Node.js, Express, MongoDB (Mongoose), Gemini Flash (gemini-flash-latest), Web Push, EmailJS API<br />
           <strong>{T.sidebar.links}:</strong> <a href="https://github.com/SameerJoshi7" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}>LinkedIn</a>
         </div>
       </details>
