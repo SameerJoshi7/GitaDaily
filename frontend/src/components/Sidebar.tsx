@@ -34,7 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Top Header Row for mobile / Standard brand alignment for desktop */}
       <div className="sidebar-header-row">
         <a href="#/dailyinsights" onClick={(e) => { e.preventDefault(); window.location.hash = '#/dailyinsights'; }} className="brand" style={{ gap: '0.6rem' }}>
-          <span className="brand-icon">🦚</span>
+          <img src="/flute-icon.png" alt="Krishna Bodha Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.3 }}>
             <span className="brand-name-sanskrit">कृष्णबोध</span>
             <span className="brand-subtitle">Krishna Bodha</span>

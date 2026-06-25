@@ -21,7 +21,7 @@ self.addEventListener('push', function(event) {
       event.waitUntil(
         self.registration.showNotification('🦚 Krishna Bodha Shloka', {
           body: event.data.text(),
-          icon: '/favicon.ico'
+          icon: '/flute-icon.png'
         })
       );
     }

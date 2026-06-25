@@ -45,7 +45,7 @@ export function DailyTab({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ fontSize: '1.5rem' }}>🦚</div>
+          <img src="/flute-icon.png" alt="Flute" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
           <div>
             <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gold-secondary)', fontWeight: 600 }}>{T.daily.challengeBannerTitle}</h4>
             <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{T.daily.challengeBannerDesc}</p>
