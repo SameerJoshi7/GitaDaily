@@ -14,12 +14,44 @@ interface ShlokaShareProps {
 export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel }) => {
   const shareRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
+  const [base64Images, setBase64Images] = useState({ bg: '', logo: '' });
+
+  const artworks = [
+    '/images/chariot.jpg',
+    '/images/discourse.jpg',
+    '/images/vishwaroopa.jpg'
+  ];
+  const activeArtwork = artworks[(shloka.chapter + shloka.verse) % artworks.length];
+
+  const toDataURL = async (url: string) => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      console.error('Failed to load image as base64', e);
+      return '';
+    }
+  };
 
   const handleShare = async () => {
     if (!shareRef.current) return;
     try {
       setIsSharing(true);
-      await new Promise(res => setTimeout(res, 100)); // give time for state/DOM to settle
+      
+      // Fetch images as base64 to fix mobile rendering issues
+      const [bgData, logoData] = await Promise.all([
+        toDataURL(activeArtwork),
+        toDataURL('/flute-icon.png')
+      ]);
+      setBase64Images({ bg: bgData, logo: logoData });
+      
+      await new Promise(res => setTimeout(res, 300)); // allow DOM to update
+      
       const htmlToImage = await import('html-to-image');
       const dataUrl = await htmlToImage.toPng(shareRef.current, {
         quality: 1.0,
@@ -49,13 +81,6 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
     }
   };
 
-  const artworks = [
-    '/images/chariot.jpg',
-    '/images/discourse.jpg',
-    '/images/vishwaroopa.jpg'
-  ];
-  const activeArtwork = artworks[(shloka.chapter + shloka.verse) % artworks.length];
-
   const hasAI = customCounsel || shloka.reflection;
 
   return (
@@ -83,22 +108,24 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            padding: '4rem',
+            padding: '3rem',
             boxSizing: 'border-box',
             overflow: 'hidden'
           }}
         >
           {/* Background Image & Overlay */}
-          <img
-            src={`${window.location.origin}${activeArtwork}`}
-            alt="background"
-            style={{
-              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-              objectFit: 'cover',
-              opacity: 0.25,
-              zIndex: 0
-            }}
-          />
+          {base64Images.bg && (
+            <img
+              src={base64Images.bg}
+              alt="background"
+              style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                objectFit: 'cover',
+                opacity: 0.25,
+                zIndex: 0
+              }}
+            />
+          )}
           <div
             style={{
               position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -127,90 +154,90 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
           <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
             
             {/* Header Logo */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                <img src={`${window.location.origin}/flute-icon.png`} alt="Logo" style={{ width: '45px', height: '45px' }} />
+                {base64Images.logo && <img src={base64Images.logo} alt="Logo" style={{ width: '40px', height: '40px' }} />}
                 <span style={{ fontSize: '2.2rem', fontWeight: 700, color: 'var(--gold-primary)', fontFamily: 'var(--font-serif)' }}>कृष्णबोध</span>
               </div>
-              <span style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '3px', fontFamily: 'var(--font-display)' }}>Krishna Bodha</span>
+              <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '3px', fontFamily: 'var(--font-display)' }}>Krishna Bodha</span>
             </div>
 
             {/* Chapter Header */}
             <div style={{ 
               display: 'inline-flex', alignItems: 'center', gap: '1rem',
-              padding: '0.5rem 2rem', borderBottom: '1px solid var(--gold-primary)', borderTop: '1px solid var(--gold-primary)',
-              marginBottom: '2.5rem'
+              padding: '0.5rem 1.5rem', borderBottom: '1px solid var(--gold-primary)', borderTop: '1px solid var(--gold-primary)',
+              marginBottom: '1.5rem'
             }}>
-              <Sparkles size={18} color="var(--gold-primary)" />
-              <span style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-primary)', fontSize: '1.2rem', letterSpacing: '3px', textTransform: 'uppercase' }}>
+              <Sparkles size={16} color="var(--gold-primary)" />
+              <span style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-primary)', fontSize: '1.1rem', letterSpacing: '3px', textTransform: 'uppercase' }}>
                 CHAPTER {shloka.chapter}, VERSE {shloka.verse}
               </span>
-              <Sparkles size={18} color="var(--gold-primary)" />
+              <Sparkles size={16} color="var(--gold-primary)" />
             </div>
 
             {/* Sanskrit & Transliteration */}
-            <div style={{ textAlign: 'center', marginBottom: '3rem', width: '90%' }}>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', color: '#ffffff', fontWeight: 600, lineHeight: 1.6, marginBottom: '1.5rem', whiteSpace: 'pre-line', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem', width: '95%' }}>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', color: '#ffffff', fontWeight: 600, lineHeight: 1.5, marginBottom: '0.75rem', whiteSpace: 'pre-line', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}>
                 {shloka.sanskrit}
               </div>
-              <div style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.8)', fontSize: '1.4rem', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+              <div style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.8)', fontSize: '1.2rem', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
                 {shloka.reflection?.translatedTransliteration || shloka.transliteration}
               </div>
             </div>
 
             {/* Translation Box */}
             <div style={{ 
-              width: '90%', background: 'rgba(18, 20, 31, 0.7)', border: '1px solid rgba(212, 175, 55, 0.3)', 
-              borderRadius: '16px', padding: '2rem', marginBottom: '3rem', textAlign: 'center', position: 'relative'
+              width: '95%', background: 'rgba(18, 20, 31, 0.7)', border: '1px solid rgba(212, 175, 55, 0.3)', 
+              borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', textAlign: 'center', position: 'relative'
             }}>
               <div style={{ 
-                position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)',
+                position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
                 background: '#0a0b10', padding: '0 1rem', color: 'var(--gold-primary)', fontFamily: 'var(--font-display)',
-                fontSize: '1.1rem', letterSpacing: '2px'
+                fontSize: '1rem', letterSpacing: '2px'
               }}>
                 TRANSLATION
               </div>
-              <p style={{ color: '#ffffff', fontSize: '1.5rem', lineHeight: 1.6 }}>
+              <p style={{ color: '#ffffff', fontSize: '1.3rem', lineHeight: 1.5 }}>
                 {shloka.reflection?.translatedTranslation || shloka.translation}
               </p>
             </div>
 
             {/* AI Sections */}
             {hasAI && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '90%', flexGrow: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '95%', flexGrow: 1 }}>
                 
                 {/* Deep Understanding */}
-                <div style={{ display: 'flex', gap: '1.5rem', background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent)', borderLeft: '3px solid var(--gold-primary)', padding: '1.5rem', borderRadius: '0 12px 12px 0' }}>
-                  <Brain size={40} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <span style={{ color: 'var(--gold-primary)', fontFamily: 'var(--font-display)', fontSize: '1.1rem', letterSpacing: '1px' }}>
+                <div style={{ display: 'flex', gap: '1.25rem', background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent)', borderLeft: '3px solid var(--gold-primary)', padding: '1rem 1.25rem', borderRadius: '0 12px 12px 0' }}>
+                  <Brain size={32} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <span style={{ color: 'var(--gold-primary)', fontFamily: 'var(--font-display)', fontSize: '1rem', letterSpacing: '1px' }}>
                       {customCounsel ? 'PERSONALIZED COUNSEL' : 'AI DEEP UNDERSTANDING'}
                     </span>
-                    <span style={{ color: '#e5e7eb', fontSize: '1.2rem', lineHeight: 1.5 }}>
+                    <span style={{ color: '#e5e7eb', fontSize: '1.1rem', lineHeight: 1.4 }}>
                       {customCounsel ? customCounsel.modernCounsel : shloka.reflection?.modernReflection}
                     </span>
                   </div>
                 </div>
 
                 {/* Emotional Wellbeing */}
-                <div style={{ display: 'flex', gap: '1.5rem', background: 'linear-gradient(90deg, rgba(168, 85, 247, 0.1), transparent)', borderLeft: '3px solid #a855f7', padding: '1.5rem', borderRadius: '0 12px 12px 0' }}>
-                  <Heart size={40} color="#a855f7" style={{ flexShrink: 0 }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <span style={{ color: '#a855f7', fontFamily: 'var(--font-display)', fontSize: '1.1rem', letterSpacing: '1px' }}>EMOTIONAL WELL-BEING</span>
-                    <span style={{ color: '#e5e7eb', fontSize: '1.2rem', lineHeight: 1.5 }}>
+                <div style={{ display: 'flex', gap: '1.25rem', background: 'linear-gradient(90deg, rgba(168, 85, 247, 0.1), transparent)', borderLeft: '3px solid #a855f7', padding: '1rem 1.25rem', borderRadius: '0 12px 12px 0' }}>
+                  <Heart size={32} color="#a855f7" style={{ flexShrink: 0 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <span style={{ color: '#a855f7', fontFamily: 'var(--font-display)', fontSize: '1rem', letterSpacing: '1px' }}>EMOTIONAL WELL-BEING</span>
+                    <span style={{ color: '#e5e7eb', fontSize: '1.1rem', lineHeight: 1.4 }}>
                       {customCounsel ? customCounsel.wellbeingInsight : shloka.reflection?.emotionalWellbeing}
                     </span>
                   </div>
                 </div>
 
                 {/* Mindfulness */}
-                <div style={{ display: 'flex', gap: '1.5rem', background: 'linear-gradient(90deg, rgba(34, 197, 94, 0.1), transparent)', borderLeft: '3px solid #22c55e', padding: '1.5rem', borderRadius: '0 12px 12px 0' }}>
-                  <span style={{ fontSize: '2.5rem', flexShrink: 0 }}>🧘</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <span style={{ color: '#22c55e', fontFamily: 'var(--font-display)', fontSize: '1.1rem', letterSpacing: '1px' }}>
+                <div style={{ display: 'flex', gap: '1.25rem', background: 'linear-gradient(90deg, rgba(34, 197, 94, 0.1), transparent)', borderLeft: '3px solid #22c55e', padding: '1rem 1.25rem', borderRadius: '0 12px 12px 0' }}>
+                  <span style={{ fontSize: '2rem', flexShrink: 0 }}>🧘</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <span style={{ color: '#22c55e', fontFamily: 'var(--font-display)', fontSize: '1rem', letterSpacing: '1px' }}>
                       {customCounsel ? 'ACTIONABLE STEP' : 'MINDFUL PRACTICE FOR TODAY'}
                     </span>
-                    <span style={{ color: '#e5e7eb', fontSize: '1.2rem', lineHeight: 1.5, fontStyle: 'italic' }}>
+                    <span style={{ color: '#e5e7eb', fontSize: '1.1rem', lineHeight: 1.4, fontStyle: 'italic' }}>
                       "{customCounsel ? customCounsel.actionStep : shloka.reflection?.mindfulnessTip}"
                     </span>
                   </div>
