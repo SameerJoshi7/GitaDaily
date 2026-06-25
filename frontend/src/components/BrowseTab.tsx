@@ -18,6 +18,7 @@ interface BrowseTabProps {
   apiBase: string;
   browseChapterNumber?: number | null;
   browseVerseNumber?: number | null;
+  readingHistory?: { chapter: number, verse: number } | null;
 }
 
 export const BrowseTab: React.FC<BrowseTabProps> = ({
@@ -28,7 +29,8 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
   email,
   apiBase,
   browseChapterNumber,
-  browseVerseNumber
+  browseVerseNumber,
+  readingHistory
 }) => {
   const T = t(lang);
 
@@ -141,6 +143,39 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
           <h2 className="dashboard-title">{T.browse.pageTitle}</h2>
           <span className="dashboard-subtitle">{T.browse.pageSubtitle}</span>
         </div>
+
+        {readingHistory && (
+          <div 
+            onClick={() => window.location.hash = `#/browse/chapter/${readingHistory.chapter}/verse/${readingHistory.verse}`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              marginBottom: '2rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              transition: 'all 0.3s ease',
+              animation: 'fadeIn 0.5s ease'
+            }}
+            className="continue-reading-banner"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ background: 'rgba(212, 175, 55, 0.2)', padding: '0.75rem', borderRadius: '50%' }}>
+                <Bookmark size={24} color="var(--gold-primary)" />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.1rem' }}>Continue Reading</h3>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                  {T.browse.chapter} {readingHistory.chapter}, {T.browse.verse} {readingHistory.verse}
+                </span>
+              </div>
+            </div>
+            <ChevronRight size={24} color="var(--gold-primary)" />
+          </div>
+        )}
 
         <div className="chapters-grid">
           {chapters.map((ch) => (

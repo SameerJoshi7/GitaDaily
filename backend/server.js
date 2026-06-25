@@ -10,9 +10,21 @@ import twilio from 'twilio';
 import webpush from 'web-push';
 import { generateOTP, verifyOTP } from './utils/otp.js';
 import { sendEmailOTP, sendDailyShlokaEmail } from './utils/mailer.js';
-import { sendTelegramShloka, startTelegramPolling } from './utils/telegram.js';
+import mongoose from 'mongoose';
+import { User } from './models/User.js';
+import { Bookmark } from './models/Bookmark.js';
+import { History } from './models/History.js';
+import { QueryLog } from './models/QueryLog.js';
 
 dotenv.config();
+
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('[MongoDB] Connected successfully'))
+    .catch(err => console.error('[MongoDB] Connection error:', err));
+} else {
+  console.warn('[MongoDB] WARNING: MONGODB_URI not found in .env');
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -63,8 +75,8 @@ const initFile = (filePath, defaultData) => {
   }
 };
 
-initFile(USERS_PATH, []);
-initFile(BOOKMARKS_PATH, []);
+// initFile(USERS_PATH, []);
+// initFile(BOOKMARKS_PATH, []);
 initFile(REFLECTIONS_CACHE_PATH, {});
 
 // Read data helper
@@ -258,7 +270,7 @@ app.post('/api/auth/send-otp', async (req, res) => {
 });
 
 // 0b. Verify OTP
-app.post('/api/auth/verify-otp', (req, res) => {
+app.post('/api/auth/verify-otp', async (req, res) => {
   let { identifier, otp } = req.body;
   if (!identifier || !otp) {
     return res.status(400).json({ error: 'Identifier and OTP are required.' });
@@ -269,50 +281,50 @@ app.post('/api/auth/verify-otp', (req, res) => {
     return res.status(401).json({ error: result.error || 'Invalid OTP.' });
   }
 
-  // Check if the user already exists
-  const users = readData(USERS_PATH);
-  const existing = users.find(u =>
-    typeof u === 'object' && u !== null && u.email === identifier
-  );
-
-  if (existing) {
-    // Existing user - return their full profile (Login)
-    return res.json({ verified: true, isNewUser: false, user: existing });
-  } else {
-    // New user - they need to complete registration
-    return res.json({ verified: true, isNewUser: true });
+  // Check if the user already exists in MongoDB
+  try {
+    const existing = await User.findOne({ email: identifier.toLowerCase() });
+    if (existing) {
+      // Existing user - return their full profile (Login)
+      return res.json({ verified: true, isNewUser: false, user: existing });
+    } else {
+      // New user - they need to complete registration
+      return res.json({ verified: true, isNewUser: true });
+    }
+  } catch (err) {
+    console.error("Error verifying user:", err);
+    return res.status(500).json({ error: 'Database error' });
   }
 });
 
 // 1. User Registration
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { email, phone, pref, lang } = req.body;
   if (!email || !email.includes('@')) {
     return res.status(400).json({ error: 'Valid email address is required.' });
   }
 
-  const users = readData(USERS_PATH);
-  const index = users.findIndex(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
-  
-  const newUser = { 
-    email, 
-    phone: phone ? normalizePhoneNumber(phone) : '', 
-    pref: pref || 'email',
-    lang: lang || 'english'
-  };
-
-  if (index >= 0) {
-    users[index] = newUser;
-  } else {
-    users.push(newUser);
+  try {
+    const cleanEmail = email.toLowerCase();
+    const newUser = await User.findOneAndUpdate(
+      { email: cleanEmail },
+      { 
+        email: cleanEmail,
+        phone: phone ? normalizePhoneNumber(phone) : '', 
+        pref: pref || 'email',
+        lang: lang || 'english'
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    res.json({ message: 'Success', ...newUser.toObject() });
+  } catch (err) {
+    console.error("Error registering user:", err);
+    res.status(500).json({ error: 'Database error' });
   }
-  writeData(USERS_PATH, users);
-
-  res.json({ message: 'Success', ...newUser });
 });
 
 // Helper to look up user language
-function getUserLanguage(email, req) {
+async function getUserLanguage(email, req) {
   if (req && req.query && req.query.lang) {
     return req.query.lang.toLowerCase();
   }
@@ -320,18 +332,12 @@ function getUserLanguage(email, req) {
     return req.body.lang.toLowerCase();
   }
   if (!email) return 'english';
-  const emailLower = email.toLowerCase();
-  const users = readData(USERS_PATH);
-  const user = users.find(u => {
-    if (typeof u === 'object' && u !== null && u.email) {
-      return u.email.toLowerCase() === emailLower;
-    }
-    if (typeof u === 'string') {
-      return u.toLowerCase() === emailLower;
-    }
-    return false;
-  });
-  return user && user.lang ? user.lang : 'english';
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+    return user && user.lang ? user.lang : 'english';
+  } catch (err) {
+    return 'english';
+  }
 }
 
 // 2. Get Daily Shloka
@@ -341,7 +347,7 @@ app.get('/api/shloka/daily', async (req, res) => {
   }
 
   const { email } = req.query;
-  const language = getUserLanguage(email, req);
+  const language = await getUserLanguage(email, req);
 
   // Calculate day-based index
   const startOfYear = new Date(new Date().getFullYear(), 0, 0);
@@ -440,9 +446,9 @@ const GITA_CHAPTERS_INFO = [
 ];
 
 // 4. Get Chapters List
-app.get('/api/chapters', (req, res) => {
+app.get('/api/chapters', async (req, res) => {
   const { email } = req.query;
-  const lang = getUserLanguage(email, req).toLowerCase();
+  const lang = await getUserLanguage(email, req);
   
   const chapters = GITA_CHAPTERS_INFO.map(ch => {
     let themeText = ch.theme;
@@ -483,54 +489,59 @@ app.get('/api/search', (req, res) => {
 });
 
 // 6. Get Bookmarks
-app.get('/api/bookmarks', (req, res) => {
-  const { email } = req.query;
-  if (!email) {
-    return res.status(400).json({ error: 'Email parameter is required.' });
+app.get('/api/bookmarks', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID parameter is required.' });
   }
 
-  const bookmarks = readData(BOOKMARKS_PATH);
-  const userBookmarks = bookmarks.filter(b => b.email === email);
-  
-  // Hydrate with shloka data
-  const hydrated = userBookmarks.map(b => {
-    const shloka = gitaData.find(s => s.chapter === b.chapter && s.verse === b.verse);
-    return shloka ? { ...shloka } : null;
-  }).filter(Boolean);
+  try {
+    const userBookmarks = await Bookmark.find({ userId });
+    
+    // Hydrate with shloka data
+    const hydrated = userBookmarks.map(b => {
+      const shloka = gitaData.find(s => s.chapter === b.chapter && s.verse === b.verse);
+      return shloka ? { ...shloka } : null;
+    }).filter(Boolean);
 
-  res.json(hydrated);
+    res.json(hydrated);
+  } catch (err) {
+    res.status(500).json({ error: 'Database error fetching bookmarks' });
+  }
 });
 
 // 7. Add Bookmark
-app.post('/api/bookmarks', (req, res) => {
-  const { email, chapter, verse } = req.body;
-  if (!email || !chapter || !verse) {
-    return res.status(400).json({ error: 'Email, chapter, and verse are required.' });
+app.post('/api/bookmarks', async (req, res) => {
+  const { userId, chapter, verse } = req.body;
+  if (!userId || !chapter || !verse) {
+    return res.status(400).json({ error: 'User ID, chapter, and verse are required.' });
   }
 
-  const bookmarks = readData(BOOKMARKS_PATH);
-  const exists = bookmarks.some(b => b.email === email && b.chapter === chapter && b.verse === verse);
-
-  if (!exists) {
-    bookmarks.push({ email, chapter, verse });
-    writeData(BOOKMARKS_PATH, bookmarks);
+  try {
+    await Bookmark.findOneAndUpdate(
+      { userId, chapter, verse },
+      { userId, chapter, verse },
+      { upsert: true }
+    );
+    res.json({ message: 'Bookmarked successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to bookmark' });
   }
-
-  res.json({ message: 'Bookmarked successfully' });
 });
 
 // 8. Delete Bookmark
-app.delete('/api/bookmarks', (req, res) => {
-  const { email, chapter, verse } = req.body;
-  if (!email || !chapter || !verse) {
-    return res.status(400).json({ error: 'Email, chapter, and verse are required.' });
+app.delete('/api/bookmarks', async (req, res) => {
+  const { userId, chapter, verse } = req.body;
+  if (!userId || !chapter || !verse) {
+    return res.status(400).json({ error: 'User ID, chapter, and verse are required.' });
   }
 
-  let bookmarks = readData(BOOKMARKS_PATH);
-  bookmarks = bookmarks.filter(b => !(b.email === email && b.chapter === chapter && b.verse === verse));
-  writeData(BOOKMARKS_PATH, bookmarks);
-
-  res.json({ message: 'Bookmark removed successfully' });
+  try {
+    await Bookmark.deleteOne({ userId, chapter, verse });
+    res.json({ message: 'Bookmark removed successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to remove bookmark' });
+  }
 });
 
 // WhatsApp Integration Config
@@ -666,16 +677,16 @@ ${messageBody}
 
 // 9. Send Test Delivery across active channels
 app.post('/api/test-delivery', async (req, res) => {
-  const { email, chapter, verse } = req.body;
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required.' });
+  const { userId, chapter, verse } = req.body;
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required.' });
   }
 
-  const users = readData(USERS_PATH);
-  const user = users.find(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found.' });
-  }
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
 
   const language = user.lang || 'english';
   let shloka = gitaData[0];
@@ -694,11 +705,7 @@ app.post('/api/test-delivery', async (req, res) => {
     deliveryStatus.email = emailResult;
   }
 
-  // 2. Telegram Delivery
-  if ((user.pref === 'telegram' || user.pref === 'both' || user.pref === 'all') && user.telegramChatId) {
-    const tgResult = await sendTelegramShloka(user.telegramChatId, messageText, getArtworkForShloka(shloka));
-    deliveryStatus.telegram = tgResult;
-  }
+
 
   // 3. Web Push Delivery
   if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
@@ -721,21 +728,76 @@ app.post('/api/test-delivery', async (req, res) => {
 });
 
 // 10. Web Push Subscription endpoint
-app.post('/api/push/subscribe', (req, res) => {
-  const { email, subscription } = req.body;
-  if (!email || !subscription) {
-    return res.status(400).json({ error: 'Email and subscription are required.' });
+app.post('/api/push/subscribe', async (req, res) => {
+  const { userId, subscription } = req.body;
+  if (!userId || !subscription) {
+    return res.status(400).json({ error: 'User ID and subscription are required.' });
   }
 
-  const users = readData(USERS_PATH);
-  const index = users.findIndex(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { pushSubscription: subscription },
+      { new: true }
+    );
+    if (user) {
+      res.json({ message: 'Settings saved', user: user });
+    } else {
+      res.status(404).json({ error: 'User not found.' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
-  if (index >= 0) {
-    users[index].pushSubscription = subscription;
-    writeData(USERS_PATH, users);
-    res.json({ message: 'Push subscription saved successfully.' });
-  } else {
-    res.status(404).json({ error: 'User not found.' });
+// 16. Get User Reading History
+app.get('/api/history', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) return res.status(400).json({ error: 'User ID required' });
+
+  try {
+    const history = await History.findOne({ userId });
+    res.json(history || { lastReadChapter: 1, lastReadVerse: 1 });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch history' });
+  }
+});
+
+// 17. Update User Reading History
+app.post('/api/history', async (req, res) => {
+  const { userId, chapter, verse } = req.body;
+  if (!userId || !chapter || !verse) return res.status(400).json({ error: 'User ID, chapter, verse required' });
+
+  try {
+    const history = await History.findOneAndUpdate(
+      { userId },
+      { lastReadChapter: chapter, lastReadVerse: verse, updatedAt: Date.now() },
+      { upsert: true, new: true }
+    );
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save history' });
+  }
+});
+
+// 18. Hard Delete User Account and all associations
+app.delete('/api/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+  if (!userId) return res.status(400).json({ error: 'User ID required' });
+
+  try {
+    // Cascading delete across all collections
+    await Promise.all([
+      User.deleteOne({ _id: userId }),
+      Bookmark.deleteMany({ userId }),
+      History.deleteOne({ userId }),
+      QueryLog.deleteMany({ userId })
+    ]);
+    
+    res.json({ success: true, message: 'Account and all associated data permanently deleted.' });
+  } catch (err) {
+    console.error('[DeleteAccount] Error:', err);
+    res.status(500).json({ error: 'Failed to fully delete account.' });
   }
 });
 
@@ -765,9 +827,22 @@ app.post('/api/trigger-daily-broadcast', async (req, res) => {
 
 // 14. Gita Guidance (Reflect by Mood/Problem) endpoint
 app.post('/api/guidance', async (req, res) => {
-  const { query, language } = req.body;
+  const { userId, query, language } = req.body;
   if (!query || !query.trim()) {
     return res.status(400).json({ error: 'Please describe the challenge or feeling you are facing.' });
+  }
+
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+
+  if (!userId) {
+    try {
+      const guestCount = await QueryLog.countDocuments({ ipAddress: clientIp, email: { $exists: false } });
+      if (guestCount >= 2) {
+        return res.status(403).json({ error: 'Guest limit reached', requireSubscription: true });
+      }
+    } catch (err) {
+      console.error('[Guidance] IP check error:', err);
+    }
   }
 
   const lang = (language || 'english').toLowerCase();
@@ -815,7 +890,7 @@ app.post('/api/guidance', async (req, res) => {
       .filter(item => item.score > 0)
       .sort((a, b) => b.score - a.score)
       .map(item => item.shloka)
-      .slice(0, 8);
+      .slice(0, 10);
 
     // Fallback to diverse default set if no keywords matched
     if (candidates.length === 0) {
@@ -834,6 +909,21 @@ app.post('/api/guidance', async (req, res) => {
       ).filter(Boolean);
     }
 
+    // VARIETY: Pick a random shloka from the top candidates
+    const selectedCandidate = candidates[Math.floor(Math.random() * candidates.length)];
+
+    // Async log the query to MongoDB
+    const logEntry = {
+      query,
+      language: lang,
+      suggestedChapter: selectedCandidate.chapter,
+      suggestedVerse: selectedCandidate.verse,
+      ipAddress: clientIp
+    };
+    if (userId) logEntry.userId = userId;
+    
+    QueryLog.create(logEntry).catch(err => console.error('[Guidance] Failed to log query:', err));
+
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const prompt = `
       You are a warm, wise, and deeply compassionate spiritual mentor and close friend who knows the Bhagavad Gita by heart.
@@ -842,22 +932,17 @@ app.post('/api/guidance', async (req, res) => {
       
       Your tasks:
       1. Listen deeply to the user's challenge. Validate their feelings with genuine empathy.
-      2. Choose the single best shloka from the candidate list below that most accurately addresses and solves the user's specific challenge. You MUST select the shloka from this list:
+      2. I have selected the perfect shloka for them: Chapter ${selectedCandidate.chapter}, Verse ${selectedCandidate.verse}.
       
-      ${candidates.map((c, i) => `
-      Candidate #${i+1}:
-      Chapter: ${c.chapter}, Verse: ${c.verse}
-      Sanskrit: "${c.sanskrit}"
-      Translation: "${c.translation}"
-      Topics: ${c.topics ? c.topics.join(', ') : 'None'}
-      `).join('\n')}
+      Sanskrit: "${selectedCandidate.sanskrit}"
+      Translation: "${selectedCandidate.translation}"
       
       3. Write a comforting response in a highly personal, warm, and conversational tone. Speak directly to them like a close friend who is right beside them, offering wise guidance. Avoid dry, academic, or generic textbook explanations.
       
       Respond STRICTLY in JSON format with the following schema:
       {
-        "selectedChapter": [chapter number of the shloka you selected],
-        "selectedVerse": [verse number of the shloka you selected],
+        "selectedChapter": ${selectedCandidate.chapter},
+        "selectedVerse": ${selectedCandidate.verse},
         "sanskrit": "Sanskrit text of the selected shloka",
         "transliteration": "Transliteration of the selected shloka",
         "translation": "English translation of the selected shloka",
@@ -1059,6 +1144,10 @@ app.post('/api/guidance', async (req, res) => {
         translit = bestShloka.localizations[lang].transliteration;
       }
 
+      const logEntry = { query, language: lang, suggestedChapter: bestShloka.chapter, suggestedVerse: bestShloka.verse, ipAddress: clientIp };
+      if (userId) logEntry.userId = userId;
+      QueryLog.create(logEntry).catch(() => {});
+
       res.json({
         success: true,
         query,
@@ -1094,12 +1183,13 @@ async function broadcastDailyShloka() {
   const index = dayOfYear % gitaData.length;
 
   const shloka = gitaData[index];
-  const users = readData(USERS_PATH);
   let sentCount = 0;
-
-  for (const user of users) {
-    if (typeof user === 'object' && user.email) {
-      const language = user.lang || 'english';
+  
+  try {
+    const users = await User.find({});
+    for (const user of users) {
+      if (user.email) {
+        const language = user.lang || 'english';
       const reflection = await getGeminiReflection(shloka, language);
       const messageText = formatShlokaMessage(shloka, reflection, language);
       
@@ -1111,11 +1201,7 @@ async function broadcastDailyShloka() {
         sentToThisUser = true;
       }
 
-      // 2. Telegram Channel
-      if ((user.pref === 'telegram' || user.pref === 'both' || user.pref === 'all') && user.telegramChatId) {
-        await sendTelegramShloka(user.telegramChatId, messageText, getArtworkForShloka(shloka));
-        sentToThisUser = true;
-      }
+
 
       // 3. Web Push Channel
       if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
@@ -1136,9 +1222,12 @@ async function broadcastDailyShloka() {
       if (sentToThisUser) {
         sentCount++;
       }
+      }
     }
+    console.log(`[Cron] Broadcast finished. Sent to ${sentCount} user(s).`);
+  } catch (err) {
+    console.error('[Cron] Error fetching users from MongoDB:', err);
   }
-  console.log(`[Cron] Broadcast finished. Sent to ${sentCount} user(s).`);
 }
 
 // Schedule morning broadcast daily at 6:00 AM local time
@@ -1147,40 +1236,7 @@ cron.schedule('0 6 * * *', async () => {
   await broadcastDailyShloka();
 });
 
-// Polling callback to subscribe a user via Telegram start deep link
-const handleTelegramSubscribe = async (email, chatId, triggerTest = false) => {
-  const users = readData(USERS_PATH);
-  
-  if (triggerTest) {
-    // If chatId triggered 'shloka' test command manually
-    const user = users.find(u => u.telegramChatId === chatId);
-    if (user) {
-      const shloka = gitaData[0];
-      const language = user.lang || 'english';
-      const reflection = await getGeminiReflection(shloka, language);
-      const messageText = formatShlokaMessage(shloka, reflection, language);
-      await sendTelegramShloka(chatId, messageText, getArtworkForShloka(shloka));
-    }
-    return true;
-  }
-
-  const index = users.findIndex(u => typeof u === 'object' && u !== null ? u.email === email : u === email);
-  if (index >= 0) {
-    users[index].telegramChatId = chatId;
-    // Upgrade preferences to telegram or both
-    if (users[index].pref === 'email') {
-      users[index].pref = 'both';
-    } else if (users[index].pref !== 'both' && users[index].pref !== 'all') {
-      users[index].pref = 'telegram';
-    }
-    writeData(USERS_PATH, users);
-    return true;
-  }
-  return false;
-};
-
-// Start Server & start Telegram bot polling
+// Start Server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  startTelegramPolling(handleTelegramSubscribe);
 });

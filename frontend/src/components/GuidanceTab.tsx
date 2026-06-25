@@ -45,7 +45,7 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
         <span className="dashboard-subtitle">{T.guidance.pageSubtitle}</span>
       </div>
 
-      {!email ? (
+      {guidanceError === 'Guest limit reached' ? (
         <div style={{ background: 'linear-gradient(145deg, var(--bg-secondary) 0%, rgba(18, 20, 31, 0.95) 100%)', padding: '4rem 2rem', borderRadius: '20px', border: '1px solid var(--card-border)', marginBottom: '2rem', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.1)', color: 'var(--gold-primary)', marginBottom: '1.5rem' }}>
             <Lock size={28} />
@@ -112,7 +112,7 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
             </button>
           </form>
 
-          {guidanceError && (
+          {guidanceError && guidanceError !== 'Guest limit reached' && (
             <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--error)', fontSize: '0.9rem' }}>
               ⚠️ {guidanceError}
             </div>

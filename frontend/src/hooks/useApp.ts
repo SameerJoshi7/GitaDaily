@@ -9,11 +9,13 @@ export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'ab
 
 export function useApp() {
   const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
+  const [userId, setUserId] = useState<string>(() => localStorage.getItem('gitadaily_userId') || '');
   const [pref, setPref] = useState<string>(() => localStorage.getItem('gitadaily_pref') || 'email');
   const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
   const [activeTab, setActiveTab] = useState<Tab>('guidance');
   const [browseChapterNumber, setBrowseChapterNumber] = useState<number | null>(null);
   const [browseVerseNumber, setBrowseVerseNumber] = useState<number | null>(null);
+  const [readingHistory, setReadingHistory] = useState<{ chapter: number, verse: number } | null>(null);
   
   // Seek Guidance States
   const [guidanceQuery, setGuidanceQuery] = useState('');
@@ -38,8 +40,7 @@ export function useApp() {
     setToast(msg);
     setTimeout(() => setToast(null), 3500);
   };
-  // Web Push & Telegram configuration states
-  const [telegramBotUsername, setTelegramBotUsername] = useState('GitaDailyBot');
+  // Web Push configuration states
   const [publicVapidKey, setPublicVapidKey] = useState('');
   const [isPushSubscribed, setIsPushSubscribed] = useState(false);
   
@@ -51,14 +52,9 @@ export function useApp() {
   
   // Fetch app configs and check Service Worker push subscription status on startup
   useEffect(() => {
-    // 1. Fetch backend configuration
+    // 1. Fetch backend configuration (unused now but kept for future structure)
     fetch(`${API_BASE}/config`)
       .then(res => res.json())
-      .then(data => {
-        if (data.telegramBotUsername) {
-          setTelegramBotUsername(data.telegramBotUsername);
-        }
-      })
       .catch(err => console.error('Failed to fetch config', err));
 
     // 2. Fetch VAPID Public Key
@@ -100,24 +96,44 @@ export function useApp() {
   const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
 
   // Helper: save user to localStorage and state
-  const loginUser = (userData: { email: string; pref: string; lang: string }) => {
+  const loginUser = (userData: { email: string; pref: string; lang: string; _id?: string }) => {
     localStorage.setItem('gitadaily_email', userData.email);
+    if (userData._id) localStorage.setItem('gitadaily_userId', userData._id);
     localStorage.setItem('gitadaily_pref', userData.pref || 'email');
     localStorage.setItem('gitadaily_lang', userData.lang || 'english');
     setEmail(userData.email);
+    if (userData._id) setUserId(userData._id);
     setPref(userData.pref || 'email');
     setLang(userData.lang || 'english');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('gitadaily_email');
+    localStorage.removeItem('gitadaily_userId');
     localStorage.removeItem('gitadaily_pref');
     localStorage.removeItem('gitadaily_lang');
     setEmail('');
+    setUserId('');
     setPref('email');
     setLang('english');
     setDailyShloka(null);
     setBookmarks([]);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!userId) return;
+    try {
+      const res = await fetch(`${API_BASE}/user/${userId}`, { method: 'DELETE' });
+      if (res.ok) {
+        handleLogout();
+        showToast('Account completely deleted.');
+      } else {
+        showToast('Failed to delete account.');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Connection error.');
+    }
   };
 
   const handleSavePrefs = async (e: React.FormEvent) => {
@@ -161,14 +177,14 @@ export function useApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email, 
+          userId, 
           chapter: dailyShloka?.chapter || 2, 
           verse: dailyShloka?.verse || 47 
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Test delivery triggered! Check your subscribed channels (Email, Telegram, or Web Push).');
+        alert('Test delivery triggered! Check your subscribed channels (Email or Web Push).');
       } else {
         alert(data.error || 'Failed to trigger test delivery.');
       }
@@ -193,6 +209,7 @@ export function useApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId,
           query: guidanceQuery,
           language: lang
         })
@@ -257,7 +274,7 @@ export function useApp() {
       const res = await fetch(`${API_BASE}/push/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, subscription })
+        body: JSON.stringify({ userId, subscription })
       });
 
       if (res.ok) {
@@ -276,6 +293,48 @@ export function useApp() {
   };
 
   // Fetch functions
+  const handleSendOtp = async (emailToAuth: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: emailToAuth })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const handleVerifyOtp = async (emailToAuth: string, otp: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: emailToAuth, otp })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Invalid OTP');
+      
+      if (!data.isNewUser && data.user) {
+        // Log them in!
+        loginUser(data.user);
+        fetchChapters();
+        fetchBookmarks();
+        fetchDailyShloka();
+        showToast(t(data.user.lang || 'english').sidebar.prefsUpdated || 'Logged in successfully');
+        return { success: true };
+      } else {
+        // Technically this shouldn't happen if we're only letting returning users login, but just in case
+        return { success: false, error: 'User not found. Please subscribe as a new user.' };
+      }
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
   const handleGuestSubscribe = async (subEmail: string, subPref: string) => {
     if (!subEmail || !subEmail.includes('@')) {
       alert('Please enter a valid email address.');
@@ -301,7 +360,7 @@ export function useApp() {
               await fetch(`${API_BASE}/bookmarks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: data.email, chapter: shloka.chapter, verse: shloka.verse }),
+                body: JSON.stringify({ userId: data._id, chapter: shloka.chapter, verse: shloka.verse }),
               });
             } catch (syncErr) {
               console.error('Failed to sync bookmark', shloka, syncErr);
@@ -359,19 +418,34 @@ export function useApp() {
   };
 
   const fetchBookmarks = async () => {
-    if (!email) {
+    if (!userId) {
       const local = localStorage.getItem('gitadaily_local_bookmarks');
       setBookmarks(local ? JSON.parse(local) : []);
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/bookmarks?email=${encodeURIComponent(email)}`);
+      const res = await fetch(`${API_BASE}/bookmarks?userId=${encodeURIComponent(userId)}`);
       if (res.ok) {
         const data = await res.json();
         setBookmarks(data);
       }
     } catch (err) {
       console.error('Failed to fetch bookmarks', err);
+    }
+  };
+
+  const fetchReadingHistory = async () => {
+    if (!userId) return;
+    try {
+      const res = await fetch(`${API_BASE}/history?userId=${encodeURIComponent(userId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.lastReadChapter) {
+          setReadingHistory({ chapter: data.lastReadChapter, verse: data.lastReadVerse });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch reading history', err);
     }
   };
 
@@ -412,7 +486,7 @@ export function useApp() {
 
   // Toggle bookmark API
   const handleToggleBookmark = async (shloka: Shloka) => {
-    if (!email) {
+    if (!userId) {
       const localBookmarksStr = localStorage.getItem('gitadaily_local_bookmarks') || '[]';
       let localBookmarks: Shloka[] = JSON.parse(localBookmarksStr);
       const isBookmarked = localBookmarks.some(b => b.chapter === shloka.chapter && b.verse === shloka.verse);
@@ -433,7 +507,7 @@ export function useApp() {
       const res = await fetch(`${API_BASE}/bookmarks`, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, chapter: shloka.chapter, verse: shloka.verse }),
+        body: JSON.stringify({ userId, chapter: shloka.chapter, verse: shloka.verse }),
       });
       if (res.ok) {
         fetchBookmarks();
@@ -463,6 +537,16 @@ export function useApp() {
         setBrowseVerseNumber(verse);
         setActiveTab('browse');
         fetchChapters();
+
+        // Save History
+        if (userId) {
+          fetch(`${API_BASE}/history`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, chapter, verse })
+          }).catch(() => {});
+          setReadingHistory({ chapter, verse });
+        }
       } else if (hash === '#/browsechapters') {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
@@ -501,9 +585,10 @@ export function useApp() {
 
     fetchChapters();
     fetchBookmarks();
+    fetchReadingHistory();
 
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [email, lang]);
+  }, [email, userId, lang]);
 
   // Handle topic click
   const handleTopicClick = (topic: string) => {
@@ -526,6 +611,7 @@ export function useApp() {
     setActiveTab,
     browseChapterNumber,
     browseVerseNumber,
+    readingHistory,
     guidanceQuery,
     setGuidanceQuery,
     guidanceLoading,
@@ -539,7 +625,6 @@ export function useApp() {
     setIsPrefsModalOpen,
     toast,
     showToast,
-    telegramBotUsername,
     publicVapidKey,
     isPushSubscribed,
     loading,
@@ -552,10 +637,13 @@ export function useApp() {
     activeTopic,
     topics,
     handleLogout,
+    handleDeleteAccount,
     handleSavePrefs,
     handleSendTestDelivery,
     handleSeekGuidance,
     handleEnableNotifications,
+    handleSendOtp,
+    handleVerifyOtp,
     handleGuestSubscribe,
     handleGuestLangChange,
     fetchDailyShloka,

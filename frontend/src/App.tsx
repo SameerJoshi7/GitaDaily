@@ -18,6 +18,7 @@ function App() {
     activeTab,
     browseChapterNumber,
     browseVerseNumber,
+    readingHistory,
     guidanceQuery,
     setGuidanceQuery,
     guidanceLoading,
@@ -30,7 +31,6 @@ function App() {
     isPrefsModalOpen,
     setIsPrefsModalOpen,
     toast,
-    telegramBotUsername,
     isPushSubscribed,
     loading,
     dailyShloka,
@@ -42,10 +42,13 @@ function App() {
     activeTopic,
     topics,
     handleLogout,
+    handleDeleteAccount,
     handleSavePrefs,
     handleSendTestDelivery,
     handleSeekGuidance,
     handleEnableNotifications,
+    handleSendOtp,
+    handleVerifyOtp,
     handleGuestSubscribe,
     handleGuestLangChange,
     fetchDailyShloka,
@@ -93,6 +96,7 @@ function App() {
               apiBase={API_BASE}
               browseChapterNumber={browseChapterNumber}
               browseVerseNumber={browseVerseNumber}
+              readingHistory={readingHistory}
             />
           )}
 
@@ -165,13 +169,15 @@ function App() {
         editLang={editLang}
         setEditLang={setEditLang}
         isPushSubscribed={isPushSubscribed}
-        telegramBotUsername={telegramBotUsername}
 
         handleGuestSubscribe={handleGuestSubscribe}
+        handleSendOtp={handleSendOtp}
+        handleVerifyOtp={handleVerifyOtp}
         handleSavePrefs={handleSavePrefs}
         handleEnableNotifications={handleEnableNotifications}
         handleSendTestDelivery={handleSendTestDelivery}
         handleLogout={handleLogout}
+        handleDeleteAccount={handleDeleteAccount}
       />
     </div>
   );
