@@ -9,7 +9,6 @@ import { PreferencesModal } from './components/PreferencesModal';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
 import { useApp } from './hooks/useApp';
-import { AudioPlayer } from './components/AudioPlayer';
 
 function App() {
   const {
@@ -61,8 +60,6 @@ function App() {
       {/* Global In-App Toast */}
       <Toast message={toast} />
 
-      {/* Floating Audio Player */}
-      <AudioPlayer />
 
       {/* Sidebar Navigation */}
       <Sidebar
