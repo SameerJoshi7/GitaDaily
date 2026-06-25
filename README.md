@@ -1,4 +1,4 @@
-# 🪔 Krishna Bodha — Daily Bhagavad Gita Wisdom & Seek Divine Guidance
+# 🦚 Krishna Bodha — Daily Bhagavad Gita Wisdom & Seek Divine Guidance
 
 > *"Perform your duty equipoised, O Arjuna, abandoning all attachment to success or failure. Such equanimity is called Yoga."* — **Bhagavad Gita (2.48)**
 
@@ -139,4 +139,4 @@ npm run dev
 
 ---
 
-> *"Arise, O Arjuna! Conquer your mind, align your action with duty, and establish your daily discipline."* 🪔
+> *"Arise, O Arjuna! Conquer your mind, align your action with duty, and establish your daily discipline."* 🦚

@@ -72,7 +72,7 @@ export const sendEmailOTP = async (toEmail, otp) => {
           subject: 'Your Krishna Bodha Verification Code',
           html: `
             <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-              <h2>🪔 Krishna Bodha</h2>
+              <h2>🦚 Krishna Bodha</h2>
               <p>Your verification code is:</p>
               <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
               <p>This code will expire in 5 minutes.</p>
@@ -107,7 +107,7 @@ export const sendEmailOTP = async (toEmail, otp) => {
       text: `Your Krishna Bodha verification code is: ${otp}\n\nThis code will expire in 5 minutes.`,
       html: `
         <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-          <h2>🪔 Krishna Bodha</h2>
+          <h2>🦚 Krishna Bodha</h2>
           <p>Your verification code is:</p>
           <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
           <p>This code will expire in 5 minutes.</p>
@@ -132,11 +132,14 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   ];
   const activeArtwork = artworks[(shloka.chapter + shloka.verse) % artworks.length];
 
-  const subject = `🪔 Krishna Bodha Ch ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})`;
+  const subject = `🦚 Krishna Bodha Ch ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})`;
+
   const htmlContent = `
-    <div style="max-width: 600px; margin: 0 auto; font-family: 'Outfit', 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #0a0b10; color: #e4e6eb; padding: 25px; border-radius: 12px; border: 1px solid #1f2937;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: #fbbf24; font-size: 24px; margin: 0; font-weight: 700; letter-spacing: 1px;">🪔 Krishna Bodha 🪔</h1>
+    <div style="font-family: 'Georgia', serif; background-color: #050508; color: #e2e8f0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #111116; border: 1px solid #1a1a24; border-radius: 12px; overflow: hidden;">
+        <!-- Header -->
+        <div style="background-color: rgba(212, 175, 55, 0.05); padding: 30px; text-align: center; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
+        <h1 style="color: #fbbf24; font-size: 24px; margin: 0; font-weight: 700; letter-spacing: 1px;">🦚 Krishna Bodha 🦚</h1>
         <p style="color: #9ca3af; font-size: 13px; margin: 5px 0 0 0;">Your Daily Dose of AI-Powered Reflection & Wisdom</p>
       </div>
       

@@ -604,7 +604,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
   const lang = language.then(lang => (lang || 'english').toLowerCase());
 
   // Custom headers based on language selection
-  let title = '🪔 *Krishna Bodha: Daily Wisdom & AI Reflection* 🪔';
+  let title = '🦚 *Krishna Bodha: Daily Wisdom & AI Reflection* 🦚';
   let chLabel = 'Chapter';
   let vLabel = 'Verse';
   let sansLabel = 'Sanskrit';
@@ -616,7 +616,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
   let footer = 'Have a blessed and focused day! 🌸';
 
   if (lang === 'hindi') {
-    title = '🪔 *कृष्णबोध: दैनिक ज्ञान और एआई चिंतन* 🪔';
+    title = '🦚 *कृष्णबोध: दैनिक ज्ञान और एआई चिंतन* 🦚';
     chLabel = 'अध्याय';
     vLabel = 'श्लोक';
     transLabel = 'अनुवाद';
@@ -624,7 +624,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
     mindLabel = 'आज का अभ्यास';
     footer = 'आपका दिन शुभ और मंगलमय हो! 🌸';
   } else if (lang === 'telugu') {
-    title = '🪔 *కృష్ణబోధః: దినసరి జ్ఞానం మరియు ఎఐ విశ్లేషణ* 🪔';
+    title = '🦚 *కృష్ణబోధః: దినసరి జ్ఞానం మరియు ఎఐ విశ్లేషణ* 🦚';
     chLabel = 'అధ్యాయం';
     vLabel = 'శ్లోకం';
     transLabel = 'అనువాదం';
@@ -632,7 +632,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
     mindLabel = 'నేటి సాధన';
     footer = 'ఈ రోజు మీకు ప్రశాంతంగా మరియు విజయవంతంగా సాగాలని కోరుకుంటున్నాము! 🌸';
   } else if (lang === 'kannada') {
-    title = '🪔 *ಕೃಷ್ಣಬೋಧಃ: ದಿನನಿತ್ಯದ ಜ್ಞಾನ ಮತ್ತು ಎಐ ವಿಶ್ಲೇಷಣೆ* 🪔';
+    title = '🦚 *ಕೃಷ್ಣಬೋಧಃ: ದಿನನಿತ್ಯದ ಜ್ಞಾನ ಮತ್ತು ಎಐ ವಿಶ್ಲೇಷಣೆ* 🦚';
     chLabel = 'ಅಧ್ಯಾಯ';
     vLabel = 'ಶ್ಲೋಕ';
     transLabel = 'ಅನುವಾದ';
@@ -739,7 +739,7 @@ app.post('/api/test-delivery', async (req, res) => {
     if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
       try {
         const payload = JSON.stringify({
-          title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
+          title: `🦚 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
           body: reflection.translatedTranslation || shloka.translation,
           image: getArtworkForShloka(shloka),
           url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
@@ -1235,7 +1235,7 @@ async function broadcastDailyShloka() {
         if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
           try {
             const payload = JSON.stringify({
-              title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
+              title: `🦚 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
               body: reflection.translatedTranslation || shloka.translation,
               image: getArtworkForShloka(shloka),
               url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`

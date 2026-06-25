@@ -13,13 +13,13 @@ self.addEventListener('push', function(event) {
       };
 
       event.waitUntil(
-        self.registration.showNotification(payload.title || '🪔 Krishna Bodha', options)
+        self.registration.showNotification(payload.title || '🦚 Krishna Bodha', options)
       );
     } catch (e) {
       console.error('Error parsing push data:', e);
       // Fallback plain text notification
       event.waitUntil(
-        self.registration.showNotification('🪔 Krishna Bodha Shloka', {
+        self.registration.showNotification('🦚 Krishna Bodha Shloka', {
           body: event.data.text(),
           icon: '/favicon.ico'
         })
