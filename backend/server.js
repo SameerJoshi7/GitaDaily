@@ -585,7 +585,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
   let footer = 'Have a blessed and focused day! 🌸';
 
   if (lang === 'hindi') {
-    title = '🪔 *कृष्णबोधः: दैनिक ज्ञान और एआई चिंतन* 🪔';
+    title = '🪔 *कृष्णबोध: दैनिक ज्ञान और एआई चिंतन* 🪔';
     chLabel = 'अध्याय';
     vLabel = 'श्लोक';
     transLabel = 'अनुवाद';

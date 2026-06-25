@@ -36,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <a href="#/dailyinsights" onClick={(e) => { e.preventDefault(); window.location.hash = '#/dailyinsights'; }} className="brand" style={{ gap: '0.6rem' }}>
           <span className="brand-icon">🪔</span>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.3 }}>
-            <span className="brand-name-sanskrit">कृष्णबोधः</span>
+            <span className="brand-name-sanskrit">कृष्णबोध</span>
             <span className="brand-subtitle">Krishna Bodha</span>
           </div>
         </a>
@@ -147,13 +147,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Language Selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <Globe size={16} color="var(--text-secondary)" />
-          <select 
-            value={lang} 
+          <select
+            value={lang}
             onChange={(e) => onLangChange(e.target.value)}
-            style={{ 
-              background: 'transparent', 
-              color: 'var(--text-primary)', 
-              border: 'none', 
+            style={{
+              background: 'transparent',
+              color: 'var(--text-primary)',
+              border: 'none',
               outline: 'none',
               width: '100%',
               cursor: 'pointer',
