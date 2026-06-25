@@ -60,12 +60,15 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
       // Wait a tiny bit just to let UI show loading state
       await new Promise(res => setTimeout(res, 100)); 
       
-      const htmlToImage = await import('html-to-image');
-      const dataUrl = await htmlToImage.toPng(shareRef.current, {
-        quality: 1.0,
-        pixelRatio: 1, // we are already 1080x1350, so 1 is fine to avoid huge files
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(shareRef.current, {
+        scale: 1, // we are already 1080x1350, so 1 is fine
         backgroundColor: '#0a0b10',
+        useCORS: true,
+        allowTaint: true,
+        logging: false
       });
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
       
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `gita-ch${shloka.chapter}-v${shloka.verse}.png`, { type: 'image/png' });
