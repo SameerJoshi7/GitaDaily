@@ -92,9 +92,9 @@ export function PreferencesModal({
             {authMode === 'subscribe' ? (
               <form onSubmit={(e) => {
                 e.preventDefault();
-                const target = e.target as any;
-                const emailVal = target.elements.guestEmail.value;
-                const prefVal = target.elements.guestPref.value;
+                const form = e.currentTarget;
+                const emailVal = (form.elements.namedItem('guestEmail') as HTMLInputElement).value;
+                const prefVal = (form.elements.namedItem('guestPref') as HTMLSelectElement).value;
                 handleGuestSubscribe(emailVal, prefVal);
                 onClose();
               }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>

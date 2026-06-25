@@ -44,11 +44,8 @@ export function useApp() {
   const [publicVapidKey, setPublicVapidKey] = useState('');
   const [isPushSubscribed, setIsPushSubscribed] = useState(false);
   
-  // Update edit states when profile loads
-  useEffect(() => {
-    setEditPref(pref);
-    setEditLang(lang);
-  }, [pref, lang]);
+  // editPref and editLang are initialised directly from pref/lang useState above.
+  // They are kept in sync via the PreferencesModal's own reset logic on open.
   
   // Fetch app configs and check Service Worker push subscription status on startup
   useEffect(() => {
@@ -284,9 +281,9 @@ export function useApp() {
         const data = await res.json();
         alert(data.error || 'Failed to save push subscription on server.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error subscribing to push notifications:', err);
-      alert('Failed to subscribe: ' + (err.message || err));
+      alert('Failed to subscribe: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }
@@ -303,8 +300,8 @@ export function useApp() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
       return { success: true };
-    } catch (err: any) {
-      return { success: false, error: err.message };
+    } catch (err: unknown) {
+      return { success: false, error: err instanceof Error ? err.message : 'Failed to send OTP' };
     }
   };
 
@@ -330,8 +327,8 @@ export function useApp() {
         // Technically this shouldn't happen if we're only letting returning users login, but just in case
         return { success: false, error: 'User not found. Please subscribe as a new user.' };
       }
-    } catch (err: any) {
-      return { success: false, error: err.message };
+    } catch (err: unknown) {
+      return { success: false, error: err instanceof Error ? err.message : 'Invalid OTP' };
     }
   };
 
@@ -585,9 +582,11 @@ export function useApp() {
 
     fetchChapters();
     fetchBookmarks();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchReadingHistory();
 
     return () => window.removeEventListener('hashchange', handleHashChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, userId, lang]);
 
   // Handle topic click

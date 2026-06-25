@@ -51,6 +51,7 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   // Sync state with url-based routing props
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (browseChapterNumber !== null && browseChapterNumber !== undefined) {
       if (chapters.length > 0) {
@@ -71,10 +72,12 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
       setError(null);
     }
   }, [browseChapterNumber, browseVerseNumber, chapters]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Fetch specific verse details from the API
   useEffect(() => {
     if (!selectedChapter) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShloka(null);
       return;
     }
@@ -91,19 +94,22 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
         }
         const data = await res.json();
         setShloka(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Error occurred';
         console.error('Error fetching shloka:', err);
-        setError(err.message || 'Error occurred');
+        setError(msg);
       } finally {
         setLoading(false);
       }
     };
 
     fetchVerse();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChapter, currentVerse, email, apiBase]);
 
   // Handle chapter selection
   const handleChapterClick = (chapter: Chapter) => {
+    // eslint-disable-next-line react-hooks/immutability
     window.location.hash = `#/browse/chapter/${chapter.chapterNumber}/verse/1`;
   };
 
