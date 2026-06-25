@@ -149,7 +149,7 @@ async function getGeminiReflection(shloka, language = 'english') {
   }
 
   console.log('language----', language)
-  const langSuffix = (language || 'english').toLowerCase();
+  const langSuffix = ((await language) || 'english').toLowerCase();
   const cacheKey = `${shloka.chapter}_${shloka.verse}_${langSuffix}`;
   const cache = readData(REFLECTIONS_CACHE_PATH);
   if (cache[cacheKey]) {
