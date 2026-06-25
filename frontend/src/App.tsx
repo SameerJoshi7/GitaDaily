@@ -138,7 +138,6 @@ function App() {
               bookmarks={bookmarks}
               onToggleBookmark={handleToggleBookmark}
               lang={lang}
-              email={email}
               onSubscribeClick={() => setIsPrefsModalOpen(true)}
             />
           )}

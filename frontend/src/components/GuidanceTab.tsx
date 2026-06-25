@@ -20,7 +20,6 @@ interface GuidanceTabProps {
   bookmarks: Shloka[];
   onToggleBookmark: (shloka: Shloka) => void;
   lang?: string;
-  email?: string;
   onSubscribeClick?: () => void;
 }
 
@@ -34,7 +33,6 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
   bookmarks,
   onToggleBookmark,
   lang = 'english',
-  email,
   onSubscribeClick,
 }) => {
   const T = t(lang);

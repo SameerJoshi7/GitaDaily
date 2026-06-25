@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, Send, Sparkles, LogOut, KeyRound } from 'lucide-react';
+import { Bell, Sparkles, LogOut } from 'lucide-react';
 import { t } from '../i18n';
 
 interface PreferencesModalProps {
