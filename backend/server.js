@@ -688,43 +688,44 @@ app.post('/api/test-delivery', async (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-  const language = user.lang || 'english';
-  let shloka = gitaData[0];
-  if (chapter && verse) {
-    const found = gitaData.find(s => s.chapter === parseInt(chapter) && s.verse === parseInt(verse));
-    if (found) shloka = found;
-  }
-
-  const reflection = await getGeminiReflection(shloka, language);
-  const messageText = formatShlokaMessage(shloka, reflection, language);
-  const deliveryStatus = {};
-
-  // 1. Email Delivery
-  if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
-    const emailResult = await sendDailyShlokaEmail(user.email, shloka, reflection, language);
-    deliveryStatus.email = emailResult;
-  }
-
-
-
-  // 3. Web Push Delivery
-  if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
-    try {
-      const payload = JSON.stringify({
-        title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
-        body: reflection.translatedTranslation || shloka.translation,
-        image: getArtworkForShloka(shloka),
-        url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
-      });
-      await webpush.sendNotification(user.pushSubscription, payload);
-      deliveryStatus.push = { success: true };
-    } catch (err) {
-      console.error('[WebPush] Error sending test notification:', err);
-      deliveryStatus.push = { success: false, error: err.message };
+    const language = user.lang || 'english';
+    let shloka = gitaData[0];
+    if (chapter && verse) {
+      const found = gitaData.find(s => s.chapter === parseInt(chapter) && s.verse === parseInt(verse));
+      if (found) shloka = found;
     }
-  }
 
-  res.json({ message: 'Test delivery triggered', status: deliveryStatus });
+    const reflection = await getGeminiReflection(shloka, language);
+    const deliveryStatus = {};
+
+    // 1. Email Delivery
+    if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
+      const emailResult = await sendDailyShlokaEmail(user.email, shloka, reflection, language);
+      deliveryStatus.email = emailResult;
+    }
+
+    // 2. Web Push Delivery
+    if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
+      try {
+        const payload = JSON.stringify({
+          title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
+          body: reflection.translatedTranslation || shloka.translation,
+          image: getArtworkForShloka(shloka),
+          url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
+        });
+        await webpush.sendNotification(user.pushSubscription, payload);
+        deliveryStatus.push = { success: true };
+      } catch (pushErr) {
+        console.error('[WebPush] Error sending test notification:', pushErr);
+        deliveryStatus.push = { success: false, error: pushErr.message };
+      }
+    }
+
+    res.json({ message: 'Test delivery triggered', status: deliveryStatus });
+  } catch (err) {
+    console.error('[TestDelivery] Error:', err);
+    res.status(500).json({ error: 'Failed to send test delivery.' });
+  }
 });
 
 // 10. Web Push Subscription endpoint
