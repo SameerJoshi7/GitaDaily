@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sparkles, Bookmark, Lock } from 'lucide-react';
 import type { Shloka } from './ShlokaCard';
+import { ShlokaShare } from './ShlokaShare';
 import { t } from '../i18n';
 
 interface GuidanceTabProps {
@@ -153,13 +154,16 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
                 <span className="shloka-meta" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                   {T.card.chapterVerse(guidanceResult.shloka.chapter, guidanceResult.shloka.verse)}
                 </span>
-                <button
-                  onClick={() => onToggleBookmark(guidanceResult.shloka)}
-                  className={`bookmark-icon-btn ${bookmarks.some(b => b.chapter === guidanceResult.shloka.chapter && b.verse === guidanceResult.shloka.verse) ? 'active' : ''}`}
-                  title={T.card.addBookmark}
-                >
-                  <Bookmark size={22} fill={bookmarks.some(b => b.chapter === guidanceResult.shloka.chapter && b.verse === guidanceResult.shloka.verse) ? 'currentColor' : 'none'} />
-                </button>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <ShlokaShare shloka={guidanceResult.shloka} customCounsel={guidanceResult.counsel} />
+                  <button
+                    onClick={() => onToggleBookmark(guidanceResult.shloka)}
+                    className={`bookmark-icon-btn ${bookmarks.some(b => b.chapter === guidanceResult.shloka.chapter && b.verse === guidanceResult.shloka.verse) ? 'active' : ''}`}
+                    title={T.card.addBookmark}
+                  >
+                    <Bookmark size={22} fill={bookmarks.some(b => b.chapter === guidanceResult.shloka.chapter && b.verse === guidanceResult.shloka.verse) ? 'currentColor' : 'none'} />
+                  </button>
+                </div>
               </div>
 
               <div className="shloka-sanskrit" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{guidanceResult.shloka.sanskrit}</div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bookmark, ArrowLeft, ChevronLeft, ChevronRight, Loader2, Sparkles, Heart, Compass } from 'lucide-react';
 import { t } from '../i18n';
 import type { Shloka } from './ShlokaCard';
+import { ShlokaShare } from './ShlokaShare';
 
 export interface Chapter {
   chapterNumber: number;
@@ -362,13 +363,16 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
                 <span className="shloka-meta" style={{ color: 'var(--gold-primary)', fontWeight: 600 }}>
                   {T.card.chapterVerse(shloka.chapter, shloka.verse)}
                 </span>
-                <button
-                  onClick={() => onToggleBookmark(shloka)}
-                  className={`bookmark-icon-btn ${isBookmarked ? 'active' : ''}`}
-                  title={T.card.addBookmark}
-                >
-                  <Bookmark size={22} fill={isBookmarked ? 'currentColor' : 'none'} />
-                </button>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <ShlokaShare shloka={shloka} />
+                  <button
+                    onClick={() => onToggleBookmark(shloka)}
+                    className={`bookmark-icon-btn ${isBookmarked ? 'active' : ''}`}
+                    title={T.card.addBookmark}
+                  >
+                    <Bookmark size={22} fill={isBookmarked ? 'currentColor' : 'none'} />
+                  </button>
+                </div>
               </div>
 
               <div className="shloka-sanskrit" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
