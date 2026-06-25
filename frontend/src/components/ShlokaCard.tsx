@@ -82,11 +82,11 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
         </div>
 
         <div className="shloka-sanskrit" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{shloka.sanskrit}</div>
-        <div className="shloka-transliteration" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>{shloka.transliteration}</div>
+        <div className="shloka-transliteration" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>{reflection?.translatedTransliteration || shloka.transliteration}</div>
 
         <div className="shloka-translation-box" style={{ background: 'rgba(25, 28, 43, 0.45)', backdropFilter: 'blur(4px)' }}>
           <div className="shloka-translation-label">{T.card.translationLabel}</div>
-          <p className="shloka-translation" style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{shloka.translation}</p>
+          <p className="shloka-translation" style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{reflection?.translatedTranslation || shloka.translation}</p>
         </div>
 
         {reflection && (

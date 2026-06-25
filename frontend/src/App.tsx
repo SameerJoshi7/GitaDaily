@@ -26,8 +26,7 @@ function App() {
     guidanceError,
     editPref,
     setEditPref,
-    editLang,
-    setEditLang,
+
     isPrefsModalOpen,
     setIsPrefsModalOpen,
     toast,
@@ -165,8 +164,7 @@ function App() {
         loading={loading}
         editPref={editPref}
         setEditPref={setEditPref}
-        editLang={editLang}
-        setEditLang={setEditLang}
+
         isPushSubscribed={isPushSubscribed}
 
         handleGuestSubscribe={handleGuestSubscribe}

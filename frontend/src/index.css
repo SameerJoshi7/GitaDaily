@@ -45,6 +45,10 @@ body {
   background-attachment: fixed;
 }
 
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -1033,6 +1037,17 @@ body {
 .desktop-profile-container {
   display: none;
   width: 100%;
+}
+
+.mobile-lang-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.03) !important;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.25) !important;
+  font-weight: 500;
 }
 
 .sidebar-artwork {

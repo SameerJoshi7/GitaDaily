@@ -108,13 +108,14 @@ export function useApp() {
     localStorage.removeItem('gitadaily_email');
     localStorage.removeItem('gitadaily_userId');
     localStorage.removeItem('gitadaily_pref');
-    localStorage.removeItem('gitadaily_lang');
+    // We intentionally DO NOT remove 'gitadaily_lang' so language persists post-logout
     setEmail('');
     setUserId('');
     setPref('email');
-    setLang('english');
+    // We intentionally DO NOT reset lang to 'english'
     setDailyShloka(null);
     setBookmarks([]);
+    setReadingHistory(null);
   };
 
   const handleDeleteAccount = async () => {
@@ -471,7 +472,7 @@ export function useApp() {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(queryStr)}`);
+      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(queryStr)}&lang=${lang}`);
       if (res.ok) {
         const data = await res.json();
         setSearchResults(data);

@@ -11,8 +11,6 @@ interface PreferencesModalProps {
   loading: boolean;
   editPref: string;
   setEditPref: (val: string) => void;
-  editLang: string;
-  setEditLang: (val: string) => void;
   isPushSubscribed: boolean;
   handleGuestSubscribe: (emailVal: string, prefVal: string) => void;
   handleSendOtp: (email: string) => Promise<{ success: boolean; error?: string }>;
@@ -33,8 +31,6 @@ export function PreferencesModal({
   loading,
   editPref,
   setEditPref,
-  editLang,
-  setEditLang,
   isPushSubscribed,
   handleGuestSubscribe,
   handleSendOtp,
@@ -226,19 +222,7 @@ export function PreferencesModal({
               await handleSavePrefs(e);
               onClose();
             }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">{T.sidebar.language}</label>
-                <select
-                  className="input-field"
-                  value={editLang}
-                  onChange={(e) => setEditLang(e.target.value)}
-                >
-                  <option value="english">English</option>
-                  <option value="hindi">Hindi (हिन्दी)</option>
-                  <option value="telugu">Telugu (తెలుగు)</option>
-                  <option value="kannada">Kannada (ಕನ್ನಡ)</option>
-                </select>
-              </div>
+
 
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">{T.sidebar.notifications}</label>

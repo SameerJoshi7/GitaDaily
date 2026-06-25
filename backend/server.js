@@ -469,21 +469,52 @@ app.get('/api/chapters', async (req, res) => {
 });
 
 // 5. Search Shlokas
-app.get('/api/search', (req, res) => {
-  const { q } = req.query;
+app.get('/api/search', async (req, res) => {
+  const { q, email } = req.query;
   if (!q) {
     return res.json([]);
   }
 
   const query = q.toString().toLowerCase();
-  const results = gitaData.filter(s =>
+  let results = gitaData.filter(s =>
     s.translation.toLowerCase().includes(query) ||
     s.transliteration.toLowerCase().includes(query) ||
     s.theme.toLowerCase().includes(query) ||
     s.topics.some(topic => topic.toLowerCase().includes(query)) ||
     `ch${s.chapter}`.includes(query) ||
     `chapter ${s.chapter}`.includes(query)
-  );
+  ).slice(0, 10);
+
+  const language = await getUserLanguage(email, req);
+  if (language !== 'english' && genAI && results.length > 0) {
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      const prompt = `
+        Translate the following Bhagavad Gita verse translations and themes into ${language}. 
+        Provide phonetic transliteration for the Sanskrit text in the script of ${language}.
+        Respond strictly in JSON array format matching the input array order:
+        [
+          { "translation": "translated english text", "theme": "translated theme text", "transliteration": "phonetic transliteration in target script" }
+        ]
+        
+        Input:
+        ${JSON.stringify(results.map(r => ({ translation: r.translation, theme: r.theme, transliteration: r.transliteration })))}
+      `;
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      });
+      const translatedData = JSON.parse(result.response.text());
+      results = results.map((r, i) => ({
+        ...r,
+        translation: translatedData[i]?.translation || r.translation,
+        theme: translatedData[i]?.theme || r.theme,
+        transliteration: translatedData[i]?.transliteration || r.transliteration
+      }));
+    } catch (err) {
+      console.error('[Search] Dynamic translation error:', err);
+    }
+  }
 
   res.json(results);
 });
@@ -831,7 +862,10 @@ app.post('/api/guidance', async (req, res) => {
     return res.status(400).json({ error: 'Please describe the challenge or feeling you are facing.' });
   }
 
-  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  let clientIp = req.socket.remoteAddress || 'unknown';
+  if (req.headers['x-forwarded-for']) {
+    clientIp = req.headers['x-forwarded-for'].split(',')[0].trim();
+  }
 
   if (!userId) {
     try {
@@ -908,8 +942,8 @@ app.post('/api/guidance', async (req, res) => {
       ).filter(Boolean);
     }
 
-    // VARIETY: Pick a random shloka from the top candidates
-    const selectedCandidate = candidates[Math.floor(Math.random() * candidates.length)];
+    // PRECISE MATCH: Pick the absolute best matching shloka
+    const selectedCandidate = candidates[0];
 
     // Async log the query to MongoDB
     const logEntry = {
@@ -948,9 +982,9 @@ app.post('/api/guidance', async (req, res) => {
         "translatedTranslation": "Translation of the selected shloka into the language: ${lang}",
         "translatedTransliteration": "Phonetic transliteration of the selected shloka written in the script of the chosen language: ${lang}",
         "theme": "A brief theme or title for this verse",
-        "modernCounsel": "Write a deeply comforting, detailed, and warm counsel (8-10 sentences) in the language: ${lang}. Start by acknowledging their specific challenge (\"${query}\") with friendship and care. Then, explain in clear, friendly, and practical terms how the selected shloka directly addresses and solves this specific issue. Break down the shloka's wisdom, showing how it guides them out of their current dilemma. You MUST include a concrete, relatable real-life example to illustrate how they can apply this wisdom in their daily life. Keep the tone loving, conversational, and highly reassuring, as if speaking to a beloved sibling.",
-        "wellbeingInsight": "A gentle, deeply comforting piece of advice (3-4 sentences) focusing on their emotional healing and mental peace, written as a caring friend in the language: ${lang}. Reassure them that they are doing well and that their peace is valuable.",
-        "actionStep": "One clear, practical, and simple step they can take today inspired by the shloka to help them make progress, written in a warm, encouraging tone in the language: ${lang}."
+        "modernCounsel": "Write a deeply comforting, highly detailed, and warm counsel (3 substantial paragraphs) in the language: ${lang}. Paragraph 1: Acknowledge their specific challenge (\"${query}\") with profound empathy and validate their feelings. Paragraph 2: Explain comprehensively how the selected shloka perfectly addresses their specific issue, breaking down the spiritual mechanics of why this wisdom works. Paragraph 3: Provide a very concrete, relatable real-life example illustrating exactly how they can apply this shift in perspective right now. Do NOT be brief. Write richly.",
+        "wellbeingInsight": "A gentle, deeply comforting reflection (4-6 sentences) focusing purely on their emotional healing and mental peace, written as a caring mentor in the language: ${lang}. Reassure them that they are doing well and that inner peace is fully accessible to them right now.",
+        "actionStep": "Provide 2 clear, practical, and highly specific steps they can take today inspired by the shloka. Explain exactly how to do them, written in a warm, encouraging tone in the language: ${lang}."
       }
     `;
 
