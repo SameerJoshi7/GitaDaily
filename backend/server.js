@@ -156,7 +156,7 @@ async function getGeminiReflection(shloka, language = 'english') {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `
       You are an enlightened guide analyzing the Bhagavad Gita for modern audiences.
       Analyze the following Gita Shloka:
@@ -381,7 +381,7 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
 
     try {
       console.log(`[Dynamic Shloka] Fetching details for Ch ${chapter}, Verse ${verse} from Gemini`);
-      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
       const prompt = `
         You are a scholar of the Bhagavad Gita.
         Provide the precise details for Bhagavad Gita Chapter ${chapter}, Verse ${verse}.
@@ -488,7 +488,7 @@ app.get('/api/search', async (req, res) => {
   const language = await getUserLanguage(email, req);
   if (language !== 'english' && genAI && results.length > 0) {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
       const prompt = `
         Translate the following Bhagavad Gita verse translations and themes into ${language}. 
         Provide phonetic transliteration for the Sanskrit text in the script of ${language}.
@@ -957,7 +957,7 @@ app.post('/api/guidance', async (req, res) => {
 
     QueryLog.create(logEntry).catch(err => console.error('[Guidance] Failed to log query:', err));
 
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `
       You are a warm, wise, and deeply compassionate spiritual mentor and close friend who knows the Bhagavad Gita by heart.
       The user is coming to you for personal, friendly advice on a specific challenge, feeling, or query they are facing:
@@ -986,6 +986,8 @@ app.post('/api/guidance', async (req, res) => {
         "wellbeingInsight": "A gentle, deeply comforting reflection (4-6 sentences) focusing purely on their emotional healing and mental peace, written as a caring mentor in the language: ${lang}. Reassure them that they are doing well and that inner peace is fully accessible to them right now.",
         "actionStep": "Provide 2 clear, practical, and highly specific steps they can take today inspired by the shloka. Explain exactly how to do them, written in a warm, encouraging tone in the language: ${lang}."
       }
+      
+      CRITICAL INSTRUCTION: Your output MUST be valid JSON. If you include multiple paragraphs in 'modernCounsel', you MUST escape newlines using \\n and avoid literal newline characters inside the JSON strings.
     `;
 
     console.log(`[Guidance] Seeking counsel for query: "${query}" in language: ${lang}`);
@@ -1090,91 +1092,63 @@ app.post('/api/guidance', async (req, res) => {
           bestShloka = gitaData.find(s => s.chapter === 2 && s.verse === 47) || gitaData[0];
         }
       }
-
-      // Determine counsel content based on the selected shloka topic/theme
-      const selectedTheme = (bestShloka.chapter === 6 && bestShloka.verse === 5) ? 'mind' :
-        (bestShloka.chapter === 2 && bestShloka.verse === 47) ? 'duty' : 'general';
-
-      const fallbackContent = {
-        english: {
-          mind: {
-            modernCounsel: "I know how exhausting it feels when your mind is racing and you can't stay focused. In this verse, Krishna reminds us that our mind can either be our greatest ally or our toughest enemy, depending on how we treat it. Don't be too hard on yourself when you drift; instead, gently bring your attention back like a friend guiding you home.",
-            wellbeingInsight: "Your mind is just tired, and that's completely okay. Take a deep breath right now, let go of the pressure to be perfect, and remember you are doing great.",
-            actionStep: "Whenever you feel distracted today, just pause, take one deep breath, and do one small thing at a time with your full presence."
-          },
-          duty: {
-            modernCounsel: "It's so easy to get anxious when we are constantly worrying about how things will turn out. This beautiful verse is a gentle reminder that we only own our efforts, not the final results. Focus all your energy on doing your best right now, and leave the rest to unfold naturally—you'll feel a huge weight lift off your shoulders.",
-            wellbeingInsight: "Let go of the need to control the future. You only have to handle this exact moment, and you are fully capable of doing that.",
-            actionStep: "Write down what you need to do next, do it sincerely, and promise yourself not to worry about the final grade or outcome."
-          },
-          general: {
-            modernCounsel: "Whatever you are walking through right now, please know that you are not alone and this phase is only temporary. This verse reminds us to anchor ourselves in inner peace and trust the bigger journey of life. Stand strong in your values, and believe that things will align for your betterment.",
-            wellbeingInsight: "Give yourself credit for how far you've come. You are much stronger and more resilient than any temporary challenge in front of you.",
-            actionStep: "Think of one thing you are grateful for today, write it down, and let that warmth guide your next step."
-          }
-        },
-        hindi: {
-          mind: {
-            modernCounsel: "मैं समझ सकता हूँ कि जब मन भटकता है और ध्यान लगाना मुश्किल होता है, तो कितना बुरा लगता है। इस श्लोक में कृष्ण हमें समझाते हैं कि हमारा मन ही हमारा सबसे अच्छा दोस्त या सबसे बड़ा दुश्मन बन सकता है। जब आपका ध्यान भटके, तो खुद पर गुस्सा करने के बजाय बड़े प्यार से अपने मन को वापस काम पर लाएं।",
-            wellbeingInsight: "आपका मन बस थोड़ा थक गया है और ऐसा होना सामान्य है। एक लंबी सांस लें, खुद पर से दबाव हटाएँ और याद रखें कि आप बहुत अच्छा कर रहे हैं।",
-            actionStep: "आज जब भी ध्यान भटके, बस एक गहरी सांस लें और बिना किसी हड़बड़ी के अपना ध्यान वर्तमान काम पर केंद्रित करें।"
-          },
-          duty: {
-            modernCounsel: "हम अक्सर इस चिंता में डूबे रहते हैं कि आगे क्या होगा, जिससे तनाव बढ़ जाता है। यह प्यारा श्लोक हमें याद दिलाता है कि हमारा अधिकार केवल अपनी मेहनत पर है, उसके नतीजे पर नहीं। आज अपना पूरा ध्यान सिर्फ कर्म करने पर लगाएं और परिणाम की चिंता छोड़ दें, इससे आप बहुत हल्का महसूस करेंगे।",
-            wellbeingInsight: "भविष्य को नियंत्रित करने की कोशिश में खुद को न थकाएँ। आपको बस इस पल को संभालना है, और आप इसमें पूरी तरह सक्षम हैं।",
-            actionStep: "अपने आज के काम की सूची बनाएं, उसे पूरी ईमानदारी से पूरा करें और नतीजे की फिक्र करना बिल्कुल छोड़ दें।"
-          },
-          general: {
-            modernCounsel: "आप आज जिस भी दौर से गुजर रहे हैं, याद रखें कि आप अकेले नहीं हैं और यह वक्त भी गुजर जाएगा। यह श्लोक हमें सिखाता है कि हमें अपनी अंतरात्मा को शांत रखना चाहिए और जीवन की यात्रा पर भरोसा करना चाहिए। अपने अच्छे इरादों पर डटे रहें, सब ठीक हो जाएगा।",
-            wellbeingInsight: "अपनी ताकत को पहचानें। आप अपनी मुश्किलों से कहीं ज्यादा मजबूत हैं, खुद पर भरोसा रखें।",
-            actionStep: "आज किसी एक अच्छी बात के बारे में सोचें जिसके लिए आप आभारी हैं, और उसी सकारात्मक ऊर्जा के साथ आगे बढ़ें।"
-          }
-        },
-        telugu: {
-          mind: {
-            modernCounsel: "మనస్సు మనకు పరమ మిత్రుడు లేదా పరమ శత్రువు కావచ్చు కనుక, దానిని జయించాలని గీత మనకు మార్గదర్శనం చేస్తుంది. ఆత్మనిగ్రహం మరియు ఆలోచనలను సకారాత్మకంగా మలచుకోవడం ద్వారానే నిజమైన శక్తి లభిస్తుంది. తాత్కాలిక వైఫల్యాలు లేదా ప్రతికూల ఆలోచనలు మిమ్మల్ని కృంగదీయనివ్వకండి.",
-            wellbeingInsight: "మీ ఆలోచనలను ఎటువంటి తీర్పులు లేకుండా గమనించండి. ప్రశాంతంగా శ్వాస తీసుకోండి మరియు మీ ప్రస్తుత మానసిక స్థితి మీ భవిష్యత్తును నిర్ణయించదని గుర్తుంచుకోండి.",
-            actionStep: "ఈరోజు మీ ఆలోచనలను గమనించడానికి మరియు ప్రశాంతపరుచుకోవడానికి 5 నిమిషాల పాటు మౌనంగా లేదా ధ్యానంలో గడపండి."
-          },
-          duty: {
-            modernCounsel: "మన ప్రయత్నాలపై మాత్రమే మనకు నియంత్రణ ఉంటుందని, ఫలితాలపై కాదని ఈ శ్లోకం మనకు గుర్తుచేస్తుంది. ఫలితాల గురించి ఆందోళన కలిగినప్పుడు, మీ ప్రస్తుత పనిని ఉత్తమంగా చేయడంపైనే దృష్టి పెట్టండి. మీ నిజాయితీతో కూడిన పనులు తగిన సమయంలో ఫలితాన్ని ఇస్తాయని నమ్మండి.",
-            wellbeingInsight: "భవిష్యత్తును అంచనా వేసే భారాన్ని వదిలేయండి. వర్తమాన క్షణంపై మరియు ప్రస్తుతం మీ నియంత్రణలో ఉన్నదానిపై దృష్టి పెట్టండి.",
-            actionStep: "ఈరోజు మీరు చేయవలసిన మూడు తక్షణ పనులను జాబితా చేయండి మరియు చివరి ఫలితం గురించి ఆందోళన చెందకుండా వాటిని శ్రద్ధగా పూర్తి చేయండి."
-          },
-          general: {
-            modernCounsel: "మన చేతనను శాశ్వత సత్యంతో అనుసంధానించడం ద్వారా అంతర్గత ప్రశాంతతను ఎలా పొందాలో ఈ పవిత్ర శ్లోకం మనకు నేర్పుతుంది. భౌతిక ప్రపంచంలో మనం ఎదుర్కొనే ప్రతి సవాలు తాత్కాలికమే. మీ ధర్మంలో స్థిరంగా నిలబడండి మరియు దైవ నిర్ణయంపై నమ్మకం ఉంచండి.",
-            wellbeingInsight: "పరిస్థితి నుండి కొంచెం వెనక్కి తగ్గి విస్తృత కోణంలో చూడండి. మీరు ఎదుర్కొంటున్న సవాళ్ల కంటే మీరు చాలా శక్తివంతులు.",
-            actionStep: "ఈ సవాలు మీకు నేర్పుతున్న ఒక సానుకూల పాఠం గురించి ఆలోచించి, దానిని రాసుకోండి."
-          }
-        },
-        kannada: {
-          mind: {
-            modernCounsel: "ಮನಸ್ಸು ನಮಗೆ ಪರಮ ಮಿತ್ರ ಅಥವಾ ಪರಮ ಶತ್ರು ಆಗಬಲ್ಲದು, ಆದ್ದರಿಂದ ಅದನ್ನು ಗೆಲ್ಲಬೇಕೆಂದು ಗೀತೆಯು ನಮಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತದೆ. ಆತ್ಮನಿಗ್ರಹ ಮತ್ತು ಧನಾತ್ಮಕ ಆಲೋಚನೆಗಳಿಂದಲೇ ನಿಜವಾದ ಶಕ್ತಿ ಸಿಗುತ್ತದೆ. ತಾತ್ಕಾಲಿಕ ವೈಫಲ್ಯಗಳು ಅಥವಾ ನಕಾರಾತ್ಮಕ ಆಲೋಚನೆಗಳು ನಿಮ್ಮನ್ನು ಕುಗ್ಗಿಸದಂತೆ ನೋಡಿಕೊಳ್ಳಿ.",
-            wellbeingInsight: "ಯಾವುದೇ ಪೂರ್ವಗ್ರಹವಿಲ್ಲದೆ ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಗಮನಿಸಿ. ಆಳವಾಗಿ ಉಸಿರಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಮಾನಸಿಕ ಸ್ಥಿತಿಯು ನಿಮ್ಮ ಭವಿಷ್ಯವನ್ನು ನಿರ್ಧರಿಸುವುದಿಲ್ಲ ಎಂಬುದನ್ನು ನೆನಪಿಡಿ.",
-            actionStep: "ಇಂದು ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಗಮನಿಸಲು ಮತ್ತು ಶಾಂತಗೊಳಿಸಲು 5 ನಿಮಿಷಗಳ ಕಾಲ ಮೌನವಾಗಿ ಅಥವಾ ಧ್ಯಾನದಲ್ಲಿ ಕಳೆಯಿರಿ."
-          },
-          duty: {
-            modernCounsel: "ನಮ್ಮ ಪ್ರಯತ್ನಗಳ ಮೇಲೆ ಮಾತ್ರ ನಮಗೆ ನಿಯಂತ್ರಣವಿದೆ, ಫಲಿತಾಂಶಗಳ ಮೇಲಲ್ಲ ಎಂಬುದನ್ನು ಈ ಶ್ಲೋಕವು ನಮಗೆ ನೆನಪಿಸುತ್ತದೆ. ಫಲಿತಾಂಶಗಳ ಬಗ್ಗೆ ಆತಂಕವಿದ್ದಾಗ, ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಕೆಲಸವನ್ನು ಉತ್ತಮವಾಗಿ ಮಾಡುವುದರ ಕಡೆಗೇ ಗಮನ ಹರಿಸಿ. ನಿಮ್ಮ ಪ್ರಾಮಾಣಿಕ ಪ್ರಯತ್ನಗಳು ಸೂಕ್ತ ಸಮಯದಲ್ಲಿ ಉತ್ತಮ ಫಲವನ್ನು ನೀಡುತ್ತವೆ ಎಂದು ನಂಬಿರಿ.",
-            wellbeingInsight: "ಭವಿಷ್ಯತ್ತನ್ನು ಊಹಿಸುವ ಹೊರೆಯನ್ನು ಬಿಟ್ಟುಬಿಡಿ. ವರ್ತಮಾನದ ಕ್ಷಣ ಮತ್ತು ನಿಮ್ಮ ನಿಯಂತ್ರಣದಲ್ಲಿರುವ ವಿಷಯಗಳ ಮೇಲೆ ಗಮನ ಹರಿಸಿ.",
-            actionStep: "ಇಂದು ನೀವು ಮಾಡಬೇಕಾದ ಮೂರು ಪ್ರಮುಖ ಕೆಲಸಗಳನ್ನು ಪಟ್ಟಿ ಮಾಡಿ ಮತ್ತು ಅಂತಿಮ ಫಲಿತಾಂಶದ ಬಗ್ಗೆ ಚಿಂತಿಸದೆ ಅವುಗಳನ್ನು ಏಕಾಗ್ರತೆಯಿಂದ ಪೂರ್ಣಗೊಳಿಸಿ."
-          },
-          general: {
-            modernCounsel: "ನಮ್ಮ ಪ್ರಜ್ಞೆಯನ್ನು ಶಾಶ್ವತ ಸತ್ಯದೊಂದಿಗೆ ಜೋಡಿಸುವ ಮೂಲಕ ಆಂತರಿಕ ಶಾಂತಿಯನ್ನು ಪಡೆಯುವುದನ್ನು ಈ ಪವಿತ್ರ ಶ್ಲೋಕವು ನಮಗೆ ಕಲಿಸುತ್ತದೆ. ಭೌತಿಕ ಜಗತ್ತಿನಲ್ಲಿ ನಾವು ಎದುರಿಸುವ ಪ್ರತಿಯೊಂದು ಸವಾಲು ತಾತ್ಕಾಲಿಕವಾಗಿದೆ. ನಿಮ್ಮ ಧರ್ಮದಲ್ಲಿ ದೃಢವಾಗಿ ನಿಲ್ಲಿ ಮತ್ತು ದೈವಿಕ ನಿರ್ಧಾರದಲ್ಲಿ ನಂಬಿಕೆಯಿಡಿ.",
-            wellbeingInsight: "ಪರಿಸ್ಥಿತಿಯಿಂದ ಸ್ವಲ್ಪ ದೂರ ಸರಿದು ವಿಶಾಲ ದೃಷ್ಟಿಕೋನದಿಂದ ನೋಡಿ. ನೀವು ಎದುರಿಸುತ್ತಿರುವ ಸವಾಲುಗಳಿಗಿಂತಲೂ ನೀವು ಬಲಿಷ್ಠರಾಗಿದ್ದೀರಿ.",
-            actionStep: "ಈ ಸವಾಲು ನಿಮಗೆ ಕಲಿಸುತ್ತಿರುವ ಒಂದು ಧನಾತ್ಮಕ ಪಾಠದ ಬಗ್ಗೆ ಯೋಚಿಸಿ, ಅದನ್ನು ಬರೆದಿಟ್ಟುಕೊಳ್ಳಿ."
-          }
-        }
+      // Dynamic Offline Fallback Counsel Generation
+      const intros = {
+        english: [
+          "I understand that things feel heavy right now. This ancient wisdom speaks directly to your situation.",
+          "It's completely natural to feel this way. Let this timeless verse guide you back to center.",
+          "Whatever you are walking through right now, please know that you are not alone. Krishna offers this profound guidance:",
+          "I know how exhausting this can feel. In this verse, we find a beautiful reminder of our own inner strength."
+        ],
+        hindi: [
+          "मैं समझ सकता हूँ कि अभी परिस्थितियाँ कठिन लग रही हैं। यह प्राचीन ज्ञान सीधे आपकी स्थिति पर बात करता है।",
+          "ऐसा महसूस होना पूरी तरह स्वाभाविक है। इस श्लोक को अपने मन की शांति का मार्गदर्शक बनने दें।",
+          "आप अभी जिस भी दौर से गुजर रहे हैं, याद रखें कि आप अकेले नहीं हैं। कृष्ण यह गहरा मार्गदर्शन देते हैं:",
+          "मुझे पता है कि यह कितना थका देने वाला हो सकता है। इस श्लोक में हमें अपनी आंतरिक शक्ति की याद दिलाई गई है।"
+        ],
+        telugu: [
+          "ప్రస్తుతం విషయాలు కష్టంగా అనిపిస్తున్నాయని నాకు అర్థమవుతోంది. ఈ ప్రాచీన జ్ఞానం మీ పరిస్థితికి మార్గదర్శనం చేస్తుంది.",
+          "ఇలా అనిపించడం చాలా సహజం. ఈ కాలాతీత శ్లోకం మిమ్మల్ని ప్రశాంతత వైపు నడిపిస్తుంది.",
+          "మీరు ఇప్పుడు ఎలాంటి పరిస్థితుల గుండా వెళుతున్నా, మీరు ఒంటరి కాదని తెలుసుకోండి. కృష్ణుడు ఈ లోతైన మార్గదర్శకత్వాన్ని అందిస్తున్నాడు:",
+          "ఇది ఎంత అలసిపోయేలా చేస్తుందో నాకు తెలుసు. ఈ శ్లోకంలో మన స్వంత అంతర్గత శక్తి యొక్క అందమైన రిమైండర్‌ను మనం కనుగొంటాము."
+        ],
+        kannada: [
+          "ಈಗ ಪರಿಸ್ಥಿತಿಗಳು ಕಷ್ಟಕರವಾಗಿವೆ ಎಂದು ನನಗೆ ಅರ್ಥವಾಗುತ್ತದೆ. ಈ ಪ್ರಾಚೀನ ಜ್ಞಾನವು ನೇರವಾಗಿ ನಿಮ್ಮ ಪರಿಸ್ಥಿತಿಯನ್ನು ತಿಳಿಸುತ್ತದೆ.",
+          "ಹೀಗೆ ಅನಿಸುವುದು ಸಂಪೂರ್ಣವಾಗಿ ಸಹಜ. ಈ ಟೈಮ್‌ಲೆಸ್ ಶ್ಲೋಕವು ನಿಮ್ಮನ್ನು ಕೇಂದ್ರಕ್ಕೆ ಹಿಂತಿರುಗಿಸಲು ಮಾರ್ಗದರ್ಶನ ನೀಡಲಿ.",
+          "ನೀವು ಇದೀಗ ಏನೇ ನಡೆಯುತ್ತಿರಲಿ, ನೀವು ಒಬ್ಬಂಟಿಯಾಗಿಲ್ಲ ಎಂಬುದನ್ನು ದಯವಿಟ್ಟು ತಿಳಿಯಿರಿ. ಕೃಷ್ಣನು ಈ ಆಳವಾದ ಮಾರ್ಗದರ್ಶನವನ್ನು ನೀಡುತ್ತಾನೆ:",
+          "ಇದು ಎಷ್ಟು ದಣಿದಿದೆ ಎಂದು ನನಗೆ ತಿಳಿದಿದೆ. ಈ ಶ್ಲೋಕದಲ್ಲಿ ನಾವು ನಮ್ಮ ಸ್ವಂತ ಆಂತರಿಕ ಶಕ್ತಿಯ ಸುಂದರವಾದ ಜ್ಞಾಪನೆಯನ್ನು ಕಾಣುತ್ತೇವೆ."
+        ]
       };
 
-      const langKey = fallbackContent[lang] ? lang : 'english';
-      const counselData = fallbackContent[langKey][selectedTheme];
+      const langKey = lang === 'hindi' ? 'hindi' : lang === 'telugu' ? 'telugu' : lang === 'kannada' ? 'kannada' : 'english';
+      const introList = intros[langKey];
+      const randomIntro = introList[Math.floor(Math.random() * introList.length)];
 
-      // Retrieve translations / localizations for the shloka itself
-      let trans = bestShloka.translation;
-      let translit = bestShloka.transliteration;
-      if (bestShloka.localizations && bestShloka.localizations[lang]) {
-        trans = bestShloka.localizations[lang].translation;
-        translit = bestShloka.localizations[lang].transliteration;
+      let transToUse = bestShloka.translation;
+      let translitToUse = bestShloka.transliteration;
+      if (bestShloka.localizations && bestShloka.localizations[langKey]) {
+        transToUse = bestShloka.localizations[langKey].translation;
+        translitToUse = bestShloka.localizations[langKey].transliteration;
+      }
+
+      let modernCounsel, wellbeingInsight, actionStep;
+
+      if (langKey === 'english') {
+        modernCounsel = `${randomIntro}\n\nChapter ${bestShloka.chapter}, Verse ${bestShloka.verse} teaches us: "${transToUse}".\n\nBy anchoring yourself in this profound thought, you can shift your perspective and overcome the immediate challenge in front of you. Trust the bigger journey.`;
+        wellbeingInsight = `Give yourself credit for how far you've come. You are much stronger and more resilient than any temporary challenge. Let go of the pressure, take a deep breath, and remember that inner peace is fully accessible to you right now.`;
+        actionStep = `1. Take a moment today to pause and reflect on this specific verse.\n2. Write down one small, actionable way you can apply this wisdom to your current situation.`;
+      } else if (langKey === 'hindi') {
+        modernCounsel = `${randomIntro}\n\nअध्याय ${bestShloka.chapter}, श्लोक ${bestShloka.verse} हमें सिखाता है: "${transToUse}"।\n\nइस गहरे विचार में खुद को स्थिर करके, आप अपने दृष्टिकोण को बदल सकते हैं और अपने सामने आने वाली तात्कालिक चुनौती को दूर कर सकते हैं।`;
+        wellbeingInsight = `आप अब तक कितना आगे आए हैं, इसके लिए खुद को श्रेय दें। आप किसी भी अस्थायी चुनौती की तुलना में बहुत अधिक मजबूत और लचीले हैं। गहरी सांस लें और याद रखें कि आंतरिक शांति अभी आपके लिए पूरी तरह से सुलभ है।`;
+        actionStep = `1. आज इस श्लोक पर विचार करने के लिए कुछ क्षण निकालें।\n2. अपनी वर्तमान स्थिति में इस ज्ञान को लागू करने का एक छोटा, व्यावहारिक तरीका लिखें।`;
+      } else if (langKey === 'telugu') {
+        modernCounsel = `${randomIntro}\n\nఅధ్యాయం ${bestShloka.chapter}, శ్లోకం ${bestShloka.verse} మనకు బోధిస్తుంది: "${transToUse}".\n\nఈ లోతైన ఆలోచనలో మిమ్మల్ని మీరు లగ్నం చేసుకోవడం ద్వారా, మీరు మీ దృక్పథాన్ని మార్చుకోవచ్చు మరియు మీ ముందు ఉన్న తక్షణ సవాలును అధిగమించవచ్చు.`;
+        wellbeingInsight = `మీరు ఇప్పటివరకు సాధించిన దానికి మిమ్మల్ని మీరు అభినందించుకోండి. ఏదైనా తాత్కాలిక సవాలు కంటే మీరు చాలా బలమైనవారు మరియు స్థితిస్థాపకంగా ఉంటారు. ఒత్తిడిని వదిలేయండి, దీర్ఘ శ్వాస తీసుకోండి మరియు అంతర్గత శాంతి ఇప్పుడు మీకు పూర్తిగా అందుబాటులో ఉందని గుర్తుంచుకోండి.`;
+        actionStep = `1. ఈ రోజు ఈ శ్లోకం గురించి ఆలోచించడానికి కొద్దిసేపు ఆగిపోండి.\n2. మీ ప్రస్తుత పరిస్థితికి ఈ జ్ఞానాన్ని వర్తింపజేయగల ఒక చిన్న ఆచరణాత్మక మార్గాన్ని రాయండి.`;
+      } else {
+        modernCounsel = `${randomIntro}\n\nಅಧ್ಯಾಯ ${bestShloka.chapter}, ಶ್ಲೋಕ ${bestShloka.verse} ನಮಗೆ ಕಲಿಸುತ್ತದೆ: "${transToUse}".\n\nಈ ಆಳವಾದ ಚಿಂತನೆಯಲ್ಲಿ ನಿಮ್ಮನ್ನು ಲಂಗರು ಹಾಕುವ ಮೂಲಕ, ನಿಮ್ಮ ದೃಷ್ಟಿಕೋನವನ್ನು ನೀವು ಬದಲಾಯಿಸಬಹುದು ಮತ್ತು ನಿಮ್ಮ ಮುಂದಿರುವ ತಕ್ಷಣದ ಸವಾಲನ್ನು ನಿವಾರಿಸಬಹುದು. ದೊಡ್ಡ ಪ್ರಯಾಣವನ್ನು ನಂಬಿರಿ.`;
+        wellbeingInsight = `ನೀವು ಎಷ್ಟು ದೂರ ಬಂದಿದ್ದೀರಿ ಎಂಬುದಕ್ಕೆ ನೀವೇ ಮನ್ನಣೆ ನೀಡಿ. ಯಾವುದೇ ತಾತ್ಕಾಲಿಕ ಸವಾಲಿಗಿಂತ ನೀವು ಹೆಚ್ಚು ಬಲಶಾಲಿ ಮತ್ತು ಸ್ಥಿತಿಸ್ಥಾಪಕರಾಗಿದ್ದೀರಿ. ಒತ್ತಡವನ್ನು ಬಿಡಿ, ದೀರ್ಘವಾದ ಉಸಿರನ್ನು ತೆಗೆದುಕೊಳ್ಳಿ ಮತ್ತು ಆಂತರಿಕ ಶಾಂತಿಯು ಇದೀಗ ನಿಮಗೆ ಸಂಪೂರ್ಣವಾಗಿ ಪ್ರವೇಶಿಸಬಹುದು ಎಂಬುದನ್ನು ನೆನಪಿಡಿ.`;
+        actionStep = `1. ಈ ನಿರ್ದಿಷ್ಟ ಶ್ಲೋಕವನ್ನು ವಿರಾಮಗೊಳಿಸಲು ಮತ್ತು ಪ್ರತಿಬಿಂಬಿಸಲು ಇಂದು ಸ್ವಲ್ಪ ಸಮಯ ತೆಗೆದುಕೊಳ್ಳಿ.\n2. ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಪರಿಸ್ಥಿತಿಗೆ ಈ ಬುದ್ಧಿವಂತಿಕೆಯನ್ನು ಅನ್ವಯಿಸುವ ಒಂದು ಸಣ್ಣ, ಕಾರ್ಯಸಾಧ್ಯವಾದ ಮಾರ್ಗವನ್ನು ಬರೆಯಿರಿ.`;
       }
 
       const logEntry = { query, language: lang, suggestedChapter: bestShloka.chapter, suggestedVerse: bestShloka.verse, ipAddress: clientIp };
@@ -1188,14 +1162,14 @@ app.post('/api/guidance', async (req, res) => {
           chapter: bestShloka.chapter,
           verse: bestShloka.verse,
           sanskrit: bestShloka.sanskrit,
-          transliteration: translit,
-          translation: trans,
-          theme: bestShloka.theme,
+          transliteration: translitToUse,
+          translation: transToUse,
+          theme: bestShloka.theme
         },
         counsel: {
-          modernCounsel: counselData.modernCounsel,
-          wellbeingInsight: counselData.wellbeingInsight,
-          actionStep: counselData.actionStep
+          modernCounsel,
+          wellbeingInsight,
+          actionStep
         }
       });
     } catch (fallbackErr) {
