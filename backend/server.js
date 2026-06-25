@@ -201,7 +201,7 @@ async function getGeminiReflection(shloka, language = 'english') {
   } catch (error) {
     console.error(`Error generating Gemini reflection for ${language}:`, error);
     // Return localized fallback on error
-    const lang = (language || 'english').toLowerCase();
+    const lang = ((await language) || 'english').toLowerCase();
     let trans = shloka.translation;
     let translit = shloka.transliteration;
 
@@ -571,7 +571,11 @@ function getArtworkForShloka(shloka) {
 
 // Format message helper
 function formatShlokaMessage(shloka, reflection, language = 'english') {
-  const lang = (language || 'english').toLowerCase();
+  const lang = language
+    .then(lang => (lang || 'english').toLowerCase())
+    .then(result => {
+      console.log(result);
+    });
 
   // Custom headers based on language selection
   let title = '🪔 *Krishna Bodha: Daily Wisdom & AI Reflection* 🪔';
@@ -845,7 +849,7 @@ app.post('/api/guidance', async (req, res) => {
     }
   }
 
-  const lang = (language || 'english').toLowerCase();
+  const lang = ((await language) || 'english').toLowerCase();
 
   if (!genAI) {
     return res.status(500).json({ error: 'Gemini AI is not configured on this server.' });
