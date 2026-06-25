@@ -188,19 +188,17 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
     </div>
 
     {/* Hidden Shareable Container (Exact Browser UI without extra AI cards) */}
-    <div 
-      ref={shareRef}
-      className="shloka-card"
-      style={{
-        position: 'absolute',
-        top: '-10000px',
-        left: '-10000px',
-        width: '400px',
-        overflow: 'hidden',
-        padding: '1.5rem',
-        boxSizing: 'border-box'
-      }}
-    >
+    <div style={{ position: 'fixed', top: 0, left: 0, zIndex: -1000, pointerEvents: 'none' }}>
+      <div 
+        ref={shareRef}
+        className="shloka-card"
+        style={{
+          width: '400px',
+          overflow: 'hidden',
+          padding: '1.5rem',
+          boxSizing: 'border-box'
+        }}
+      >
       <div
         style={{
           position: 'absolute',
@@ -251,6 +249,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
           <p style={{ margin: 0, color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }}>with ❤️ by Sameer Joshi</p>
         </div>
       </div>
+    </div>
     </div>
     </>
   );
