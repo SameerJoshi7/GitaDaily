@@ -72,7 +72,7 @@ export const sendEmailOTP = async (toEmail, otp) => {
           subject: 'Your Krishna Bodha Verification Code',
           html: `
             <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-              <h2>🦚 Krishna Bodha</h2>
+              <h2><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha</h2>
               <p>Your verification code is:</p>
               <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
               <p>This code will expire in 5 minutes.</p>
@@ -107,7 +107,7 @@ export const sendEmailOTP = async (toEmail, otp) => {
       text: `Your Krishna Bodha verification code is: ${otp}\n\nThis code will expire in 5 minutes.`,
       html: `
         <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-          <h2>🦚 Krishna Bodha</h2>
+          <h2><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha</h2>
           <p>Your verification code is:</p>
           <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
           <p>This code will expire in 5 minutes.</p>
@@ -139,7 +139,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
       <div style="max-width: 600px; margin: 0 auto; background-color: #111116; border: 1px solid #1a1a24; border-radius: 12px; overflow: hidden;">
         <!-- Header -->
         <div style="background-color: rgba(212, 175, 55, 0.05); padding: 30px; text-align: center; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
-        <h1 style="color: #fbbf24; font-size: 24px; margin: 0; font-weight: 700; letter-spacing: 1px;">🦚 Krishna Bodha 🦚</h1>
+        <h1 style="color: #fbbf24; font-size: 24px; margin: 0; font-weight: 700; letter-spacing: 1px;"><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-left: 8px;" /></h1>
         <p style="color: #9ca3af; font-size: 13px; margin: 5px 0 0 0;">Your Daily Dose of AI-Powered Reflection & Wisdom</p>
       </div>
       
