@@ -89,12 +89,12 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
           }}
         >
           {/* Background Image & Overlay */}
-          <div
+          <img
+            src={`${window.location.origin}${activeArtwork}`}
+            alt="background"
             style={{
-              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-              backgroundImage: `url(${activeArtwork})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+              objectFit: 'cover',
               opacity: 0.25,
               zIndex: 0
             }}
@@ -126,17 +126,26 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
           {/* Content Container */}
           <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
             
-            {/* Header */}
+            {/* Header Logo */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                <img src={`${window.location.origin}/flute-icon.png`} alt="Logo" style={{ width: '45px', height: '45px' }} />
+                <span style={{ fontSize: '2.2rem', fontWeight: 700, color: 'var(--gold-primary)', fontFamily: 'var(--font-serif)' }}>कृष्णबोध</span>
+              </div>
+              <span style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '3px', fontFamily: 'var(--font-display)' }}>Krishna Bodha</span>
+            </div>
+
+            {/* Chapter Header */}
             <div style={{ 
               display: 'inline-flex', alignItems: 'center', gap: '1rem',
               padding: '0.5rem 2rem', borderBottom: '1px solid var(--gold-primary)', borderTop: '1px solid var(--gold-primary)',
-              marginBottom: '3rem', marginTop: '1rem'
+              marginBottom: '2.5rem'
             }}>
-              <Sparkles size={20} color="var(--gold-primary)" />
-              <span style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-primary)', fontSize: '1.4rem', letterSpacing: '3px', textTransform: 'uppercase' }}>
+              <Sparkles size={18} color="var(--gold-primary)" />
+              <span style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-primary)', fontSize: '1.2rem', letterSpacing: '3px', textTransform: 'uppercase' }}>
                 CHAPTER {shloka.chapter}, VERSE {shloka.verse}
               </span>
-              <Sparkles size={20} color="var(--gold-primary)" />
+              <Sparkles size={18} color="var(--gold-primary)" />
             </div>
 
             {/* Sanskrit & Transliteration */}
@@ -210,14 +219,11 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
               </div>
             )}
 
-            {/* Footer Logo */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'auto', paddingTop: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                <img src="/flute-icon.png" alt="Logo" style={{ width: '50px', height: '50px' }} />
-                <span style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--gold-primary)', fontFamily: 'var(--font-serif)' }}>कृष्णबोध</span>
-              </div>
-              <span style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '3px', fontFamily: 'var(--font-display)' }}>Krishna Bodha</span>
-              <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.5rem', fontStyle: 'italic' }}>with ❤️ by Sameer Joshi</span>
+            {/* Footer */}
+            <div style={{ marginTop: 'auto', paddingTop: '1rem', textAlign: 'center', width: '100%' }}>
+              <span style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', fontStyle: 'italic', display: 'block' }}>
+                with ❤️ by Sameer Joshi
+              </span>
             </div>
 
           </div>
