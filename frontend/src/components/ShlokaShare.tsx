@@ -145,20 +145,30 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
             }}
           />
 
-          {/* Decorative Border */}
+          {/* Decorative Outer Border */}
           <div
             style={{
-              position: 'absolute', top: '2rem', left: '2rem', right: '2rem', bottom: '2rem',
-              border: '2px solid rgba(212, 175, 55, 0.4)',
+              position: 'absolute', top: '1.5rem', left: '1.5rem', right: '1.5rem', bottom: '1.5rem',
+              border: '1px solid rgba(212, 175, 55, 0.2)',
+              zIndex: 1,
+              pointerEvents: 'none'
+            }}
+          />
+
+          {/* Decorative Inner Border */}
+          <div
+            style={{
+              position: 'absolute', top: '2.2rem', left: '2.2rem', right: '2.2rem', bottom: '2.2rem',
+              border: '1px solid rgba(212, 175, 55, 0.6)',
               zIndex: 1,
               pointerEvents: 'none'
             }}
           >
-            {/* Corner accents */}
-            <div style={{ position: 'absolute', top: '-6px', left: '-6px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--gold-primary)' }} />
-            <div style={{ position: 'absolute', top: '-6px', right: '-6px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--gold-primary)' }} />
-            <div style={{ position: 'absolute', bottom: '-6px', left: '-6px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--gold-primary)' }} />
-            <div style={{ position: 'absolute', bottom: '-6px', right: '-6px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--gold-primary)' }} />
+            {/* Elegant Diamond Corner accents */}
+            <div style={{ position: 'absolute', top: '-4px', left: '-4px', width: '8px', height: '8px', background: 'var(--gold-primary)', transform: 'rotate(45deg)' }} />
+            <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', background: 'var(--gold-primary)', transform: 'rotate(45deg)' }} />
+            <div style={{ position: 'absolute', bottom: '-4px', left: '-4px', width: '8px', height: '8px', background: 'var(--gold-primary)', transform: 'rotate(45deg)' }} />
+            <div style={{ position: 'absolute', bottom: '-4px', right: '-4px', width: '8px', height: '8px', background: 'var(--gold-primary)', transform: 'rotate(45deg)' }} />
           </div>
 
           {/* Content Container */}
