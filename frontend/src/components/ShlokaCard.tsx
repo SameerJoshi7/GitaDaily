@@ -187,7 +187,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
     </div>
 
     {/* Shareable Container: 1080x1350 */}
-    <div style={{ position: 'fixed', top: 0, left: 0, zIndex: -1000, pointerEvents: 'none' }}>
+    <div style={{ position: 'fixed', top: 0, left: '-9999px', zIndex: -1000, pointerEvents: 'none' }}>
       <div 
         ref={shareRef}
         style={{
