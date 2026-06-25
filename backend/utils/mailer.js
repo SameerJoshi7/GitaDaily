@@ -135,53 +135,73 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   const subject = `🦚 Krishna Bodha Ch ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})`;
 
   const htmlContent = `
-    <div style="font-family: 'Georgia', serif; background-color: #050508; color: #e2e8f0; padding: 20px;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #111116; border: 1px solid #1a1a24; border-radius: 12px; overflow: hidden;">
-        <!-- Header -->
-        <div style="background-color: rgba(212, 175, 55, 0.05); padding: 30px; text-align: center; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
-        <h1 style="color: #fbbf24; font-size: 24px; margin: 0; font-weight: 700; letter-spacing: 1px;"><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-left: 8px;" /></h1>
-        <p style="color: #9ca3af; font-size: 13px; margin: 5px 0 0 0;">Your Daily Dose of AI-Powered Reflection & Wisdom</p>
-      </div>
-      
-      <div style="border-radius: 8px; overflow: hidden; margin-bottom: 20px; text-align: center;">
-        <img src="${activeArtwork}" alt="Sacred Gita Art" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px;" />
-      </div>
-
-      <div style="text-align: center; margin-bottom: 25px;">
-        <h2 style="color: #fbbf24; font-size: 20px; margin: 0 0 10px 0;">Chapter ${shloka.chapter}, Verse ${shloka.verse}</h2>
-        <div style="font-size: 18px; font-style: italic; color: #f59e0b; line-height: 1.6; margin: 15px 0; font-family: 'Georgia', serif;">
-          ${shloka.sanskrit}
+    <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; color: #e2e8f0; padding: 20px; text-align: center;">
+      <!-- Main Card Container -->
+      <div style="max-width: 600px; margin: 0 auto; background-color: #0d0f16; background-image: linear-gradient(to bottom, rgba(13, 15, 22, 0.95), rgba(13, 15, 22, 0.98)), url('${activeArtwork}'); background-size: cover; background-position: center; border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        
+        <!-- Header: Meta & Icon -->
+        <div style="text-align: center; margin-bottom: 25px;">
+          <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5)); margin-bottom: 10px;" />
+          <h2 style="color: #fbbf24; font-size: 14px; margin: 0; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Chapter ${shloka.chapter}, Verse ${shloka.verse}</h2>
         </div>
-        <p style="font-size: 13px; color: #9ca3af; line-height: 1.5; margin: 0 0 5px 0;"><strong>Transliteration:</strong> ${reflection.translatedTransliteration || shloka.transliteration}</p>
-        <p style="font-size: 15px; color: #fbbf24; line-height: 1.6; margin: 10px 0 0 0;"><strong>Translation:</strong> ${reflection.translatedTranslation || shloka.translation}</p>
+
+        <!-- Sanskrit & Transliteration -->
+        <div style="margin-bottom: 30px;">
+          <div style="font-size: 22px; font-weight: bold; color: #fbbf24; line-height: 1.6; margin-bottom: 10px; font-family: 'Rozha One', 'Georgia', serif; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+            ${shloka.sanskrit}
+          </div>
+          <div style="font-size: 14px; font-style: italic; color: #9ca3af; line-height: 1.5;">
+            ${reflection.translatedTransliteration || shloka.transliteration}
+          </div>
+        </div>
+
+        <!-- Translation Box -->
+        <div style="background-color: rgba(25, 28, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left;">
+          <div style="font-size: 11px; color: #fbbf24; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600;">Translation</div>
+          <p style="font-size: 15px; color: #ffffff; line-height: 1.6; margin: 0;">${reflection.translatedTranslation || shloka.translation}</p>
+        </div>
+
+        <!-- AI Deep Understanding -->
+        <div style="text-align: left;">
+          <h3 style="color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 15px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 10px;">
+            ✨ AI Deep Understanding
+          </h3>
+
+          <!-- Reflection Cards (Stacked for Email Compatibility) -->
+          <div style="background-color: rgba(18, 20, 31, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+            <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">🧠 Modern Relevance</div>
+            <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.modernReflection}</p>
+          </div>
+
+          <div style="background-color: rgba(18, 20, 31, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+            <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">❤️ Emotional Well-being</div>
+            <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.emotionalWellbeing}</p>
+          </div>
+
+          <div style="background-color: rgba(18, 20, 31, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 25px;">
+            <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">💼 Career & Focus</div>
+            <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.careerApplication}</p>
+          </div>
+
+          <!-- Mindfulness Banner -->
+          <div style="background-color: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 10px; padding: 15px; text-align: center;">
+            <div style="font-size: 20px; margin-bottom: 8px;">🧘</div>
+            <div style="color: #fbbf24; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Mindful Practice for Today</div>
+            <p style="font-size: 14px; color: #ffffff; font-style: italic; margin: 0;">"${reflection.mindfulnessTip}"</p>
+          </div>
+        </div>
+
       </div>
 
-      <hr style="border: 0; border-top: 1px solid #1f2937; margin: 20px 0;" />
-
-      <div style="margin-bottom: 20px;">
-        <h3 style="color: #f59e0b; font-size: 15px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">✨ AI Reflection</h3>
-        <p style="font-size: 14px; color: #d1d5db; line-height: 1.6; margin: 0;">${reflection.modernReflection}</p>
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <h3 style="color: #f59e0b; font-size: 15px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">🧘 Emotional Well-being</h3>
-        <p style="font-size: 14px; color: #d1d5db; line-height: 1.6; margin: 0;">${reflection.emotionalWellbeing}</p>
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <h3 style="color: #f59e0b; font-size: 15px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">💼 Career Application</h3>
-        <p style="font-size: 14px; color: #d1d5db; line-height: 1.6; margin: 0;">${reflection.careerApplication}</p>
-      </div>
-
-      <div style="background-color: #1e1b4b; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin-bottom: 25px;">
-        <h3 style="color: #fbbf24; font-size: 13px; margin: 0 0 5px 0; text-transform: uppercase;">🌸 Daily Mindfulness Exercise</h3>
-        <p style="font-size: 14px; color: #e0e7ff; line-height: 1.5; margin: 0; font-style: italic;">"${reflection.mindfulnessTip}"</p>
-      </div>
-
-      <div style="text-align: center; margin-top: 30px; font-size: 11px; color: #6b7280; border-top: 1px solid #1f2937; padding-top: 15px;">
-        <p style="margin: 0;">You received this because you subscribed to daily reflections from Krishna Bodha.</p>
-        <p style="margin: 5px 0 0 0;">Made with ❤️ by <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none; font-weight: 500;">Sameer Joshi</a> (<a href="https://github.com/SameerJoshi7" target="_blank" style="color: #fbbf24; text-decoration: none;">GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none;">LinkedIn</a>)</p>
-        <p style="margin: 5px 0 0 0;">Have a blessed day! 🌸</p>
+      <!-- Footer / Watermark -->
+      <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #6b7280;">
+        <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 6px; opacity: 0.5;" />
+        <span style="font-weight: 700; color: rgba(212, 175, 55, 0.7); letter-spacing: 1px;">KRISHNA BODHA</span>
+        <div style="margin-top: 8px;">with love by Sameer Joshi</div>
+        <div style="margin-top: 15px; font-size: 11px;">
+          You received this because you subscribed to daily reflections.<br>
+          <a href="https://github.com/SameerJoshi7" target="_blank" style="color: #fbbf24; text-decoration: none;">GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none;">LinkedIn</a>
+        </div>
       </div>
     </div>
   `;

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Bookmark, Sparkles, Brain, Heart, Briefcase } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Bookmark, Sparkles, Brain, Heart, Briefcase, Share2 } from 'lucide-react';
 import { t } from '../i18n';
 
 export interface Reflection {
@@ -45,8 +45,50 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
   ];
   const activeArtwork = artworks[(shloka.chapter + shloka.verse) % artworks.length];
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isSharing, setIsSharing] = useState(false);
+
+  const handleShare = async () => {
+    if (!cardRef.current) return;
+    try {
+      setIsSharing(true);
+      // Brief timeout to allow state to render the watermark
+      await new Promise(res => setTimeout(res, 50));
+      const htmlToImage = await import('html-to-image');
+      const dataUrl = await htmlToImage.toPng(cardRef.current, {
+        quality: 0.95,
+        backgroundColor: '#0a0b10',
+        style: {
+          transform: 'scale(1)',
+          margin: '0'
+        }
+      });
+      
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `gita-ch${shloka.chapter}-v${shloka.verse}.png`, { type: 'image/png' });
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `Krishna Bodha - Ch ${shloka.chapter}, Verse ${shloka.verse}`,
+          text: 'Daily wisdom and AI reflection from Krishna Bodha.',
+          files: [file]
+        });
+      } else {
+        // Fallback: download
+        const link = document.createElement('a');
+        link.download = file.name;
+        link.href = dataUrl;
+        link.click();
+      }
+    } catch (err) {
+      console.error('Failed to share image', err);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   return (
-    <div className="shloka-card" style={{ position: 'relative', overflow: 'hidden' }}>
+    <div className="shloka-card" ref={cardRef} style={{ position: 'relative', overflow: 'hidden', padding: isSharing ? '30px' : undefined }}>
       {/* Subtle background image watermark */}
       <div
         style={{
@@ -71,14 +113,24 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
           <span className="shloka-meta" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
             {T.card.chapterVerse(shloka.chapter, shloka.verse)}
           </span>
-          <button
-            onClick={onToggleBookmark}
-            className={`bookmark-icon-btn ${isBookmarked ? 'active' : ''}`}
-            title={isBookmarked ? T.card.removeBookmark : T.card.addBookmark}
-            aria-label={isBookmarked ? T.card.removeBookmark : T.card.addBookmark}
-          >
-            <Bookmark size={22} fill={isBookmarked ? 'currentColor' : 'none'} />
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', opacity: isSharing ? 0 : 1 }}>
+            <button
+              onClick={handleShare}
+              className="bookmark-icon-btn"
+              title="Share as Image"
+              aria-label="Share as Image"
+            >
+              <Share2 size={22} />
+            </button>
+            <button
+              onClick={onToggleBookmark}
+              className={`bookmark-icon-btn ${isBookmarked ? 'active' : ''}`}
+              title={isBookmarked ? T.card.removeBookmark : T.card.addBookmark}
+              aria-label={isBookmarked ? T.card.removeBookmark : T.card.addBookmark}
+            >
+              <Bookmark size={22} fill={isBookmarked ? 'currentColor' : 'none'} />
+            </button>
+          </div>
         </div>
 
         <div className="shloka-sanskrit" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{shloka.sanskrit}</div>
@@ -131,6 +183,16 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
                 <span className="mindfulness-desc" style={{ color: '#ffffff', fontStyle: 'italic' }}>"{reflection.mindfulnessTip}"</span>
               </div>
             </div>
+          </div>
+        )}
+
+        {isSharing && (
+          <div style={{ marginTop: '2rem', textAlign: 'center', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <img src="/flute-icon.png" alt="Flute" style={{ width: '24px', height: '24px' }} />
+              <span style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-primary)', fontSize: '1.2rem', fontWeight: 'bold' }}>Krishna Bodha</span>
+            </div>
+            <p style={{ margin: '0.25rem 0 0', color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>with love by Sameer Joshi</p>
           </div>
         )}
       </div>
