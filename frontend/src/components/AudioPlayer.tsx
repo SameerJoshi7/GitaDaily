@@ -33,23 +33,32 @@ export const AudioPlayer: React.FC = () => {
   const [isMuted, setIsMuted] = useState<boolean>(() => {
     return localStorage.getItem('gitadaily_music_muted') === 'true';
   });
+  const [volume, setVolume] = useState<number>(() => {
+    const saved = localStorage.getItem('gitadaily_music_volume');
+    if (saved !== null) {
+      const parsed = parseFloat(saved);
+      return Math.min(Math.max(parsed, 0), 0.4);
+    }
+    return 0.005;
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Sync volume & mute state on mount and update
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.muted = isMuted;
-      audioRef.current.volume = 0.005; // Set extremely soft, whisper background volume (0.5%)
+      audioRef.current.volume = volume;
     }
     localStorage.setItem('gitadaily_music_muted', String(isMuted));
-  }, [isMuted]);
+    localStorage.setItem('gitadaily_music_volume', String(volume));
+  }, [isMuted, volume]);
 
   // Sync current track source and play state
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.src = tracks[currentTrackIndex].url;
       audioRef.current.load();
-      audioRef.current.volume = 0.005; // Maintain soft volume on load
+      audioRef.current.volume = volume;
       localStorage.setItem('gitadaily_music_track', String(currentTrackIndex));
       if (isPlaying) {
         audioRef.current.play()
@@ -70,7 +79,7 @@ export const AudioPlayer: React.FC = () => {
       // Autoplay only if user hasn't explicitly paused it previously
       const isExplicitlyPaused = localStorage.getItem('gitadaily_music_playing') === 'false';
       if (!isExplicitlyPaused && audioRef.current && !isPlaying) {
-        audioRef.current.volume = 0.005;
+        audioRef.current.volume = volume;
         audioRef.current.play()
           .then(() => {
             setIsPlaying(true);
@@ -105,7 +114,7 @@ export const AudioPlayer: React.FC = () => {
       setIsPlaying(false);
       localStorage.setItem('gitadaily_music_playing', 'false');
     } else {
-      audioRef.current.volume = 0.005;
+      audioRef.current.volume = volume;
       audioRef.current.play()
         .then(() => {
           setIsPlaying(true);
@@ -171,10 +180,26 @@ export const AudioPlayer: React.FC = () => {
         <button
           onClick={toggleMute}
           className="audio-btn mute-btn"
-          title={isMuted ? "Unmute" : "Mute"}
+          title={isMuted || volume === 0 ? "Unmute" : "Mute"}
         >
-          {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+          {isMuted || volume === 0 ? <VolumeX size={14} /> : <Volume2 size={14} />}
         </button>
+        <div className="volume-slider-container">
+          <input
+            type="range"
+            min="0"
+            max="0.4"
+            step="0.001"
+            value={volume}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value);
+              setVolume(Math.min(val, 0.4));
+              if (isMuted && val > 0) setIsMuted(false);
+            }}
+            className="volume-slider"
+            title="Volume"
+          />
+        </div>
       </div>
     </div>
   );

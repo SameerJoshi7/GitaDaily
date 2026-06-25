@@ -1229,6 +1229,52 @@ body {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.volume-slider-container {
+  display: flex;
+  align-items: center;
+  width: 60px;
+  margin-left: 0.25rem;
+}
+
+.volume-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
 /* Music Visualizer Bars */
 .music-bars {
   position: absolute;
