@@ -122,56 +122,54 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
       // ── Layout constants ──
       const pad = 72; // horizontal content padding
       const contentW = W - pad * 2;
-      let y = 56; // current drawing Y cursor
+      let y = 60; // current drawing Y cursor
 
       // ── 5. Header: Logo + App Name ──
       try {
         const logo = await loadImage('/flute-icon.png');
-        ctx.drawImage(logo, W / 2 - 88, y, 42, 42);
+        ctx.drawImage(logo, W / 2 - 100, y, 46, 46);
       } catch {
         // Skip logo if it fails
       }
       ctx.fillStyle = '#d4af37';
-      ctx.font = '700 38px "Tiro Devanagari Sanskrit", serif';
+      ctx.font = '700 40px "Tiro Devanagari Sanskrit", serif';
       ctx.textAlign = 'left';
-      ctx.fillText('कृष्णबोध', W / 2 - 40, y + 34);
-      y += 52;
+      ctx.fillText('कृष्णबोध', W / 2 - 44, y + 36);
+      y += 56;
 
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '400 13px "Inter", sans-serif';
+      ctx.font = '400 14px "Inter", sans-serif';
       ctx.textAlign = 'center';
-      ctx.letterSpacing = '4px';
-      ctx.fillText('K R I S H N A   B O D H A', W / 2, y);
-      y += 36;
+      ctx.fillText('KRISHNA BODHA', W / 2, y);
+      y += 40;
 
       // ── 6. Chapter / Verse badge ──
       const badgeText = `✦  CHAPTER ${shloka.chapter}, VERSE ${shloka.verse}  ✦`;
       ctx.strokeStyle = '#d4af37';
       ctx.lineWidth = 1;
-      // Top line
-      const badgeW = 360;
+      const badgeW = 380;
       const badgeX = (W - badgeW) / 2;
+      // Top line
       ctx.beginPath();
       ctx.moveTo(badgeX, y);
       ctx.lineTo(badgeX + badgeW, y);
       ctx.stroke();
-      y += 28;
+      y += 30;
       ctx.fillStyle = '#d4af37';
-      ctx.font = '500 15px "Inter", sans-serif';
+      ctx.font = '600 16px "Inter", sans-serif';
       ctx.textAlign = 'center';
-      ctx.letterSpacing = '3px';
       ctx.fillText(badgeText, W / 2, y);
-      y += 18;
+      y += 20;
       // Bottom line
       ctx.beginPath();
       ctx.moveTo(badgeX, y);
       ctx.lineTo(badgeX + badgeW, y);
       ctx.stroke();
-      y += 36;
+      y += 40;
 
       // ── 7. Sanskrit text ──
       ctx.fillStyle = '#ffffff';
-      ctx.font = '600 36px "Tiro Devanagari Sanskrit", serif';
+      ctx.font = '600 40px "Tiro Devanagari Sanskrit", serif';
       ctx.textAlign = 'center';
       ctx.shadowColor = 'rgba(0,0,0,0.7)';
       ctx.shadowBlur = 12;
@@ -180,35 +178,35 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
         const subLines = wrapText(ctx, line.trim(), contentW);
         subLines.forEach((sl) => {
           ctx.fillText(sl, W / 2, y);
-          y += 54;
+          y += 58;
         });
       });
       ctx.shadowBlur = 0;
-      y += 8;
+      y += 12;
 
       // ── 8. Transliteration ──
       ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = 'italic 18px "Inter", sans-serif';
+      ctx.font = 'italic 20px "Inter", sans-serif';
       ctx.textAlign = 'center';
       const translitText = shloka.reflection?.translatedTransliteration || shloka.transliteration;
-      const translitLines = wrapText(ctx, translitText, contentW);
+      const translitLines = wrapText(ctx, translitText, contentW - 20);
       translitLines.forEach((line) => {
         ctx.fillText(line, W / 2, y);
-        y += 28;
+        y += 30;
       });
-      y += 24;
+      y += 30;
 
       // ── 9. Translation box ──
-      const boxPadX = 28;
-      const boxPadY = 28;
+      const boxPadX = 32;
+      const boxPadY = 32;
       const boxX = pad;
       const boxY = y;
       const translationText = shloka.reflection?.translatedTranslation || shloka.translation;
 
       // Measure how tall the translation text will be
-      ctx.font = '400 20px "Inter", sans-serif';
+      ctx.font = '400 22px "Inter", sans-serif';
       const transLines = wrapText(ctx, translationText, contentW - boxPadX * 2);
-      const transTextHeight = transLines.length * 32;
+      const transTextHeight = transLines.length * 34;
       const boxH = transTextHeight + boxPadY * 2;
 
       // Draw box background
@@ -222,46 +220,50 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
       ctx.stroke();
 
       // "TRANSLATION" label
-      const labelText = 'T R A N S L A T I O N';
-      ctx.font = '500 13px "Inter", sans-serif';
-      const labelW = ctx.measureText(labelText).width + 24;
+      const labelText = 'TRANSLATION';
+      ctx.font = '600 13px "Inter", sans-serif';
+      const labelW = ctx.measureText(labelText).width + 28;
       ctx.fillStyle = '#0a0b10';
-      ctx.fillRect(W / 2 - labelW / 2, boxY - 9, labelW, 18);
+      ctx.fillRect(W / 2 - labelW / 2, boxY - 10, labelW, 20);
       ctx.fillStyle = '#d4af37';
       ctx.textAlign = 'center';
       ctx.fillText(labelText, W / 2, boxY + 5);
 
       // Translation text
       ctx.fillStyle = '#ffffff';
-      ctx.font = '400 20px "Inter", sans-serif';
+      ctx.font = '400 22px "Inter", sans-serif';
       ctx.textAlign = 'center';
-      let transY = boxY + boxPadY + 22;
+      let transY = boxY + boxPadY + 24;
       transLines.forEach((line) => {
         ctx.fillText(line, W / 2, transY);
-        transY += 32;
+        transY += 34;
       });
-      y = boxY + boxH + 28;
+      y = boxY + boxH + 30;
 
       // ── 10. AI Sections ──
+      // Calculate remaining space to distribute evenly
+      const footerHeight = 50;
+      const remainingH = H - y - footerHeight - 30; // 30px bottom margin
+      
       if (hasAI) {
         const sections = [
           {
             color: '#d4af37',
-            bgColor: 'rgba(212, 175, 55, 0.08)',
+            bgColor: 'rgba(212, 175, 55, 0.1)',
             title: customCounsel ? 'PERSONALIZED COUNSEL' : 'AI DEEP UNDERSTANDING',
             text: customCounsel ? customCounsel.modernCounsel : shloka.reflection?.modernReflection || '',
             emoji: '🧠',
           },
           {
             color: '#a855f7',
-            bgColor: 'rgba(168, 85, 247, 0.08)',
+            bgColor: 'rgba(168, 85, 247, 0.1)',
             title: 'EMOTIONAL WELL-BEING',
             text: customCounsel ? customCounsel.wellbeingInsight : shloka.reflection?.emotionalWellbeing || '',
             emoji: '💜',
           },
           {
             color: '#22c55e',
-            bgColor: 'rgba(34, 197, 94, 0.08)',
+            bgColor: 'rgba(34, 197, 94, 0.1)',
             title: customCounsel ? 'ACTIONABLE STEP' : 'MINDFUL PRACTICE',
             text: customCounsel ? customCounsel.actionStep : shloka.reflection?.mindfulnessTip || '',
             emoji: '🧘',
@@ -269,19 +271,34 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
           }
         ];
 
+        // First pass: measure total AI content height
+        let totalAIHeight = 0;
+        const sectionHeights: number[] = [];
         for (const s of sections) {
+          ctx.font = `${s.italic ? 'italic ' : ''}19px "Inter", sans-serif`;
+          const bodyText = s.italic ? `"${s.text}"` : s.text;
+          const bodyLines = wrapText(ctx, bodyText, contentW - 72);
+          const bodyH = bodyLines.length * 29;
+          const sH = Math.max(bodyH + 56, 80);
+          sectionHeights.push(sH);
+          totalAIHeight += sH;
+        }
+        // Calculate gap between sections to fill remaining space
+        const sectionGap = Math.max(16, Math.min(28, (remainingH - totalAIHeight) / (sections.length + 1)));
+        y += sectionGap / 2;
+
+        for (let i = 0; i < sections.length; i++) {
+          const s = sections[i];
           const sectionX = pad;
           const sectionW = contentW;
 
-          // Measure text height
-          ctx.font = `${s.italic ? 'italic ' : ''}17px "Inter", sans-serif`;
+          ctx.font = `${s.italic ? 'italic ' : ''}19px "Inter", sans-serif`;
           const bodyText = s.italic ? `"${s.text}"` : s.text;
-          const bodyLines = wrapText(ctx, bodyText, sectionW - 60);
-          const bodyH = bodyLines.length * 27;
-          const sectionH = Math.max(bodyH + 48, 72);
+          const bodyLines = wrapText(ctx, bodyText, sectionW - 72);
+          const sectionH = sectionHeights[i];
           const sRadius = 12;
 
-          // Background with gradient
+          // Background
           ctx.fillStyle = s.bgColor;
           ctx.beginPath();
           ctx.roundRect(sectionX, y, sectionW, sectionH, [0, sRadius, sRadius, 0]);
@@ -289,29 +306,29 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
 
           // Left accent bar
           ctx.fillStyle = s.color;
-          ctx.fillRect(sectionX, y, 3, sectionH);
+          ctx.fillRect(sectionX, y, 4, sectionH);
 
           // Emoji icon
-          ctx.font = '24px sans-serif';
+          ctx.font = '28px sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText(s.emoji, sectionX + 18, y + 30);
+          ctx.fillText(s.emoji, sectionX + 18, y + 34);
 
           // Title
           ctx.fillStyle = s.color;
-          ctx.font = '600 13px "Inter", sans-serif';
+          ctx.font = '700 14px "Inter", sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText(s.title, sectionX + 54, y + 26);
+          ctx.fillText(s.title, sectionX + 58, y + 30);
 
           // Body text
           ctx.fillStyle = '#e5e7eb';
-          ctx.font = `${s.italic ? 'italic ' : ''}17px "Inter", sans-serif`;
-          let bodyY = y + 48;
+          ctx.font = `${s.italic ? 'italic ' : ''}19px "Inter", sans-serif`;
+          let bodyY = y + 54;
           bodyLines.forEach((line) => {
-            ctx.fillText(line, sectionX + 54, bodyY);
-            bodyY += 27;
+            ctx.fillText(line, sectionX + 58, bodyY);
+            bodyY += 29;
           });
 
-          y += sectionH + 14;
+          y += sectionH + sectionGap;
         }
       }
 
