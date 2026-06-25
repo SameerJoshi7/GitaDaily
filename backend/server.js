@@ -105,7 +105,7 @@ function normalizePhoneNumber(phone) {
 
   // Strip all non-digit characters
   let digits = phone.replace(/\D/g, '');
-  
+
   if (digits.length === 10) {
     return `+91${digits}`;
   }
@@ -148,6 +148,7 @@ async function getGeminiReflection(shloka, language = 'english') {
     };
   }
 
+  console.log('language----', language)
   const langSuffix = (language || 'english').toLowerCase();
   const cacheKey = `${shloka.chapter}_${shloka.verse}_${langSuffix}`;
   const cache = readData(REFLECTIONS_CACHE_PATH);
@@ -308,9 +309,9 @@ app.post('/api/register', async (req, res) => {
     const cleanEmail = email.toLowerCase();
     const newUser = await User.findOneAndUpdate(
       { email: cleanEmail },
-      { 
+      {
         email: cleanEmail,
-        phone: phone ? normalizePhoneNumber(phone) : '', 
+        phone: phone ? normalizePhoneNumber(phone) : '',
         pref: pref || 'email',
         lang: lang || 'english'
       },
@@ -373,12 +374,12 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
   const language = getUserLanguage(email, req);
 
   let shloka = gitaData.find(s => s.chapter === chapter && s.verse === verse);
-  
+
   if (!shloka) {
     if (!genAI) {
       return res.status(500).json({ error: 'Gemini AI is not configured to fetch this verse.' });
     }
-    
+
     try {
       console.log(`[Dynamic Shloka] Fetching details for Ch ${chapter}, Verse ${verse} from Gemini`);
       const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
@@ -396,12 +397,12 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
           "theme": "A brief theme or title for this verse (e.g. 'Karma Yoga', 'Dhyana Yoga')"
         }
       `;
-      
+
       const result = await model.generateContent({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: { responseMimeType: "application/json" }
       });
-      
+
       const responseText = result.response.text();
       shloka = JSON.parse(responseText);
     } catch (err) {
@@ -449,22 +450,22 @@ const GITA_CHAPTERS_INFO = [
 app.get('/api/chapters', async (req, res) => {
   const { email } = req.query;
   const lang = await getUserLanguage(email, req);
-  
+
   const chapters = GITA_CHAPTERS_INFO.map(ch => {
     let themeText = ch.theme;
     if (ch.localThemes && ch.localThemes[lang]) {
       themeText = ch.localThemes[lang];
     }
-    
+
     const verses = Array.from({ length: ch.versesCount }, (_, i) => i + 1);
-    
+
     return {
       chapterNumber: ch.chapterNumber,
       theme: themeText,
       verses
     };
   });
-  
+
   res.json(chapters);
 });
 
@@ -476,7 +477,7 @@ app.get('/api/search', (req, res) => {
   }
 
   const query = q.toString().toLowerCase();
-  const results = gitaData.filter(s => 
+  const results = gitaData.filter(s =>
     s.translation.toLowerCase().includes(query) ||
     s.transliteration.toLowerCase().includes(query) ||
     s.theme.toLowerCase().includes(query) ||
@@ -497,7 +498,7 @@ app.get('/api/bookmarks', async (req, res) => {
 
   try {
     const userBookmarks = await Bookmark.find({ userId });
-    
+
     // Hydrate with shloka data
     const hydrated = userBookmarks.map(b => {
       const shloka = gitaData.find(s => s.chapter === b.chapter && s.verse === b.verse);
@@ -571,7 +572,7 @@ function getArtworkForShloka(shloka) {
 // Format message helper
 function formatShlokaMessage(shloka, reflection, language = 'english') {
   const lang = (language || 'english').toLowerCase();
-  
+
   // Custom headers based on language selection
   let title = '🪔 *Krishna Bodha: Daily Wisdom & AI Reflection* 🪔';
   let chLabel = 'Chapter';
@@ -611,7 +612,7 @@ function formatShlokaMessage(shloka, reflection, language = 'english') {
   }
 
   const artLink = getArtworkForShloka(shloka);
-  
+
   return `${title}
 
 *${chLabel} ${shloka.chapter}, ${vLabel} ${shloka.verse}*
@@ -794,7 +795,7 @@ app.delete('/api/user/:userId', async (req, res) => {
       History.deleteOne({ userId }),
       QueryLog.deleteMany({ userId })
     ]);
-    
+
     res.json({ success: true, message: 'Account and all associated data permanently deleted.' });
   } catch (err) {
     console.error('[DeleteAccount] Error:', err);
@@ -845,7 +846,7 @@ app.post('/api/guidance', async (req, res) => {
   }
 
   const lang = (language || 'english').toLowerCase();
-  
+
   if (!genAI) {
     return res.status(500).json({ error: 'Gemini AI is not configured on this server.' });
   }
@@ -855,7 +856,7 @@ app.post('/api/guidance', async (req, res) => {
     const queryLower = query.toLowerCase();
     const scoredShlokas = gitaData.map(shloka => {
       let score = 0;
-      
+
       // Topic matches (exact word matches)
       if (shloka.topics && Array.isArray(shloka.topics)) {
         for (const topic of shloka.topics) {
@@ -865,12 +866,12 @@ app.post('/api/guidance', async (req, res) => {
           }
         }
       }
-      
+
       // Theme matches
       if (shloka.theme && queryLower.includes(shloka.theme.toLowerCase())) {
         score += 8;
       }
-      
+
       // Word matches in translation
       if (shloka.translation) {
         const words = shloka.translation.toLowerCase().split(/\W+/);
@@ -880,7 +881,7 @@ app.post('/api/guidance', async (req, res) => {
           }
         }
       }
-      
+
       return { shloka, score };
     });
 
@@ -903,7 +904,7 @@ app.post('/api/guidance', async (req, res) => {
         { chapter: 9, verse: 22 }, // Faith / Peace
         { chapter: 12, verse: 13 } // Equanimity / Kindness
       ];
-      candidates = defaultVerses.map(v => 
+      candidates = defaultVerses.map(v =>
         gitaData.find(s => s.chapter === v.chapter && s.verse === v.verse)
       ).filter(Boolean);
     }
@@ -920,7 +921,7 @@ app.post('/api/guidance', async (req, res) => {
       ipAddress: clientIp
     };
     if (userId) logEntry.userId = userId;
-    
+
     QueryLog.create(logEntry).catch(err => console.error('[Guidance] Failed to log query:', err));
 
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
@@ -989,14 +990,14 @@ app.post('/api/guidance', async (req, res) => {
     console.error('[Guidance] Error fetching Gita counsel, using offline fallback:', error);
     try {
       const queryLower = query.toLowerCase();
-      
+
       // Basic scoring of shlokas offline
       let bestShloka = gitaData[0];
       let bestScore = -1;
-      
+
       for (const shloka of gitaData) {
         let score = 0;
-        
+
         // Topic matches
         if (shloka.topics && Array.isArray(shloka.topics)) {
           for (const topic of shloka.topics) {
@@ -1009,7 +1010,7 @@ app.post('/api/guidance', async (req, res) => {
             }
           }
         }
-        
+
         // Give Ch 6 Verse 5 a massive boost for focus/mind queries
         if (shloka.chapter === 6 && shloka.verse === 5) {
           const mindKeywords = ['focus', 'concentration', 'attention', 'distracted', 'study', 'concentrate', 'mind', 'stress', 'anxious', 'anxiety', 'depression'];
@@ -1017,12 +1018,12 @@ app.post('/api/guidance', async (req, res) => {
             score += 50;
           }
         }
-        
+
         // Theme matches
         if (shloka.theme && queryLower.includes(shloka.theme.toLowerCase())) {
           score += 5;
         }
-        
+
         // Translation word matches (minimum 4 letters)
         if (shloka.translation) {
           const words = shloka.translation.toLowerCase().split(/\W+/);
@@ -1032,13 +1033,13 @@ app.post('/api/guidance', async (req, res) => {
             }
           }
         }
-        
+
         if (score > bestScore) {
           bestScore = score;
           bestShloka = shloka;
         }
       }
-      
+
       // If we couldn't match anything well, decide a default based on keywords
       if (bestScore <= 0) {
         const stressKeywords = [
@@ -1058,8 +1059,8 @@ app.post('/api/guidance', async (req, res) => {
       }
 
       // Determine counsel content based on the selected shloka topic/theme
-      const selectedTheme = (bestShloka.chapter === 6 && bestShloka.verse === 5) ? 'mind' : 
-                            (bestShloka.chapter === 2 && bestShloka.verse === 47) ? 'duty' : 'general';
+      const selectedTheme = (bestShloka.chapter === 6 && bestShloka.verse === 5) ? 'mind' :
+        (bestShloka.chapter === 2 && bestShloka.verse === 47) ? 'duty' : 'general';
 
       const fallbackContent = {
         english: {
@@ -1145,7 +1146,7 @@ app.post('/api/guidance', async (req, res) => {
 
       const logEntry = { query, language: lang, suggestedChapter: bestShloka.chapter, suggestedVerse: bestShloka.verse, ipAddress: clientIp };
       if (userId) logEntry.userId = userId;
-      QueryLog.create(logEntry).catch(() => {});
+      QueryLog.create(logEntry).catch(() => { });
 
       res.json({
         success: true,
@@ -1183,44 +1184,44 @@ async function broadcastDailyShloka() {
 
   const shloka = gitaData[index];
   let sentCount = 0;
-  
+
   try {
     const users = await User.find({});
     for (const user of users) {
       if (user.email) {
         const language = user.lang || 'english';
-      const reflection = await getGeminiReflection(shloka, language);
-      const messageText = formatShlokaMessage(shloka, reflection, language);
-      
-      let sentToThisUser = false;
+        const reflection = await getGeminiReflection(shloka, language);
+        const messageText = formatShlokaMessage(shloka, reflection, language);
 
-      // 1. Email Channel
-      if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
-        await sendDailyShlokaEmail(user.email, shloka, reflection, language);
-        sentToThisUser = true;
-      }
+        let sentToThisUser = false;
 
-
-
-      // 3. Web Push Channel
-      if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
-        try {
-          const payload = JSON.stringify({
-            title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
-            body: reflection.translatedTranslation || shloka.translation,
-            image: getArtworkForShloka(shloka),
-            url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
-          });
-          await webpush.sendNotification(user.pushSubscription, payload);
+        // 1. Email Channel
+        if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
+          await sendDailyShlokaEmail(user.email, shloka, reflection, language);
           sentToThisUser = true;
-        } catch (err) {
-          console.error(`[WebPush] Failed for ${user.email}:`, err.message);
         }
-      }
 
-      if (sentToThisUser) {
-        sentCount++;
-      }
+
+
+        // 3. Web Push Channel
+        if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
+          try {
+            const payload = JSON.stringify({
+              title: `🪔 Gita Ch ${shloka.chapter}, Verse ${shloka.verse}`,
+              body: reflection.translatedTranslation || shloka.translation,
+              image: getArtworkForShloka(shloka),
+              url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
+            });
+            await webpush.sendNotification(user.pushSubscription, payload);
+            sentToThisUser = true;
+          } catch (err) {
+            console.error(`[WebPush] Failed for ${user.email}:`, err.message);
+          }
+        }
+
+        if (sentToThisUser) {
+          sentCount++;
+        }
       }
     }
     console.log(`[Cron] Broadcast finished. Sent to ${sentCount} user(s).`);
