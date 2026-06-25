@@ -808,9 +808,7 @@ app.get('/api/push/public-key', (req, res) => {
 
 // 12. App configuration endpoint
 app.get('/api/config', (req, res) => {
-  res.json({
-    telegramBotUsername: process.env.TELEGRAM_BOT_USERNAME || 'GitaDailyBot'
-  });
+  res.json({});
 });
 
 // 13. Trigger daily broadcast manually (for external cron schedules)

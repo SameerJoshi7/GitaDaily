@@ -266,42 +266,7 @@ export function PreferencesModal({
             <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '0.25rem 0' }} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {/* Telegram Connection */}
-              {(pref === 'telegram' || pref === 'both' || pref === 'all') && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                  <button
-                    disabled
-                    className="primary-btn"
-                    style={{
-                      padding: '0.5rem',
-                      justifyContent: 'center',
-                      background: 'linear-gradient(135deg, #555, #777)',
-                      color: '#bbb',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      cursor: 'not-allowed',
-                      opacity: 0.7,
-                      border: 'none'
-                    }}
-                  >
-                    <Send size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />
-                    <span>{T.sidebar.connectTelegram}</span>
-                  </button>
-                  <div style={{
-                    fontSize: '0.7rem',
-                    color: '#ef4444',
-                    textAlign: 'center',
-                    padding: '0.4rem',
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(239, 68, 68, 0.2)',
-                    lineHeight: '1.2'
-                  }}>
-                    {T.sidebar.telegramUnavailable(telegramBotUsername)}
-                  </div>
-                </div>
-              )}
+
 
               {/* Web Push Subscription Action */}
               {(pref === 'push' || pref === 'all') && (

@@ -14,16 +14,14 @@ const userSchema = new mongoose.Schema({
   },
   pref: {
     type: String,
-    enum: ['email', 'telegram', 'push', 'both', 'all'],
+    enum: ['email', 'push', 'all'],
     default: 'email',
   },
   lang: {
     type: String,
     default: 'english',
   },
-  telegramChatId: {
-    type: Number,
-  },
+
   pushSubscription: {
     type: Object,
   },
