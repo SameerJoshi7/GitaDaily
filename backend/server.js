@@ -834,7 +834,7 @@ app.post('/api/guidance', async (req, res) => {
 
   if (!userId) {
     try {
-      const guestCount = await QueryLog.countDocuments({ ipAddress: clientIp, email: { $exists: false } });
+      const guestCount = await QueryLog.countDocuments({ ipAddress: clientIp, userId: { $exists: false } });
       if (guestCount >= 2) {
         return res.status(403).json({ error: 'Guest limit reached', requireSubscription: true });
       }
