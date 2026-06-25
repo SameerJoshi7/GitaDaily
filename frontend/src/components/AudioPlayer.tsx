@@ -42,6 +42,29 @@ export const AudioPlayer: React.FC = () => {
     return 0.005;
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const collapseTimerRef = useRef<number | null>(null);
+
+  const startCollapseTimer = () => {
+    if (collapseTimerRef.current) clearTimeout(collapseTimerRef.current);
+    collapseTimerRef.current = setTimeout(() => {
+      setIsExpanded(false);
+    }, 3000);
+  };
+
+  const handleMouseEnter = () => {
+    setIsExpanded(true);
+    if (collapseTimerRef.current) clearTimeout(collapseTimerRef.current);
+  };
+
+  const handleMouseLeave = () => {
+    startCollapseTimer();
+  };
+
+  const handleInteraction = () => {
+    setIsExpanded(true);
+    startCollapseTimer();
+  };
 
   // Sync volume & mute state on mount and update
   useEffect(() => {
@@ -136,23 +159,35 @@ export const AudioPlayer: React.FC = () => {
   };
 
   return (
-    <div className="audio-player-floating">
+    <div 
+      className={`audio-player-floating ${!isExpanded ? 'collapsed' : 'expanded'}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleInteraction}
+      onTouchStart={handleInteraction}
+    >
       <audio
         ref={audioRef}
         loop
         preload="auto"
       />
-      <div className="audio-info">
-        <div className={`audio-icon-wrapper ${isPlaying ? 'playing' : ''}`}>
-          <Music size={15} className="flute-note-icon" />
-          {isPlaying && (
-            <div className="music-bars">
-              <span className="bar"></span>
-              <span className="bar"></span>
-              <span className="bar"></span>
-            </div>
-          )}
+      {!isExpanded ? (
+        <div className={`audio-icon-wrapper ${isPlaying ? 'playing' : ''}`} style={{ width: '100%', height: '100%', background: 'transparent' }}>
+          <Music size={22} className={isPlaying ? "flute-note-icon" : ""} />
         </div>
+      ) : (
+        <>
+          <div className="audio-info">
+            <div className={`audio-icon-wrapper ${isPlaying ? 'playing' : ''}`}>
+              <Music size={15} className="flute-note-icon" />
+              {isPlaying && (
+                <div className="music-bars">
+                  <span className="bar"></span>
+                  <span className="bar"></span>
+                  <span className="bar"></span>
+                </div>
+              )}
+            </div>
         <div className="audio-text" style={{ maxWidth: '140px' }}>
           <span className="audio-title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {tracks[currentTrackIndex].title}
@@ -201,6 +236,8 @@ export const AudioPlayer: React.FC = () => {
           />
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

@@ -1140,8 +1140,23 @@ body {
   align-items: center;
   gap: 1.25rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   animation: fadeIn 0.5s ease-out;
+  max-width: 500px;
+  overflow: hidden;
+}
+
+.audio-player-floating.collapsed {
+  max-width: 50px;
+  height: 50px;
+  padding: 0;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.audio-player-floating.collapsed:hover {
+  transform: scale(1.05);
 }
 
 .audio-player-floating:hover {
