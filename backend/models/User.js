@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema({
   pushSubscription: {
     type: Object,
   },
+  lastNotifiedAt: {
+    type: Date,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -1249,6 +1249,12 @@ async function broadcastDailyShloka() {
 
         if (sentToThisUser) {
           sentCount++;
+          try {
+            user.lastNotifiedAt = new Date();
+            await user.save();
+          } catch (e) {
+            console.error(`[Cron] Failed to save lastNotifiedAt for ${user.email}:`, e);
+          }
         }
       }
     }
