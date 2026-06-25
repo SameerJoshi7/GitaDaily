@@ -209,16 +209,17 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
             {/* Translation Box */}
             <div style={{ 
               width: '95%', background: 'rgba(18, 20, 31, 0.7)', border: '1px solid rgba(212, 175, 55, 0.3)', 
-              borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', textAlign: 'center', position: 'relative'
+              borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', textAlign: 'center', position: 'relative',
+              flexShrink: 0
             }}>
               <div style={{ 
-                position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
-                background: '#0a0b10', padding: '0 1rem', color: 'var(--gold-primary)', fontFamily: 'var(--font-display)',
+                position: 'absolute', top: '-12px', left: 0, right: 0, textAlign: 'center',
+                color: 'var(--gold-primary)', fontFamily: 'var(--font-display)',
                 fontSize: '1rem', letterSpacing: '2px'
               }}>
-                TRANSLATION
+                <span style={{ background: '#0a0b10', padding: '0 1rem' }}>TRANSLATION</span>
               </div>
-              <p style={{ color: '#ffffff', fontSize: '1.3rem', lineHeight: 1.5 }}>
+              <p style={{ color: '#ffffff', fontSize: '1.3rem', lineHeight: 1.5, margin: 0, marginTop: '0.5rem' }}>
                 {shloka.reflection?.translatedTranslation || shloka.translation}
               </p>
             </div>
