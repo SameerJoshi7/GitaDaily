@@ -148,7 +148,6 @@ async function getGeminiReflection(shloka, language = 'english') {
     };
   }
 
-  console.log('language----', language)
   const langSuffix = ((await language) || 'english').toLowerCase();
   const cacheKey = `${shloka.chapter}_${shloka.verse}_${langSuffix}`;
   const cache = readData(REFLECTIONS_CACHE_PATH);
@@ -571,11 +570,7 @@ function getArtworkForShloka(shloka) {
 
 // Format message helper
 function formatShlokaMessage(shloka, reflection, language = 'english') {
-  const lang = language
-    .then(lang => (lang || 'english').toLowerCase())
-    .then(result => {
-      console.log(result);
-    });
+  const lang = language.then(lang => (lang || 'english').toLowerCase());
 
   // Custom headers based on language selection
   let title = '🪔 *Krishna Bodha: Daily Wisdom & AI Reflection* 🪔';
