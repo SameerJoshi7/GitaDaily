@@ -61,13 +61,13 @@ function App() {
       <Toast message={toast} />
 
 
-      {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
         email={email}
         lang={lang}
         onRefreshDaily={fetchDailyShloka}
         onOpenPrefs={() => setIsPrefsModalOpen(true)}
+        onLangChange={handleGuestLangChange}
       />
 
       {/* Main Panel */}
@@ -134,6 +134,8 @@ function App() {
               bookmarks={bookmarks}
               onToggleBookmark={handleToggleBookmark}
               lang={lang}
+              email={email}
+              onSubscribeClick={() => setIsPrefsModalOpen(true)}
             />
           )}
           
@@ -164,7 +166,7 @@ function App() {
         setEditLang={setEditLang}
         isPushSubscribed={isPushSubscribed}
         telegramBotUsername={telegramBotUsername}
-        handleGuestLangChange={handleGuestLangChange}
+
         handleGuestSubscribe={handleGuestSubscribe}
         handleSavePrefs={handleSavePrefs}
         handleEnableNotifications={handleEnableNotifications}

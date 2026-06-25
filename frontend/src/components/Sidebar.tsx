@@ -5,7 +5,8 @@ import {
   Search,
   Bookmark,
   Sparkles,
-  Info
+  Info,
+  Globe
 } from 'lucide-react';
 import { t } from '../i18n';
 
@@ -15,6 +16,7 @@ interface SidebarProps {
   lang: string;
   onRefreshDaily: () => void;
   onOpenPrefs: () => void;
+  onLangChange: (lang: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -22,7 +24,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   email,
   lang,
   onRefreshDaily,
-  onOpenPrefs
+  onOpenPrefs,
+  onLangChange
 }) => {
   const T = t(lang);
 
@@ -139,8 +142,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </li>
       </ul>
 
-      {/* Desktop Preferences widget */}
+      {/* Desktop Preferences & Language widget */}
       <div className="desktop-profile-container">
+        {/* Language Selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <Globe size={16} color="var(--text-secondary)" />
+          <select 
+            value={lang} 
+            onChange={(e) => onLangChange(e.target.value)}
+            style={{ 
+              background: 'transparent', 
+              color: 'var(--text-primary)', 
+              border: 'none', 
+              outline: 'none',
+              width: '100%',
+              cursor: 'pointer',
+              fontSize: '0.85rem'
+            }}
+          >
+            <option value="english" style={{ background: '#12141f' }}>English</option>
+            <option value="hindi" style={{ background: '#12141f' }}>हिंदी (Hindi)</option>
+            <option value="telugu" style={{ background: '#12141f' }}>తెలుగు (Telugu)</option>
+            <option value="kannada" style={{ background: '#12141f' }}>ಕನ್ನಡ (Kannada)</option>
+          </select>
+        </div>
+
         {email ? (
           <button
             onClick={onOpenPrefs}
@@ -162,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               fontWeight: 600
             }}
           >
-            ✨ Subscribe / Lang
+            ✨ Subscribe
           </button>
         )}
       </div>

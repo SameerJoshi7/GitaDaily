@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Bookmark } from 'lucide-react';
+import { Sparkles, Bookmark, Lock } from 'lucide-react';
 import type { Shloka } from './ShlokaCard';
 import { t } from '../i18n';
 
@@ -20,6 +20,8 @@ interface GuidanceTabProps {
   bookmarks: Shloka[];
   onToggleBookmark: (shloka: Shloka) => void;
   lang?: string;
+  email?: string;
+  onSubscribeClick?: () => void;
 }
 
 export const GuidanceTab: React.FC<GuidanceTabProps> = ({
@@ -32,6 +34,8 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
   bookmarks,
   onToggleBookmark,
   lang = 'english',
+  email,
+  onSubscribeClick,
 }) => {
   const T = t(lang);
   return (
@@ -41,60 +45,80 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
         <span className="dashboard-subtitle">{T.guidance.pageSubtitle}</span>
       </div>
 
-      <div style={{ background: 'linear-gradient(145deg, var(--bg-secondary) 0%, rgba(18, 20, 31, 0.95) 100%)', padding: '2rem', borderRadius: '20px', border: '1px solid var(--card-border)', marginBottom: '2rem' }}>
-        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.95rem', color: 'var(--gold-secondary)', marginBottom: '0.5rem' }}>
-              {T.guidance.queryLabel}
-            </label>
-            <textarea
-              className="input-field"
-              style={{
-                width: '100%',
-                minHeight: '120px',
-                padding: '0.75rem',
-                fontSize: '0.95rem',
-                borderRadius: '10px',
-                background: 'rgba(25, 28, 43, 0.3)',
-                borderColor: 'var(--card-border)',
-                resize: 'vertical',
-                color: 'var(--text-primary)',
-                fontFamily: 'var(--font-sans)',
-                lineHeight: '1.5'
-              }}
-              placeholder={T.guidance.queryPlaceholder}
-              value={guidanceQuery}
-              onChange={(e) => setGuidanceQuery(e.target.value)}
-              disabled={guidanceLoading}
-            />
+      {!email ? (
+        <div style={{ background: 'linear-gradient(145deg, var(--bg-secondary) 0%, rgba(18, 20, 31, 0.95) 100%)', padding: '4rem 2rem', borderRadius: '20px', border: '1px solid var(--card-border)', marginBottom: '2rem', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.1)', color: 'var(--gold-primary)', marginBottom: '1.5rem' }}>
+            <Lock size={28} />
           </div>
-
+          <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>Premium Feature</h3>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem auto', lineHeight: '1.6' }}>
+            Subscribe to Krishna Bodha to unlock personalized, AI-powered guidance for your life's challenges based on the timeless wisdom of the Bhagavad Gita.
+          </p>
           <button
-            type="submit"
+            onClick={onSubscribeClick}
             className="primary-btn"
-            disabled={guidanceLoading || !guidanceQuery.trim()}
-            style={{ alignSelf: 'flex-start', padding: '0.6rem 1.5rem', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+            style={{ padding: '0.8rem 2.5rem', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            {guidanceLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', width: '100%' }}>
-                <div className="spinner" style={{ width: 16, height: 16, borderTopColor: '#000' }} />
-                <span>{T.guidance.consultingGita}</span>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', width: '100%' }}>
-                <Sparkles size={16} />
-                <span>{T.guidance.seekButton}</span>
-              </div>
-            )}
+            <Sparkles size={18} />
+            <span>Subscribe to Unlock</span>
           </button>
-        </form>
+        </div>
+      ) : (
+        <div style={{ background: 'linear-gradient(145deg, var(--bg-secondary) 0%, rgba(18, 20, 31, 0.95) 100%)', padding: '2rem', borderRadius: '20px', border: '1px solid var(--card-border)', marginBottom: '2rem' }}>
+          <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.95rem', color: 'var(--gold-secondary)', marginBottom: '0.5rem' }}>
+                {T.guidance.queryLabel}
+              </label>
+              <textarea
+                className="input-field"
+                style={{
+                  width: '100%',
+                  minHeight: '120px',
+                  padding: '0.75rem',
+                  fontSize: '0.95rem',
+                  borderRadius: '10px',
+                  background: 'rgba(25, 28, 43, 0.3)',
+                  borderColor: 'var(--card-border)',
+                  resize: 'vertical',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-sans)',
+                  lineHeight: '1.5'
+                }}
+                placeholder={T.guidance.queryPlaceholder}
+                value={guidanceQuery}
+                onChange={(e) => setGuidanceQuery(e.target.value)}
+                disabled={guidanceLoading}
+              />
+            </div>
 
-        {guidanceError && (
-          <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--error)', fontSize: '0.9rem' }}>
-            ⚠️ {guidanceError}
-          </div>
-        )}
-      </div>
+            <button
+              type="submit"
+              className="primary-btn"
+              disabled={guidanceLoading || !guidanceQuery.trim()}
+              style={{ alignSelf: 'flex-start', padding: '0.6rem 1.5rem', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              {guidanceLoading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', width: '100%' }}>
+                  <div className="spinner" style={{ width: 16, height: 16, borderTopColor: '#000' }} />
+                  <span>{T.guidance.consultingGita}</span>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', width: '100%' }}>
+                  <Sparkles size={16} />
+                  <span>{T.guidance.seekButton}</span>
+                </div>
+              )}
+            </button>
+          </form>
+
+          {guidanceError && (
+            <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--error)', fontSize: '0.9rem' }}>
+              ⚠️ {guidanceError}
+            </div>
+          )}
+        </div>
+      )}
 
       {guidanceResult && (
         <div className="shloka-card-container" style={{ animation: 'fadeIn 0.6s ease-out' }}>

@@ -14,7 +14,6 @@ interface PreferencesModalProps {
   setEditLang: (val: string) => void;
   isPushSubscribed: boolean;
   telegramBotUsername: string;
-  handleGuestLangChange: (newLang: string) => void;
   handleGuestSubscribe: (emailVal: string, prefVal: string) => void;
   handleSavePrefs: (e: React.FormEvent) => Promise<void>;
   handleEnableNotifications: () => Promise<void>;
@@ -35,7 +34,6 @@ export function PreferencesModal({
   setEditLang,
   isPushSubscribed,
   telegramBotUsername,
-  handleGuestLangChange,
   handleGuestSubscribe,
   handleSavePrefs,
   handleEnableNotifications,
@@ -57,24 +55,7 @@ export function PreferencesModal({
               {T.sidebar.guestWelcome}
             </h3>
             
-            {/* Guest Language Dropdown */}
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">{T.sidebar.appLanguageLabel}</label>
-              <select
-                className="input-field"
-                value={lang}
-                onChange={(e) => {
-                  handleGuestLangChange(e.target.value);
-                }}
-              >
-                <option value="english">English</option>
-                <option value="hindi">Hindi (हिन्दी)</option>
-                <option value="telugu">Telugu (తెలుగు)</option>
-                <option value="kannada">Kannada (ಕನ್ನಡ)</option>
-              </select>
-            </div>
 
-            <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '0.5rem 0' }} />
 
             {/* Guest Subscribe Form */}
             <form onSubmit={(e) => {
@@ -120,6 +101,9 @@ export function PreferencesModal({
               >
                 {T.sidebar.subscribeButton}
               </button>
+              <div style={{ marginTop: '0.2rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <span style={{ color: 'var(--gold-primary)' }}>🔒</span> We value your privacy. Your email will never be spammed or shared.
+              </div>
             </form>
           </div>
         ) : (
