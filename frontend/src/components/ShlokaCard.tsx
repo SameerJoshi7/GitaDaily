@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Bookmark, Sparkles, Brain, Heart, Briefcase, Share2 } from 'lucide-react';
 import { t } from '../i18n';
 
@@ -47,12 +47,10 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
 
   const cardRef = useRef<HTMLDivElement>(null);
   const shareRef = useRef<HTMLDivElement>(null);
-  const [isSharing, setIsSharing] = useState(false);
 
   const handleShare = async () => {
     if (!shareRef.current) return;
     try {
-      setIsSharing(true);
       // Brief timeout to ensure the DOM is ready
       await new Promise(res => setTimeout(res, 100));
       const htmlToImage = await import('html-to-image');
@@ -84,8 +82,6 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
       }
     } catch (err) {
       console.error('Failed to share image', err);
-    } finally {
-      setIsSharing(false);
     }
   };
 
