@@ -223,7 +223,7 @@ async function getGeminiReflection(shloka, language = 'english') {
         translatedTranslation: trans,
         translatedTransliteration: translit,
         modernReflection: "ఆధునిక సవాళ్లను అధిగమించడానికి ఆత్మపరిశీలనే నిజమైన సాధనం అని మన పురాతన జ్ఞానం గుర్తుచేస్తుంది.",
-        emotionalWellbeing: "భావోద్వేగాలు సముద్రపు అలల లాంటివి; మీ ప్రశాಂತతను కోల్పోకుండా వాటిని రానిచ్చి పోనివ్వండి.",
+        emotionalWellbeing: "భావోద్వేగాలు సముద్రపు అలల లాంటివి; మీ ప్రశాంతతను కోల్పోకుండా వాటిని రానిచ్చి పోనివ్వండి.",
         careerApplication: "ఫలితాల పట్ల అతిగా ఆశపడకుండా, మీ వృత్తిపరమైన బాధ్యతలను పూర్తి నిబద్ధతతో నిర్వహించండి.",
         mindfulnessTip: "ధృవీకరించుకోండి: 'నేను స్థిరంగా ఉన్నాను, కేంద్రీకృతంగా ఉన్నాను, ఫలితాలకు దూరంగా ఉన్నాను.'"
       };
