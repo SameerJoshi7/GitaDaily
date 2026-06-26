@@ -211,8 +211,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
         </div>
         
         <div style="margin-top: 15px; font-size: 11px; color: #6b7280;">
-          You received this because you subscribed to daily reflections.<br>
-          <a href="https://github.com/SameerJoshi7" target="_blank" style="color: #fbbf24; text-decoration: none;">GitHub</a>
+          You received this because you subscribed to daily reflections.
         </div>
       </div>
     </div>
