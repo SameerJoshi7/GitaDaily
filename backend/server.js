@@ -149,7 +149,7 @@ if (openaiKey) {
 async function generateContentWithFallback(prompt, responseMimeType = "text/plain", featureContext = "basic") {
   let models = [];
   if (featureContext === "guidance") {
-    models = ["gpt-4o", "gemini-1.5-pro", "gpt-4-turbo", "gemini-3.5-flash", "gpt-4o-mini"];
+    models = ["gpt-4o", "gemini-1.5-pro-latest", "gpt-4-turbo-preview", "gemini-3.5-flash", "gpt-4o-mini"];
   } else {
     models = ["gemini-3.5-flash", "gpt-4o-mini", "gemini-1.5-flash"];
   }
@@ -1099,13 +1099,7 @@ app.post('/api/guidance', async (req, res) => {
     `;
 
     console.log(`[Guidance] Seeking counsel for query: "${query}" in language: ${lang}`);
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
-      }
-    });
-
+    const result = await generateContentWithFallback(prompt, "application/json", "guidance");
     const responseText = result.response.text();
     const parsed = JSON.parse(responseText);
 
