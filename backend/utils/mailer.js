@@ -135,17 +135,17 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   const subject = `🦚 Krishna Bodha Ch ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})`;
 
   const htmlContent = `
-    <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; color: #e2e8f0; padding: 20px; text-align: center;">
+    <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; background-image: linear-gradient(to bottom, rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; color: #e2e8f0; padding: 20px; text-align: center;">
       <!-- Main Card Container -->
-      <div style="max-width: 600px; margin: 0 auto; background-color: #0d0f16; background-image: linear-gradient(to bottom, rgba(13, 15, 22, 0.75), rgba(13, 15, 22, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.85); border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
         
         <!-- Header: Logo & App Title -->
-        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 25px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));" />
-            <span style="font-size: 24px; font-weight: 700; color: #d4af37; font-family: 'Georgia', serif;">कृष्णबोध</span>
+        <div style="text-align: center; margin-bottom: 25px;">
+          <div style="margin-bottom: 8px;">
+            <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5)); vertical-align: middle; margin-right: 8px;" />
+            <span style="font-size: 24px; font-weight: 700; color: #d4af37; font-family: 'Georgia', serif; vertical-align: middle;">कृष्णबोध</span>
           </div>
-          <span style="font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 3px; font-family: 'Cinzel', serif;">Krishna Bodha</span>
+          <div style="font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 3px; font-family: 'Cinzel', serif;">Krishna Bodha</div>
         </div>
 
         <!-- Meta Chapter & Verse -->
@@ -202,15 +202,15 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
       </div>
 
       <!-- Footer / Watermark -->
-      <div style="text-align: center; margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-        <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; color: #d4af37; letter-spacing: 1px; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+      <div style="text-align: center; margin-top: 30px;">
+        <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; color: #d4af37; letter-spacing: 1px; text-shadow: 0 2px 6px rgba(0,0,0,0.5); margin-bottom: 6px;">
           श्रीकृष्णार्पणमस्तु
         </div>
-        <div style="font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-transform: uppercase; font-weight: 500;">
+        <div style="font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-transform: uppercase; font-weight: 500; margin-bottom: 15px;">
           <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: inherit; text-decoration: none;">By Sameer Joshi</a>
         </div>
         
-        <div style="margin-top: 15px; font-size: 11px; color: #6b7280;">
+        <div style="font-size: 11px; color: #6b7280; line-height: 1.5;">
           You received this because you subscribed to daily reflections.
         </div>
       </div>
