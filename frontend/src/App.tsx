@@ -65,10 +65,10 @@ function App() {
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('gitadaily_welcome_seen');
-    if (!hasSeenWelcome) {
+    if (!hasSeenWelcome && !email) {
       setIsWelcomeModalOpen(true);
     }
-  }, []);
+  }, [email]);
 
   const handleCloseWelcome = () => {
     localStorage.setItem('gitadaily_welcome_seen', 'true');

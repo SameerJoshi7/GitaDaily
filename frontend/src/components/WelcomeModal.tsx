@@ -21,8 +21,12 @@ export function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
           <div className="brand-name-sanskrit" style={{ fontSize: '2.2rem', marginTop: '0.2rem' }}>कृष्णबोध</div>
         </div>
 
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
-          Discover the timeless wisdom of the Bhagavad Gita through AI-powered reflections. Explore chapters, seek personalized guidance, and find inner peace—one verse at a time.
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+          <span style={{ fontStyle: 'italic', color: 'var(--gold-secondary)' }}>
+            "You have the right to perform your duties, but you are not entitled to the fruits of your actions."
+          </span>
+          <br /><br />
+          Welcome to Krishna Bodha. Embark on a journey of discovering timeless wisdom and inner peace. Let go of outcomes and focus on the present moment, one verse at a time.
         </p>
 
         <button 
