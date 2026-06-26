@@ -13,6 +13,8 @@ interface SearchTabProps {
   onSearchSubmit: (queryStr: string) => void;
   onVerseSelect: (chapter: number, verse: number) => void;
   lang?: string;
+  searchError?: string | null;
+  searchRetryTimer?: number;
 }
 
 export const SearchTab: React.FC<SearchTabProps> = ({
@@ -25,6 +27,8 @@ export const SearchTab: React.FC<SearchTabProps> = ({
   onSearchSubmit,
   onVerseSelect,
   lang = 'english',
+  searchError,
+  searchRetryTimer,
 }) => {
   const T = t(lang);
   return (
@@ -48,6 +52,17 @@ export const SearchTab: React.FC<SearchTabProps> = ({
             }}
           />
         </div>
+
+        {searchError && (
+          <div style={{ margin: '1rem 0', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--error)', fontSize: '0.9rem', textAlign: 'center' }}>
+            ⚠️ {searchError}
+            {searchRetryTimer !== undefined && searchRetryTimer > 0 && (
+              <div style={{ marginTop: '0.5rem', fontWeight: 600 }}>
+                Please try again in {searchRetryTimer}s
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="topic-filters">
           {topics.map(topic => (

@@ -557,6 +557,9 @@ app.get('/api/search', async (req, res) => {
         transliteration: translatedData[i]?.transliteration || r.transliteration
       }));
     } catch (err) {
+      if (err.status === 429) {
+        return res.status(429).json({ error: 'High traffic: The translation servers are currently busy. Please wait a moment and try again.', retryAfter: 30 });
+      }
       console.error('[Search] Dynamic translation error:', err);
     }
   }
@@ -1095,6 +1098,9 @@ app.post('/api/guidance', async (req, res) => {
       }
     });
   } catch (error) {
+    if (error.status === 429) {
+      return res.status(429).json({ error: 'High traffic: The divine servers are currently busy. Please wait a moment and try again.', retryAfter: 30 });
+    }
     console.error('[Guidance] Error fetching Gita counsel, using offline fallback:', error);
     try {
       const queryLower = query.toLowerCase();
@@ -1262,13 +1268,19 @@ async function broadcastDailyShloka() {
 
   const shloka = gitaData[index];
   let sentCount = 0;
+  const reflectionCache = {};
 
   try {
     const users = await User.find({});
     for (const user of users) {
       if (user.email) {
         const language = user.lang || 'english';
-        const reflection = await getGeminiReflection(shloka, language);
+        
+        if (!reflectionCache[language]) {
+          reflectionCache[language] = await getGeminiReflection(shloka, language);
+        }
+        const reflection = reflectionCache[language];
+        
         const messageText = formatShlokaMessage(shloka, reflection, language);
 
         let sentToThisUser = false;

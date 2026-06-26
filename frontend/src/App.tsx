@@ -27,6 +27,7 @@ function App() {
     guidanceLoading,
     guidanceResult,
     guidanceError,
+    guidanceRetryTimer,
     editPref,
     setEditPref,
 
@@ -42,6 +43,8 @@ function App() {
     searchQuery,
     setSearchQuery,
     searchResults,
+    searchError,
+    searchRetryTimer,
     activeTopic,
     topics,
     handleLogout,
@@ -122,6 +125,8 @@ function App() {
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               searchResults={searchResults}
+              searchError={searchError}
+              searchRetryTimer={searchRetryTimer}
               activeTopic={activeTopic}
               topics={topics}
               onTopicClick={handleTopicClick}
@@ -161,6 +166,7 @@ function App() {
               guidanceLoading={guidanceLoading}
               guidanceResult={guidanceResult}
               guidanceError={guidanceError}
+              guidanceRetryTimer={guidanceRetryTimer}
               onSubmit={handleSeekGuidance}
               bookmarks={bookmarks}
               onToggleBookmark={handleToggleBookmark}

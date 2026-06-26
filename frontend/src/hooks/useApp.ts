@@ -18,7 +18,7 @@ export function useApp() {
   const [readingHistory, setReadingHistory] = useState<{ chapter: number, verse: number } | null>(null);
   
   // Seek Guidance States
-  const [guidanceQuery, setGuidanceQuery] = useState('');
+  const [guidanceQuery, setGuidanceQuery] = useState(() => sessionStorage.getItem('gitadaily_guidanceQuery') || '');
   const [guidanceLoading, setGuidanceLoading] = useState(false);
   const [guidanceResult, setGuidanceResult] = useState<{
     shloka: Shloka;
@@ -27,8 +27,34 @@ export function useApp() {
       wellbeingInsight: string;
       actionStep: string;
     };
-  } | null>(null);
+  } | null>(() => {
+    const saved = sessionStorage.getItem('gitadaily_guidanceResult');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [guidanceError, setGuidanceError] = useState<string | null>(null);
+  const [guidanceRetryTimer, setGuidanceRetryTimer] = useState(0);
+
+  useEffect(() => {
+    sessionStorage.setItem('gitadaily_guidanceQuery', guidanceQuery);
+  }, [guidanceQuery]);
+
+  useEffect(() => {
+    if (guidanceResult) {
+      sessionStorage.setItem('gitadaily_guidanceResult', JSON.stringify(guidanceResult));
+    } else {
+      sessionStorage.removeItem('gitadaily_guidanceResult');
+    }
+  }, [guidanceResult]);
+
+  useEffect(() => {
+    let interval: number;
+    if (guidanceRetryTimer > 0) {
+      interval = setInterval(() => {
+        setGuidanceRetryTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [guidanceRetryTimer]);
   
   // Edit Prefs States
   const [editPref, setEditPref] = useState(pref);
@@ -87,9 +113,32 @@ export function useApp() {
   const [bookmarks, setBookmarks] = useState<Shloka[]>([]);
   
   // Search States
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Shloka[]>([]);
+  const [searchQuery, setSearchQuery] = useState(() => sessionStorage.getItem('gitadaily_searchQuery') || '');
+  const [searchResults, setSearchResults] = useState<Shloka[]>(() => {
+    const saved = sessionStorage.getItem('gitadaily_searchResults');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchRetryTimer, setSearchRetryTimer] = useState(0);
+
+  useEffect(() => {
+    sessionStorage.setItem('gitadaily_searchQuery', searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    sessionStorage.setItem('gitadaily_searchResults', JSON.stringify(searchResults));
+  }, [searchResults]);
+
+  useEffect(() => {
+    let interval: number;
+    if (searchRetryTimer > 0) {
+      interval = setInterval(() => {
+        setSearchRetryTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [searchRetryTimer]);
   
   const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
 
@@ -219,6 +268,9 @@ export function useApp() {
           shloka: data.shloka,
           counsel: data.counsel
         });
+      } else if (res.status === 429) {
+        setGuidanceRetryTimer(data.retryAfter || 30);
+        setGuidanceError(data.error);
       } else {
         setGuidanceError(data.error || 'Failed to receive divine counsel.');
       }
@@ -489,11 +541,15 @@ export function useApp() {
       setSearchResults([]);
       return;
     }
+    setSearchError(null);
     try {
-      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(queryStr)}&lang=${lang}`);
+      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(queryStr)}&email=${email}`);
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
         setSearchResults(data);
+      } else if (res.status === 429) {
+        setSearchRetryTimer(data.retryAfter || 30);
+        setSearchError(data.error);
       }
     } catch (err) {
       console.error('Failed search query', err);
@@ -635,6 +691,7 @@ export function useApp() {
     guidanceLoading,
     guidanceResult,
     guidanceError,
+    guidanceRetryTimer,
     editPref,
     setEditPref,
     editLang,
@@ -653,6 +710,8 @@ export function useApp() {
     searchQuery,
     setSearchQuery,
     searchResults,
+    searchError,
+    searchRetryTimer,
     activeTopic,
     topics,
     handleLogout,

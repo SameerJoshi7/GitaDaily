@@ -17,6 +17,7 @@ interface GuidanceTabProps {
     };
   } | null;
   guidanceError: string | null;
+  guidanceRetryTimer?: number;
   onSubmit: (e: React.FormEvent) => void;
   bookmarks: Shloka[];
   onToggleBookmark: (shloka: Shloka) => void;
@@ -30,6 +31,7 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
   guidanceLoading,
   guidanceResult,
   guidanceError,
+  guidanceRetryTimer,
   onSubmit,
   bookmarks,
   onToggleBookmark,
@@ -112,8 +114,13 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
           </form>
 
           {guidanceError && guidanceError !== 'Guest limit reached' && (
-            <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--error)', fontSize: '0.9rem' }}>
+            <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--error)', fontSize: '0.9rem', textAlign: 'center' }}>
               ⚠️ {guidanceError}
+              {guidanceRetryTimer !== undefined && guidanceRetryTimer > 0 && (
+                <div style={{ marginTop: '0.5rem', fontWeight: 600 }}>
+                  Please try again in {guidanceRetryTimer}s
+                </div>
+              )}
             </div>
           )}
         </div>
