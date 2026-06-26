@@ -13,7 +13,7 @@ interface PreferencesModalProps {
   setEditPref: (val: string) => void;
   isPushSubscribed: boolean;
   handleGuestSubscribe: (emailVal: string, prefVal: string) => Promise<{ success: boolean; error?: string; status?: number }>;
-  handleSendOtp: (email: string) => Promise<{ success: boolean; error?: string }>;
+  handleSendOtp: (email: string) => Promise<{ success: boolean; error?: string; status?: number }>;
   handleVerifyOtp: (email: string, otp: string) => Promise<{ success: boolean; error?: string }>;
   handleSavePrefs: (e: React.FormEvent) => Promise<void>;
   handleEnableNotifications: () => Promise<void>;
