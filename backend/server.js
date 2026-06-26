@@ -336,6 +336,38 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// 1b. Update User Preferences
+app.put('/api/user/preferences', async (req, res) => {
+  const { email, pref, lang } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required.' });
+  }
+
+  try {
+    const cleanEmail = email.toLowerCase();
+    
+    // Create an update object with only provided fields
+    const updateFields = {};
+    if (pref) updateFields.pref = pref;
+    if (lang) updateFields.lang = lang;
+
+    const user = await User.findOneAndUpdate(
+      { email: cleanEmail },
+      { $set: updateFields },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({ message: 'Preferences updated', ...user.toObject() });
+  } catch (err) {
+    console.error("Error updating preferences:", err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // Helper to look up user language
 async function getUserLanguage(email, req) {
   if (req && req.query && req.query.lang) {

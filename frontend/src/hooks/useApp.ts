@@ -139,10 +139,10 @@ export function useApp() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/register`, {
-        method: 'POST',
+      const res = await fetch(`${API_BASE}/user/preferences`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, phone: '', pref: editPref, lang: editLang }),
+        body: JSON.stringify({ email, pref: editPref, lang: editLang }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -386,9 +386,23 @@ export function useApp() {
     }
   };
 
-  const handleGuestLangChange = (newLang: string) => {
+  const handleGuestLangChange = async (newLang: string) => {
     localStorage.setItem('gitadaily_lang', newLang);
     setLang(newLang);
+    
+    // If user is logged in, sync language choice to the backend immediately
+    if (email) {
+      try {
+        await fetch(`${API_BASE}/user/preferences`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, lang: newLang }),
+        });
+      } catch (err) {
+        console.error('Failed to sync language', err);
+      }
+    }
+    
     window.location.reload();
   };
 
