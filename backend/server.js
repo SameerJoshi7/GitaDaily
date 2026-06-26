@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import cron from 'node-cron';
 import twilio from 'twilio';
 import webpush from 'web-push';
@@ -135,6 +136,59 @@ if (aiKey) {
   console.warn("WARNING: GEMINI_API_KEY environment variable is not set.");
 }
 
+// Initialize OpenAI Client
+const openaiKey = process.env.OPENAI_API_KEY;
+let openai = null;
+if (openaiKey) {
+  openai = new OpenAI({ apiKey: openaiKey });
+} else {
+  console.warn("WARNING: OPENAI_API_KEY environment variable is not set.");
+}
+
+// Universal AI Fallback Helper
+async function generateContentWithFallback(prompt, responseMimeType = "text/plain", featureContext = "basic") {
+  let models = [];
+  if (featureContext === "guidance") {
+    models = ["gpt-4o", "gemini-1.5-pro", "gpt-4-turbo", "gemini-3.5-flash", "gpt-4o-mini"];
+  } else {
+    models = ["gemini-3.5-flash", "gpt-4o-mini", "gemini-1.5-flash"];
+  }
+
+  let lastError;
+
+  for (const modelName of models) {
+    try {
+      if (modelName.startsWith('gpt')) {
+        if (!openai) throw new Error("OpenAI client not initialized (missing API key)");
+        
+        const response = await openai.chat.completions.create({
+          model: modelName,
+          messages: [{ role: "user", content: prompt }],
+          response_format: responseMimeType === "application/json" ? { type: "json_object" } : { type: "text" }
+        });
+        
+        let text = response.choices[0].message.content;
+        // Mock the Gemini result structure so the rest of the code works seamlessly
+        return { response: { text: () => text } };
+      } 
+      else if (modelName.startsWith('gemini')) {
+        if (!genAI) throw new Error("Gemini client not initialized (missing API key)");
+        
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType }
+        });
+        return result;
+      }
+    } catch (error) {
+      lastError = error;
+      console.warn(`[AI Fallback] Model ${modelName} failed (${error.status || error.message}). Trying next...`);
+    }
+  }
+  throw lastError;
+}
+
 // Helper to generate reflection using Gemini
 async function getGeminiReflection(shloka, language = 'english') {
   if (!genAI) {
@@ -156,7 +210,6 @@ async function getGeminiReflection(shloka, language = 'english') {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `
       You are an enlightened guide analyzing the Bhagavad Gita for modern audiences.
       Analyze the following Gita Shloka:
@@ -182,15 +235,9 @@ async function getGeminiReflection(shloka, language = 'english') {
       }
     `;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
-      }
-    });
-
-    const text = result.response.text();
-    const parsed = JSON.parse(text);
+    const result = await generateContentWithFallback(prompt, "application/json", "guidance");
+    const counselStr = result.response.text();
+    const parsed = JSON.parse(counselStr);
 
     // Save to cache
     cache[cacheKey] = parsed;
@@ -420,13 +467,8 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
   let shloka = gitaData.find(s => s.chapter === chapter && s.verse === verse);
 
   if (!shloka) {
-    if (!genAI) {
-      return res.status(500).json({ error: 'Gemini AI is not configured to fetch this verse.' });
-    }
-
     try {
-      console.log(`[Dynamic Shloka] Fetching details for Ch ${chapter}, Verse ${verse} from Gemini`);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+      console.log(`[Dynamic Shloka] Fetching details for Ch ${chapter}, Verse ${verse} from AI`);
       const prompt = `
         You are a scholar of the Bhagavad Gita.
         Provide the precise details for Bhagavad Gita Chapter ${chapter}, Verse ${verse}.
@@ -441,12 +483,7 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
           "theme": "A brief theme or title for this verse (e.g. 'Karma Yoga', 'Dhyana Yoga')"
         }
       `;
-
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" }
-      });
-
+      const result = await generateContentWithFallback(prompt, "application/json", "basic");
       const responseText = result.response.text();
       shloka = JSON.parse(responseText);
     } catch (err) {
@@ -531,9 +568,8 @@ app.get('/api/search', async (req, res) => {
   ).slice(0, 10);
 
   const language = await getUserLanguage(email, req);
-  if (language !== 'english' && genAI && results.length > 0) {
+  if (language !== 'english' && results.length > 0) {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
       const prompt = `
         Translate the following Bhagavad Gita verse translations and themes into ${language}. 
         Provide phonetic transliteration for the Sanskrit text in the script of ${language}.
@@ -545,10 +581,7 @@ app.get('/api/search', async (req, res) => {
         Input:
         ${JSON.stringify(results.map(r => ({ translation: r.translation, theme: r.theme, transliteration: r.transliteration })))}
       `;
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" }
-      });
+      const result = await generateContentWithFallback(prompt, "application/json", "basic");
       const translatedData = JSON.parse(result.response.text());
       results = results.map((r, i) => ({
         ...r,
@@ -1028,7 +1061,6 @@ app.post('/api/guidance', async (req, res) => {
     // Async log the query to MongoDB
     logQueryInBackground(selectedCandidate.chapter, selectedCandidate.verse);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `
       You are a warm, wise, and deeply compassionate spiritual mentor and close friend who knows the Bhagavad Gita by heart.
       The user is coming to you for personal, friendly advice on a specific challenge, feeling, or query they are facing:

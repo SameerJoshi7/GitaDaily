@@ -21,6 +21,7 @@
     "mongoose": "^9.7.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^9.0.1",
+    "openai": "^6.45.0",
     "twilio": "^6.0.2",
     "web-push": "^3.6.7"
   },
