@@ -136,33 +136,35 @@ if (aiKey) {
   console.warn("WARNING: GEMINI_API_KEY environment variable is not set.");
 }
 
-// Initialize OpenAI Client
-const openaiKey = process.env.OPENAI_API_KEY;
-let openai = null;
-if (openaiKey) {
-  openai = new OpenAI({ apiKey: openaiKey });
+// Initialize Groq Client
+const groqKey = process.env.GROQ_API_KEY;
+let groq = null;
+if (groqKey) {
+  // We use the OpenAI NPM package, but point it to Groq's servers
+  groq = new OpenAI({ apiKey: groqKey, baseURL: 'https://api.groq.com/openai/v1' });
 } else {
-  console.warn("WARNING: OPENAI_API_KEY environment variable is not set.");
+  console.warn("WARNING: GROQ_API_KEY environment variable is not set.");
 }
 
 // Universal AI Fallback Helper
 async function generateContentWithFallback(prompt, responseMimeType = "text/plain", featureContext = "basic") {
   let models = [];
   if (featureContext === "guidance") {
-    models = ["gpt-4o", "gemini-1.5-pro-latest", "gpt-4-turbo-preview", "gemini-3.5-flash", "gpt-4o-mini"];
+    models = ["groq-llama3-70b-8192", "gemini-1.5-pro", "gemini-1.5-flash"];
   } else {
-    models = ["gemini-3.5-flash", "gpt-4o-mini", "gemini-1.5-flash"];
+    models = ["gemini-1.5-flash", "groq-llama3-8b-8192"];
   }
 
   let lastError;
 
   for (const modelName of models) {
     try {
-      if (modelName.startsWith('gpt')) {
-        if (!openai) throw new Error("OpenAI client not initialized (missing API key)");
+      if (modelName.startsWith('groq-')) {
+        if (!groq) throw new Error("Groq client not initialized (missing API key)");
         
-        const response = await openai.chat.completions.create({
-          model: modelName,
+        const actualModelName = modelName.replace('groq-', '');
+        const response = await groq.chat.completions.create({
+          model: actualModelName,
           messages: [{ role: "user", content: prompt }],
           response_format: responseMimeType === "application/json" ? { type: "json_object" } : { type: "text" }
         });
