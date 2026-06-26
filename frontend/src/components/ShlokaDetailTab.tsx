@@ -1,8 +1,6 @@
-import React from 'react';
 import { ShlokaCard } from './ShlokaCard';
 import type { Shloka } from './ShlokaCard';
 import { ArrowLeft } from 'lucide-react';
-import { t } from '../i18n';
 
 interface ShlokaDetailTabProps {
   shloka: Shloka | null;
@@ -19,7 +17,6 @@ export function ShlokaDetailTab({
   onToggleBookmark,
   lang,
 }: ShlokaDetailTabProps) {
-  const T = t(lang);
 
   const handleBack = () => {
     window.history.back();
