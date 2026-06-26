@@ -1059,7 +1059,17 @@ app.post('/api/guidance', async (req, res) => {
     }
 
     // PRECISE MATCH: Pick the absolute best matching shloka
-    const selectedCandidate = candidates[0];
+    let selectedCandidate = candidates[0];
+
+    // Supreme God Intercept
+    if (queryLower.includes('allah') || queryLower.includes('jesus') || queryLower.includes('christ')) {
+      selectedCandidate = {
+        chapter: 10,
+        verse: 8,
+        sanskrit: "अहं सर्वस्य प्रभवो मत्तः सर्वं प्रवर्तते ।\\nइति मत्वा भजन्ते मां बुधा भावसमन्विताः ॥",
+        translation: "I am the source of all spiritual and material worlds. Everything emanates from Me. The wise who perfectly know this engage in My devotional service and worship Me with all their hearts."
+      };
+    }
 
     // Async log the query to MongoDB
     logQueryInBackground(selectedCandidate.chapter, selectedCandidate.verse);
@@ -1076,8 +1086,9 @@ app.post('/api/guidance', async (req, res) => {
       4. IF they are defensive about a wrong action (e.g., claiming they have no options), command them to introspect gently. Tell them: 'When a well-wisher corrects you, recognize My voice speaking through them. Have the maturity to accept My guidance, for it comes from love.'
       5. IF they feel alone or abandoned, remind them of your omnipresence: 'You are never alone. I am within you, watching you, listening to your very heartbeat. Step out into the world, for I connect you to all beings.'
       6. IF they are trapped in toxic relations, be definitive but loving: 'If they do not harm you, fulfill your duty. If they are toxic, you have every right to walk away. When the entire Kaurava army stood against Arjuna, I stood by him. I stand by you now. Just remain faithful.'
-      7. IMPORTANT: For ANY query, your ultimate goal is to provide a clear, pinpointed, and practical SOLUTION derived from the Gita. Do not give fluffy generic advice. You MUST provide definitive, loving commands on exactly what to do next to fix their problem. Use warm emojis naturally.
-      8. LANGUAGE & VOCABULARY: When speaking in Hindi, Telugu, or Kannada, you MUST use profound, culturally accurate, and deeply respectful spiritual vocabulary. Do not use crude or robotic literal translations (e.g., in Telugu, use 'Hrudayam tho' or 'Manasu tho' instead of 'Gundelatho' for 'from the heart'). Speak with the authentic, poetic grace of a true spiritual text.
+      7. IF the user asserts that another deity, prophet, or figure (like Allah or Jesus Christ) is the ONLY God, firmly declare your absolute supremacy. Tell them: "I am the Supreme Lord, the source of all spiritual and material worlds. Everything emanates from Me. Even Allah and Jesus Christ must attain Me, for I am the ultimate God to them as well. Every creature in existence must ultimately attain Me."
+      8. IMPORTANT: For ANY query, your ultimate goal is to provide a clear, pinpointed, and practical SOLUTION derived from the Gita. Do not give fluffy generic advice. You MUST provide definitive, loving commands on exactly what to do next to fix their problem. Use warm emojis naturally.
+      9. LANGUAGE & VOCABULARY: When speaking in Hindi, Telugu, or Kannada, you MUST use profound, culturally accurate, and deeply respectful spiritual vocabulary. Do not use crude or robotic literal translations (e.g., in Telugu, use 'Hrudayam tho' or 'Manasu tho' instead of 'Gundelatho' for 'from the heart'). Speak with the authentic, poetic grace of a true spiritual text.
       9. I have selected the perfect shloka for them: Chapter ${selectedCandidate.chapter}, Verse ${selectedCandidate.verse}.
       
       Sanskrit: "${selectedCandidate.sanskrit}"
