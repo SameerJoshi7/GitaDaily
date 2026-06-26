@@ -10,6 +10,7 @@ export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'ab
 export function useApp() {
   const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
   const [userId, setUserId] = useState<string>(() => localStorage.getItem('gitadaily_userId') || '');
+  const [userName, setUserName] = useState<string>(() => localStorage.getItem('gitadaily_name') || '');
   const [pref, setPref] = useState<string>(() => localStorage.getItem('gitadaily_pref') || 'email');
   const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
   const [activeTab, setActiveTab] = useState<Tab>('guidance');
@@ -59,6 +60,7 @@ export function useApp() {
   // Edit Prefs States
   const [editPref, setEditPref] = useState(pref);
   const [editLang, setEditLang] = useState(lang);
+  const [editName, setEditName] = useState(userName);
   const [isPrefsModalOpen, setIsPrefsModalOpen] = useState(false);
   // In-app toast notification
   const [toast, setToast] = useState<string | null>(null);
@@ -143,11 +145,15 @@ export function useApp() {
   const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
 
   // Helper: save user to localStorage and state
-  const loginUser = (userData: { email: string; pref: string; lang: string; _id?: string }) => {
+  const loginUser = (userData: { email: string; pref: string; lang: string; name?: string; _id?: string }) => {
     localStorage.setItem('gitadaily_email', userData.email);
     if (userData._id) localStorage.setItem('gitadaily_userId', userData._id);
     localStorage.setItem('gitadaily_pref', userData.pref || 'email');
     localStorage.setItem('gitadaily_lang', userData.lang || 'english');
+    if (userData.name) {
+      localStorage.setItem('gitadaily_name', userData.name);
+      setUserName(userData.name);
+    }
     setEmail(userData.email);
     if (userData._id) setUserId(userData._id);
     setPref(userData.pref || 'email');
@@ -184,19 +190,24 @@ export function useApp() {
     }
   };
 
-  const handleSavePrefs = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSavePrefs = async (e?: React.FormEvent, overrideName?: string) => {
+    if (e) e.preventDefault();
     setLoading(true);
     try {
+      const payloadName = overrideName !== undefined ? overrideName : editName;
       const res = await fetch(`${API_BASE}/user/preferences`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, pref: editPref, lang: editLang }),
+        body: JSON.stringify({ email, pref: editPref, lang: editLang, name: payloadName }),
       });
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem('gitadaily_pref', data.pref || 'email');
         localStorage.setItem('gitadaily_lang', data.lang || 'english');
+        if (data.name !== undefined) {
+          localStorage.setItem('gitadaily_name', data.name);
+          setUserName(data.name);
+        }
         setPref(data.pref || 'email');
         setLang(data.lang || 'english');
         // Refresh daily shloka in new language
@@ -259,7 +270,8 @@ export function useApp() {
         body: JSON.stringify({
           userId,
           query: guidanceQuery,
-          language: lang
+          language: lang,
+          userName: userName
         })
       });
       const data = await res.json();
@@ -679,6 +691,9 @@ export function useApp() {
 
   return {
     email,
+    userId,
+    userName,
+    setUserName,
     pref,
     lang,
     activeTab,
@@ -696,6 +711,8 @@ export function useApp() {
     setEditPref,
     editLang,
     setEditLang,
+    editName,
+    setEditName,
     isPrefsModalOpen,
     setIsPrefsModalOpen,
     toast,

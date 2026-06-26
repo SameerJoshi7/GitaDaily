@@ -12,6 +12,8 @@ interface PreferencesModalProps {
   loading: boolean;
   editPref: string;
   setEditPref: (val: string) => void;
+  editName: string;
+  setEditName: (val: string) => void;
   isPushSubscribed: boolean;
   handleGuestSubscribe: (emailVal: string, prefVal: string) => Promise<{ success: boolean; error?: string; status?: number }>;
   handleSendOtp: (email: string) => Promise<{ success: boolean; error?: string; status?: number }>;
@@ -32,6 +34,8 @@ export function PreferencesModal({
   loading,
   editPref,
   setEditPref,
+  editName,
+  setEditName,
   isPushSubscribed,
   handleGuestSubscribe,
   handleSendOtp,
@@ -245,6 +249,17 @@ export function PreferencesModal({
               await handleSavePrefs(e);
               onClose();
             }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Your Name</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="How should Krishna address you?"
+                />
+              </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">Language</label>

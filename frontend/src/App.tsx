@@ -11,6 +11,7 @@ import { PreferencesModal } from './components/PreferencesModal';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
 import { WelcomeModal } from './components/WelcomeModal';
+import { NamePromptModal } from './components/NamePromptModal';
 import { useApp } from './hooks/useApp';
 
 function App() {
@@ -30,6 +31,9 @@ function App() {
     guidanceRetryTimer,
     editPref,
     setEditPref,
+    userName,
+    editName,
+    setEditName,
 
     isPrefsModalOpen,
     setIsPrefsModalOpen,
@@ -199,6 +203,8 @@ function App() {
         loading={loading}
         editPref={editPref}
         setEditPref={setEditPref}
+        editName={editName}
+        setEditName={setEditName}
 
         isPushSubscribed={isPushSubscribed}
 
@@ -215,6 +221,16 @@ function App() {
       <WelcomeModal 
         isOpen={isWelcomeModalOpen}
         onClose={handleCloseWelcome}
+      />
+
+      {/* Name Prompt Modal for Logged-In Users Without a Name */}
+      <NamePromptModal
+        isOpen={!!email && !userName}
+        loading={loading}
+        onSave={async (name) => {
+          setEditName(name);
+          await handleSavePrefs(undefined, name);
+        }}
       />
     </div>
   );

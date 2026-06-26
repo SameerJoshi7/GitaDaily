@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
   },
+  name: {
+    type: String,
+    default: '',
+    trim: true,
+  },
   phone: {
     type: String,
     default: '',
