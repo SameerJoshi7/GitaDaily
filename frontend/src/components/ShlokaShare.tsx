@@ -269,9 +269,34 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
             )}
 
             {/* Footer */}
-            <div style={{ marginTop: 'auto', paddingTop: '1rem', textAlign: 'center', width: '100%' }}>
-              <span style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', fontStyle: 'italic', display: 'block' }}>
-                with ❤️ by Sameer Joshi
+            <div style={{ 
+              marginTop: 'auto', 
+              paddingTop: '1rem', 
+              textAlign: 'center', 
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}>
+              <div style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: '1.4rem',
+                fontWeight: 600,
+                color: 'var(--gold-primary)',
+                letterSpacing: '0.04em',
+                textShadow: '0 2px 6px rgba(0,0,0,0.5)'
+              }}>
+                श्रीकृष्णार्पणमस्तु
+              </div>
+              <span style={{ 
+                fontSize: '0.8rem', 
+                color: 'rgba(255,255,255,0.5)', 
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                fontWeight: 500
+              }}>
+                By Sameer Joshi
               </span>
             </div>
 
