@@ -6,7 +6,7 @@ import {
   Bookmark,
   Sparkles,
   Info,
-  Globe
+  Settings
 } from 'lucide-react';
 import { t } from '../i18n';
 
@@ -16,7 +16,6 @@ interface SidebarProps {
   lang: string;
   onRefreshDaily: () => void;
   onOpenPrefs: () => void;
-  onLangChange: (lang: string) => void;
   onLogout?: () => void;
 }
 
@@ -26,7 +25,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   lang,
   onRefreshDaily,
   onOpenPrefs,
-  onLangChange,
   onLogout
 }) => {
   const T = t(lang);
@@ -43,30 +41,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </a>
 
-        {/* Mobile Language and Preferences Trigger */}
+        {/* Mobile Preferences Trigger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <select
-            value={lang}
-            onChange={(e) => onLangChange(e.target.value)}
-            className="mobile-lang-select"
-            style={{
-              background: 'transparent',
-              color: 'var(--text-primary)',
-              border: 'none',
-              outline: 'none',
-              cursor: 'pointer',
-              fontSize: '0.85rem'
-            }}
-          >
-            <option value="english" style={{ background: '#12141f' }}>EN</option>
-            <option value="hindi" style={{ background: '#12141f' }}>HI</option>
-            <option value="telugu" style={{ background: '#12141f' }}>TE</option>
-            <option value="kannada" style={{ background: '#12141f' }}>KN</option>
-          </select>
-          <button className="mobile-pref-btn" onClick={onOpenPrefs} aria-label="Preferences">
+          <button className="mobile-pref-btn" onClick={onOpenPrefs} aria-label="Settings">
             {email ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--gold-primary)', fontWeight: 500 }}>
-                👤 Prefs
+                <Settings size={14} /> Settings
               </span>
             ) : (
               <span className="glow-subscribe-text">
@@ -178,31 +158,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </ul>
       </div>
 
-      {/* Desktop Preferences & Language widget */}
+      {/* Desktop Settings widget */}
       <div className="desktop-profile-container">
-        {/* Language Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <Globe size={16} color="var(--text-secondary)" />
-          <select
-            value={lang}
-            onChange={(e) => onLangChange(e.target.value)}
-            style={{
-              background: 'transparent',
-              color: 'var(--text-primary)',
-              border: 'none',
-              outline: 'none',
-              width: '100%',
-              cursor: 'pointer',
-              fontSize: '0.85rem'
-            }}
-          >
-            <option value="english" style={{ background: '#12141f' }}>English</option>
-            <option value="hindi" style={{ background: '#12141f' }}>हिंदी (Hindi)</option>
-            <option value="telugu" style={{ background: '#12141f' }}>తెలుగు (Telugu)</option>
-            <option value="kannada" style={{ background: '#12141f' }}>ಕನ್ನಡ (Kannada)</option>
-          </select>
-        </div>
-
         {email ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <button
@@ -210,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="secondary-btn"
               style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem' }}
             >
-              👤 Preferences
+              <Settings size={16} style={{ marginRight: '6px' }} /> Settings
             </button>
             {onLogout && (
               <button

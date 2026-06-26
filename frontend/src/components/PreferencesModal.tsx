@@ -8,6 +8,7 @@ interface PreferencesModalProps {
   email: string;
   pref: string;
   lang: string;
+  onLangChange: (lang: string) => void;
   loading: boolean;
   editPref: string;
   setEditPref: (val: string) => void;
@@ -27,6 +28,7 @@ export function PreferencesModal({
   email,
   pref,
   lang,
+  onLangChange,
   loading,
   editPref,
   setEditPref,
@@ -230,8 +232,8 @@ export function PreferencesModal({
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
-            <h3 style={{ color: 'var(--gold-primary)', margin: 0, fontFamily: 'var(--font-display)', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-              {T.sidebar.editPreferences}
+            <h3 style={{ color: 'var(--gold-primary)', margin: 0, fontFamily: 'var(--font-display)', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              ⚙️ Settings
             </h3>
             
             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -244,6 +246,19 @@ export function PreferencesModal({
               onClose();
             }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
 
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Language</label>
+                <select
+                  className="input-field"
+                  value={lang}
+                  onChange={(e) => onLangChange(e.target.value)}
+                >
+                  <option value="english">English</option>
+                  <option value="hindi">हिंदी (Hindi)</option>
+                  <option value="telugu">తెలుగు (Telugu)</option>
+                  <option value="kannada">ಕನ್ನಡ (Kannada)</option>
+                </select>
+              </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">{T.sidebar.notifications}</label>

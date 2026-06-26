@@ -71,7 +71,6 @@ function App() {
         lang={lang}
         onRefreshDaily={fetchDailyShloka}
         onOpenPrefs={() => setIsPrefsModalOpen(true)}
-        onLangChange={handleGuestLangChange}
         onLogout={handleLogout}
       />
 
@@ -174,6 +173,7 @@ function App() {
         email={email}
         pref={pref}
         lang={lang}
+        onLangChange={handleGuestLangChange}
         loading={loading}
         editPref={editPref}
         setEditPref={setEditPref}
