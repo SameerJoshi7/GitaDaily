@@ -1313,6 +1313,8 @@ async function broadcastDailyShloka() {
 cron.schedule('0 6 * * *', async () => {
   console.log('[Cron] Triggering daily morning shloka broadcast...');
   await broadcastDailyShloka();
+}, {
+  timezone: 'Asia/Kolkata'
 });
 
 // Start Server
