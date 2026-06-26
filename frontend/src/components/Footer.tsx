@@ -22,8 +22,8 @@ export function Footer() {
         </div>
       </details>
 
-      <div>
-        Made with ❤️ by <a href="https://github.com/SameerJoshi7" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'none', fontWeight: 500 }}>Sameer Joshi</a>
+      <div style={{ fontWeight: 500, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+        श्रीकृष्णार्पणमस्तु • By Sameer Joshi
       </div>
     </footer>
   );
