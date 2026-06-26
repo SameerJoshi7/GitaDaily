@@ -1133,6 +1133,12 @@ app.post('/api/guidance', async (req, res) => {
     if (error.status === 429) {
       return res.status(429).json({ error: 'High traffic: The divine servers are currently busy. Please wait a moment and try again.', retryAfter: 30 });
     }
+    
+    // Explicitly handle unauthorized/invalid keys
+    if (error.status === 401 || error.status === 403) {
+      return res.status(500).json({ error: `AI Authentication Failed: The API key provided is invalid or out of credits. (${error.message})` });
+    }
+
     console.error('[Guidance] Error fetching Gita counsel, using offline fallback:', error);
     try {
       const queryLower = query.toLowerCase();
@@ -1276,7 +1282,7 @@ app.post('/api/guidance', async (req, res) => {
           theme: bestShloka.theme
         },
         counsel: {
-          modernCounsel,
+          modernCounsel: `[OFFLINE MODE - AI UNREACHABLE]\n\n${modernCounsel}`,
           wellbeingInsight,
           actionStep
         }
