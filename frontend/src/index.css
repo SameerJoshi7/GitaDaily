@@ -152,9 +152,17 @@ button, a, input, select, textarea {
 .nav-links {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.5rem;
   list-style: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
 }
 
 @media(min-width: 768px) {
@@ -162,6 +170,7 @@ button, a, input, select, textarea {
     flex-direction: column;
     margin-top: 2rem;
     flex-grow: 1;
+    overflow-x: visible;
   }
 }
 
@@ -1090,6 +1099,23 @@ button, a, input, select, textarea {
   z-index: 100;
 }
 
+/* Nav Wrapper fading scroll hint for mobile */
+.nav-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.nav-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, transparent, var(--bg-secondary));
+  pointer-events: none;
+}
+
 /* Desktop styles override */
 @media(min-width: 768px) {
   .mobile-pref-btn,
@@ -1110,6 +1136,10 @@ button, a, input, select, textarea {
     border: 1px solid rgba(255,255,255,0.05);
     margin-top: -0.75rem;
     margin-bottom: -0.5rem;
+  }
+
+  .nav-wrapper::after {
+    display: none;
   }
   
   .sidebar .nav-links {

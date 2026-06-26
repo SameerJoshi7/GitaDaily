@@ -17,6 +17,7 @@ interface SidebarProps {
   onRefreshDaily: () => void;
   onOpenPrefs: () => void;
   onLangChange: (lang: string) => void;
+  onLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -25,7 +26,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   lang,
   onRefreshDaily,
   onOpenPrefs,
-  onLangChange
+  onLangChange,
+  onLogout
 }) => {
   const T = t(lang);
 
@@ -72,6 +74,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </span>
             )}
           </button>
+          {email && onLogout && (
+            <button 
+              className="mobile-pref-btn" 
+              onClick={() => {
+                if(window.confirm('Are you sure you want to log out?')) onLogout();
+              }}
+              style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.75rem', color: 'var(--error)' }}
+              aria-label="Logout"
+            >
+              <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>Logout</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -83,84 +97,86 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       </div>
 
-      <ul className="nav-links">
-        <li className="nav-item" style={{ marginBottom: '0.4rem' }}>
-          <button
-            onClick={() => { window.location.hash = '#/guidance'; }}
-            className={`nav-button ${activeTab === 'guidance' ? 'active' : ''}`}
-            style={activeTab === 'guidance' ? {} : {
-              border: '1px dashed rgba(212, 175, 55, 0.4)',
-              background: 'rgba(212, 175, 55, 0.03)',
-              boxShadow: '0 0 10px rgba(212, 175, 55, 0.05)'
-            }}
-          >
-            <Sparkles size={18} style={{ color: 'var(--gold-primary)', filter: 'drop-shadow(0 0 4px var(--gold-glow))' }} />
-            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{T.nav.seekGuidance}</span>
-            <span style={{
-              fontSize: '0.6rem',
-              background: 'linear-gradient(135deg, #fbbf24, #d97706)',
-              color: '#000',
-              padding: '1px 6px',
-              borderRadius: '10px',
-              marginLeft: 'auto',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>{T.nav.newBadge}</span>
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            onClick={() => {
-              if (window.location.hash === '#/dailyinsights') {
-                onRefreshDaily();
-              } else {
-                window.location.hash = '#/dailyinsights';
-              }
-            }}
-            className={`nav-button ${activeTab === 'daily' ? 'active' : ''}`}
-          >
-            <Compass size={18} />
-            <span>{T.nav.dailyInsight}</span>
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            onClick={() => { window.location.hash = '#/browsechapters'; }}
-            className={`nav-button ${activeTab === 'browse' ? 'active' : ''}`}
-          >
-            <BookOpen size={18} />
-            <span>{T.nav.browseChapters}</span>
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            onClick={() => { window.location.hash = '#/searchinsights'; }}
-            className={`nav-button ${activeTab === 'search' ? 'active' : ''}`}
-          >
-            <Search size={18} />
-            <span>{T.nav.searchTopics}</span>
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            onClick={() => { window.location.hash = '#/bookmarks'; }}
-            className={`nav-button ${activeTab === 'bookmarks' ? 'active' : ''}`}
-          >
-            <Bookmark size={18} />
-            <span>{T.nav.myBookmarks}</span>
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            onClick={() => { window.location.hash = '#/about'; }}
-            className={`nav-button ${activeTab === 'about' ? 'active' : ''}`}
-          >
-            <Info size={18} />
-            <span>{T.nav.aboutKrishnaBodha}</span>
-          </button>
-        </li>
-      </ul>
+      <div className="nav-wrapper">
+        <ul className="nav-links">
+          <li className="nav-item" style={{ marginBottom: '0.4rem' }}>
+            <button
+              onClick={() => { window.location.hash = '#/guidance'; }}
+              className={`nav-button ${activeTab === 'guidance' ? 'active' : ''}`}
+              style={activeTab === 'guidance' ? {} : {
+                border: '1px dashed rgba(212, 175, 55, 0.4)',
+                background: 'rgba(212, 175, 55, 0.03)',
+                boxShadow: '0 0 10px rgba(212, 175, 55, 0.05)'
+              }}
+            >
+              <Sparkles size={18} style={{ color: 'var(--gold-primary)', filter: 'drop-shadow(0 0 4px var(--gold-glow))' }} />
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{T.nav.seekGuidance}</span>
+              <span style={{
+                fontSize: '0.6rem',
+                background: 'linear-gradient(135deg, #fbbf24, #d97706)',
+                color: '#000',
+                padding: '1px 6px',
+                borderRadius: '10px',
+                marginLeft: 'auto',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>{T.nav.newBadge}</span>
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              onClick={() => {
+                if (window.location.hash === '#/dailyinsights') {
+                  onRefreshDaily();
+                } else {
+                  window.location.hash = '#/dailyinsights';
+                }
+              }}
+              className={`nav-button ${activeTab === 'daily' ? 'active' : ''}`}
+            >
+              <Compass size={18} />
+              <span>{T.nav.dailyInsight}</span>
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              onClick={() => { window.location.hash = '#/browsechapters'; }}
+              className={`nav-button ${activeTab === 'browse' ? 'active' : ''}`}
+            >
+              <BookOpen size={18} />
+              <span>{T.nav.browseChapters}</span>
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              onClick={() => { window.location.hash = '#/searchinsights'; }}
+              className={`nav-button ${activeTab === 'search' ? 'active' : ''}`}
+            >
+              <Search size={18} />
+              <span>{T.nav.searchTopics}</span>
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              onClick={() => { window.location.hash = '#/bookmarks'; }}
+              className={`nav-button ${activeTab === 'bookmarks' ? 'active' : ''}`}
+            >
+              <Bookmark size={18} />
+              <span>{T.nav.myBookmarks}</span>
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              onClick={() => { window.location.hash = '#/about'; }}
+              className={`nav-button ${activeTab === 'about' ? 'active' : ''}`}
+            >
+              <Info size={18} />
+              <span>{T.nav.aboutKrishnaBodha}</span>
+            </button>
+          </li>
+        </ul>
+      </div>
 
       {/* Desktop Preferences & Language widget */}
       <div className="desktop-profile-container">
@@ -188,13 +204,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {email ? (
-          <button
-            onClick={onOpenPrefs}
-            className="secondary-btn"
-            style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem' }}
-          >
-            👤 Preferences
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <button
+              onClick={onOpenPrefs}
+              className="secondary-btn"
+              style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem' }}
+            >
+              👤 Preferences
+            </button>
+            {onLogout && (
+              <button
+                onClick={() => {
+                  if(window.confirm('Are you sure you want to log out?')) onLogout();
+                }}
+                className="secondary-btn"
+                style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem', color: 'var(--error)', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+              >
+                Logout
+              </button>
+            )}
+          </div>
         ) : (
           <button
             onClick={onOpenPrefs}

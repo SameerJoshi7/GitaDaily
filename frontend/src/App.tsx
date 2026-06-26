@@ -72,6 +72,7 @@ function App() {
         onRefreshDaily={fetchDailyShloka}
         onOpenPrefs={() => setIsPrefsModalOpen(true)}
         onLangChange={handleGuestLangChange}
+        onLogout={handleLogout}
       />
 
       {/* Main Panel */}
@@ -185,7 +186,6 @@ function App() {
         handleSavePrefs={handleSavePrefs}
         handleEnableNotifications={handleEnableNotifications}
         handleSendTestDelivery={handleSendTestDelivery}
-        handleLogout={handleLogout}
         handleDeleteAccount={handleDeleteAccount}
       />
     </div>

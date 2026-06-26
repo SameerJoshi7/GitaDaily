@@ -18,7 +18,6 @@ interface PreferencesModalProps {
   handleSavePrefs: (e: React.FormEvent) => Promise<void>;
   handleEnableNotifications: () => Promise<void>;
   handleSendTestDelivery: () => Promise<void>;
-  handleLogout: () => void;
   handleDeleteAccount: () => Promise<void>;
 }
 
@@ -38,7 +37,6 @@ export function PreferencesModal({
   handleSavePrefs,
   handleEnableNotifications,
   handleSendTestDelivery,
-  handleLogout,
   handleDeleteAccount,
 }: PreferencesModalProps) {
   const [authMode, setAuthMode] = useState<'subscribe' | 'login'>('subscribe');
@@ -304,17 +302,6 @@ export function PreferencesModal({
                 <span>{T.sidebar.testSendInsight}</span>
               </button>
 
-              <button
-                onClick={() => {
-                  handleLogout();
-                  onClose();
-                }}
-                className="secondary-btn"
-                style={{ padding: '0.5rem', justifyContent: 'center', borderColor: 'rgba(239, 68, 68, 0.2)', color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-              >
-                <LogOut size={12} />
-                <span>{T.sidebar.signOut}</span>
-              </button>
 
               <button
                 onClick={() => {
