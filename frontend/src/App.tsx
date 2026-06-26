@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { DailyTab } from './components/DailyTab';
 import { AboutTab } from './components/AboutTab';
@@ -9,6 +10,7 @@ import { BookmarksTab } from './components/BookmarksTab';
 import { PreferencesModal } from './components/PreferencesModal';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
+import { WelcomeModal } from './components/WelcomeModal';
 import { useApp } from './hooks/useApp';
 
 function App() {
@@ -58,6 +60,20 @@ function App() {
     handleSearch,
     API_BASE
   } = useApp();
+
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('gitadaily_welcome_seen');
+    if (!hasSeenWelcome) {
+      setIsWelcomeModalOpen(true);
+    }
+  }, []);
+
+  const handleCloseWelcome = () => {
+    localStorage.setItem('gitadaily_welcome_seen', 'true');
+    setIsWelcomeModalOpen(false);
+  };
 
   return (
     <div className="app-container">
@@ -187,6 +203,12 @@ function App() {
         handleEnableNotifications={handleEnableNotifications}
         handleSendTestDelivery={handleSendTestDelivery}
         handleDeleteAccount={handleDeleteAccount}
+      />
+
+      {/* Welcome Modal for First-time Users */}
+      <WelcomeModal 
+        isOpen={isWelcomeModalOpen}
+        onClose={handleCloseWelcome}
       />
     </div>
   );
