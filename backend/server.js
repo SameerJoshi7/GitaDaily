@@ -370,7 +370,7 @@ app.get('/api/shloka/:chapter/:verse', async (req, res) => {
   const chapter = parseInt(req.params.chapter);
   const verse = parseInt(req.params.verse);
   const { email } = req.query;
-  const language = getUserLanguage(email, req);
+  const language = await getUserLanguage(email, req);
 
   let shloka = gitaData.find(s => s.chapter === chapter && s.verse === verse);
 

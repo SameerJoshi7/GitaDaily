@@ -41,38 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </a>
 
-        {/* Mobile Language and Preferences Trigger */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <select
-            value={lang}
-            onChange={(e) => onLangChange(e.target.value)}
-            className="mobile-lang-select"
-            style={{
-              background: 'transparent',
-              color: 'var(--text-primary)',
-              border: 'none',
-              outline: 'none',
-              cursor: 'pointer',
-              fontSize: '0.85rem'
-            }}
-          >
-            <option value="english" style={{ background: '#12141f' }}>EN</option>
-            <option value="hindi" style={{ background: '#12141f' }}>HI</option>
-            <option value="telugu" style={{ background: '#12141f' }}>TE</option>
-            <option value="kannada" style={{ background: '#12141f' }}>KN</option>
-          </select>
-          <button className="mobile-pref-btn" onClick={onOpenPrefs} aria-label="Preferences">
-            {email ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--gold-primary)', fontWeight: 500 }}>
-                👤 Prefs
-              </span>
-            ) : (
-              <span className="glow-subscribe-text">
-                ✨ Subscribe
-              </span>
-            )}
-          </button>
-        </div>
+
       </div>
 
       <div className="sidebar-artwork">
