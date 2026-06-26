@@ -1032,7 +1032,7 @@ app.post('/api/guidance', async (req, res) => {
       "${query}"
       
       Your tasks:
-      1. Listen deeply to the user's challenge. Validate their feelings with genuine empathy.
+      1. Listen deeply to the user's challenge. Validate their feelings with genuine empathy. IF the user is confessing a mistake, expressing guilt, or trying to correct a wrong they committed, you MUST explicitly praise their courage. Tell them something along these lines: 'While many make mistakes, very few have the courage and state of mind to accept and try to correct them. You are one of the rare few. Krishna deeply loves this sincere state of mind. Making a mistake is human, but refusing to correct it is what distances us from the Divine.' End the counsel by reassuring them: 'Krishna Himself is Dharma, and as long as you follow the path of correcting yourself, Krishna will always be with you.'
       2. I have selected the perfect shloka for them: Chapter ${selectedCandidate.chapter}, Verse ${selectedCandidate.verse}.
       
       Sanskrit: "${selectedCandidate.sanskrit}"
