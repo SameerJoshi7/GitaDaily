@@ -1092,7 +1092,8 @@ button, a, input, select, textarea {
 
 /* Desktop styles override */
 @media(min-width: 768px) {
-  .mobile-pref-btn {
+  .mobile-pref-btn,
+  .mobile-lang-select {
     display: none;
   }
   
