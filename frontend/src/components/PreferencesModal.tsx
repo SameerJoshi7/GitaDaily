@@ -12,7 +12,7 @@ interface PreferencesModalProps {
   editPref: string;
   setEditPref: (val: string) => void;
   isPushSubscribed: boolean;
-  handleGuestSubscribe: (emailVal: string, prefVal: string) => void;
+  handleGuestSubscribe: (emailVal: string, prefVal: string) => Promise<{ success: boolean; error?: string; status?: number }>;
   handleSendOtp: (email: string) => Promise<{ success: boolean; error?: string }>;
   handleVerifyOtp: (email: string, otp: string) => Promise<{ success: boolean; error?: string }>;
   handleSavePrefs: (e: React.FormEvent) => Promise<void>;
@@ -86,13 +86,25 @@ export function PreferencesModal({
             </div>
 
             {authMode === 'subscribe' ? (
-              <form onSubmit={(e) => {
+              <form onSubmit={async (e) => {
                 e.preventDefault();
+                setOtpError('');
                 const form = e.currentTarget;
                 const emailVal = (form.elements.namedItem('guestEmail') as HTMLInputElement).value;
                 const prefVal = (form.elements.namedItem('guestPref') as HTMLSelectElement).value;
-                handleGuestSubscribe(emailVal, prefVal);
-                onClose();
+                const res = await handleGuestSubscribe(emailVal, prefVal);
+                if (res.success) {
+                  onClose();
+                } else {
+                  if (res.status === 400 && res.error?.includes('already exists')) {
+                    setAuthMode('login');
+                    setLoginStep('email');
+                    setAuthEmailInput(emailVal);
+                    setOtpError('Account already exists. Please log in.');
+                  } else {
+                    setOtpError(res.error || 'Subscription failed');
+                  }
+                }
               }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                 <h4 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '0.95rem' }}>
                   Subscribe to Daily Wisdom
@@ -127,6 +139,11 @@ export function PreferencesModal({
                 >
                   Subscribe
                 </button>
+                {otpError && authMode === 'subscribe' && (
+                  <div style={{ color: 'var(--error)', fontSize: '0.8rem', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '4px' }}>
+                    ⚠️ {otpError}
+                  </div>
+                )}
                 <div style={{ marginTop: '0.2rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   <span style={{ color: 'var(--gold-primary)' }}>🔒</span> We value your privacy. Your email will never be spammed or shared.
                 </div>
@@ -142,7 +159,13 @@ export function PreferencesModal({
                   if (res.success) {
                     setLoginStep('otp');
                   } else {
-                    setOtpError(res.error || 'Failed to send OTP');
+                    if (res.status === 404) {
+                      setAuthMode('subscribe');
+                      setOtpError('User not found. Please subscribe as a new user.');
+                      // We can optionally pre-fill the subscribe email field if needed, but it's okay for now.
+                    } else {
+                      setOtpError(res.error || 'Failed to send OTP');
+                    }
                   }
                 } else {
                   const res = await handleVerifyOtp(authEmailInput, otpCode);

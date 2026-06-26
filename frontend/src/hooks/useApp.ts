@@ -292,7 +292,7 @@ export function useApp() {
   };
 
   // Fetch functions
-  const handleSendOtp = async (emailToAuth: string) => {
+  const handleSendOtp = async (emailToAuth: string): Promise<{ success: boolean; error?: string; status?: number }> => {
     try {
       const res = await fetch(`${API_BASE}/auth/send-otp`, {
         method: 'POST',
@@ -300,7 +300,9 @@ export function useApp() {
         body: JSON.stringify({ identifier: emailToAuth })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Failed to send OTP', status: res.status };
+      }
       return { success: true };
     } catch (err: unknown) {
       return { success: false, error: err instanceof Error ? err.message : 'Failed to send OTP' };
@@ -334,10 +336,10 @@ export function useApp() {
     }
   };
 
-  const handleGuestSubscribe = async (subEmail: string, subPref: string) => {
+  const handleGuestSubscribe = async (subEmail: string, subPref: string): Promise<{ success: boolean; error?: string; status?: number }> => {
     if (!subEmail || !subEmail.includes('@')) {
       alert('Please enter a valid email address.');
-      return;
+      return { success: false, error: 'Invalid email' };
     }
     setLoading(true);
     try {
@@ -373,11 +375,12 @@ export function useApp() {
         fetchDailyShloka();
         
         showToast(t(data.lang || 'english').sidebar.prefsUpdated);
+        return { success: true };
       } else {
-        alert(data.error || 'Subscription failed');
+        return { success: false, error: data.error || 'Subscription failed', status: res.status };
       }
     } catch {
-      alert('Could not connect to the server.');
+      return { success: false, error: 'Could not connect to the server.' };
     } finally {
       setLoading(false);
     }

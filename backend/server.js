@@ -258,6 +258,16 @@ app.post('/api/auth/send-otp', async (req, res) => {
     return res.status(400).json({ error: 'Valid email address is required.' });
   }
 
+  try {
+    const existing = await User.findOne({ email: identifier.toLowerCase() });
+    if (!existing) {
+      return res.status(404).json({ error: 'User not found. Please subscribe as a new user.' });
+    }
+  } catch (err) {
+    console.error("Error checking user:", err);
+    return res.status(500).json({ error: 'Database error' });
+  }
+
   const otp = generateOTP(identifier);
 
   // Send via Email
@@ -306,16 +316,19 @@ app.post('/api/register', async (req, res) => {
 
   try {
     const cleanEmail = email.toLowerCase();
-    const newUser = await User.findOneAndUpdate(
-      { email: cleanEmail },
-      {
-        email: cleanEmail,
-        phone: phone ? normalizePhoneNumber(phone) : '',
-        pref: pref || 'email',
-        lang: lang || 'english'
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+    
+    const existing = await User.findOne({ email: cleanEmail });
+    if (existing) {
+      return res.status(400).json({ error: 'User already exists. Please log in.' });
+    }
+
+    const newUser = await User.create({
+      email: cleanEmail,
+      phone: phone ? normalizePhoneNumber(phone) : '',
+      pref: pref || 'email',
+      lang: lang || 'english'
+    });
+    
     res.json({ message: 'Success', ...newUser.toObject() });
   } catch (err) {
     console.error("Error registering user:", err);
