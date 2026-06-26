@@ -137,7 +137,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   const htmlContent = `
     <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; background-image: linear-gradient(to bottom, rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; color: #e2e8f0; padding: 20px; text-align: center;">
       <!-- Main Card Container -->
-      <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.85); border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
         
         <!-- Header: Logo & App Title -->
         <div style="text-align: center; margin-bottom: 25px;">
@@ -164,7 +164,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
         </div>
 
         <!-- Translation Box -->
-        <div style="background-color: rgba(25, 28, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left;">
+        <div style="background-color: rgba(25, 28, 43, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left;">
           <div style="font-size: 11px; color: #fbbf24; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600;">Translation</div>
           <p style="font-size: 15px; color: #ffffff; line-height: 1.6; margin: 0;">${reflection.translatedTranslation || shloka.translation}</p>
         </div>
@@ -176,17 +176,17 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
           </h3>
 
           <!-- Reflection Cards (Stacked for Email Compatibility) -->
-          <div style="background-color: rgba(18, 20, 31, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+          <div style="background-color: rgba(18, 20, 31, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
             <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">🧠 Modern Relevance</div>
             <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.modernReflection}</p>
           </div>
 
-          <div style="background-color: rgba(18, 20, 31, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+          <div style="background-color: rgba(18, 20, 31, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
             <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">❤️ Emotional Well-being</div>
             <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.emotionalWellbeing}</p>
           </div>
 
-          <div style="background-color: rgba(18, 20, 31, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 25px;">
+          <div style="background-color: rgba(18, 20, 31, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 25px;">
             <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">💼 Career & Focus</div>
             <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.careerApplication}</p>
           </div>
