@@ -139,9 +139,17 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
       <!-- Main Card Container -->
       <div style="max-width: 600px; margin: 0 auto; background-color: #0d0f16; background-image: linear-gradient(to bottom, rgba(13, 15, 22, 0.75), rgba(13, 15, 22, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
         
-        <!-- Header: Meta & Icon -->
+        <!-- Header: Logo & App Title -->
+        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 25px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));" />
+            <span style="font-size: 24px; font-weight: 700; color: #d4af37; font-family: 'Georgia', serif;">कृष्णबोध</span>
+          </div>
+          <span style="font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 3px; font-family: 'Cinzel', serif;">Krishna Bodha</span>
+        </div>
+
+        <!-- Meta Chapter & Verse -->
         <div style="text-align: center; margin-bottom: 25px;">
-          <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5)); margin-bottom: 10px;" />
           <h2 style="color: #fbbf24; font-size: 14px; margin: 0; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Chapter ${shloka.chapter}, Verse ${shloka.verse}</h2>
         </div>
 
@@ -194,13 +202,17 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
       </div>
 
       <!-- Footer / Watermark -->
-      <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #6b7280;">
-        <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 6px; opacity: 0.5;" />
-        <span style="font-weight: 700; color: rgba(212, 175, 55, 0.7); letter-spacing: 1px;">KRISHNA BODHA</span>
-        <div style="margin-top: 8px;">with love by Sameer Joshi</div>
-        <div style="margin-top: 15px; font-size: 11px;">
+      <div style="text-align: center; margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+        <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; color: #d4af37; letter-spacing: 1px; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+          श्रीकृष्णार्पणमस्तु
+        </div>
+        <div style="font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-transform: uppercase; font-weight: 500;">
+          <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: inherit; text-decoration: none;">By Sameer Joshi</a>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 11px; color: #6b7280;">
           You received this because you subscribed to daily reflections.<br>
-          <a href="https://github.com/SameerJoshi7" target="_blank" style="color: #fbbf24; text-decoration: none;">GitHub</a> | <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: #fbbf24; text-decoration: none;">LinkedIn</a>
+          <a href="https://github.com/SameerJoshi7" target="_blank" style="color: #fbbf24; text-decoration: none;">GitHub</a>
         </div>
       </div>
     </div>
