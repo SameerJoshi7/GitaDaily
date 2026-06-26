@@ -3,6 +3,7 @@ import { DailyTab } from './components/DailyTab';
 import { AboutTab } from './components/AboutTab';
 import { GuidanceTab } from './components/GuidanceTab';
 import { SearchTab } from './components/SearchTab';
+import { ShlokaDetailTab } from './components/ShlokaDetailTab';
 import { BrowseTab } from './components/BrowseTab';
 import { BookmarksTab } from './components/BookmarksTab';
 import { PreferencesModal } from './components/PreferencesModal';
@@ -33,6 +34,7 @@ function App() {
     isPushSubscribed,
     loading,
     dailyShloka,
+    specificShloka,
     chapters,
     bookmarks,
     searchQuery,
@@ -111,6 +113,16 @@ function App() {
               onVerseSelect={(chapter, verse) => {
                 window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
               }}
+              lang={lang}
+            />
+          )}
+
+          {activeTab === 'shloka-detail' && (
+            <ShlokaDetailTab
+              shloka={specificShloka}
+              loading={loading}
+              bookmarks={bookmarks}
+              onToggleBookmark={handleToggleBookmark}
               lang={lang}
             />
           )}

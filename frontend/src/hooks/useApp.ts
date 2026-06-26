@@ -5,7 +5,7 @@ import { t } from '../i18n';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
 
-export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'about';
+export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'about' | 'shloka-detail';
 
 export function useApp() {
   const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
@@ -81,6 +81,7 @@ export function useApp() {
   // Loading & Data States
   const [loading, setLoading] = useState(false);
   const [dailyShloka, setDailyShloka] = useState<Shloka | null>(null);
+  const [specificShloka, setSpecificShloka] = useState<Shloka | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
 
   const [bookmarks, setBookmarks] = useState<Shloka[]>([]);
@@ -454,9 +455,9 @@ export function useApp() {
       if (res.ok) {
         const data = await res.json();
 
-        // If we fetch a specific shloka, switch to dashboard tab to show it
-        setActiveTab('daily');
-        setDailyShloka(data); // Display as the main active shloka
+        // If we fetch a specific shloka, switch to shloka-detail tab to show it
+        setActiveTab('shloka-detail');
+        setSpecificShloka(data); // Display as the individual active shloka
       }
     } catch (err) {
       console.error('Failed to fetch specific shloka', err);
@@ -629,6 +630,7 @@ export function useApp() {
     isPushSubscribed,
     loading,
     dailyShloka,
+    specificShloka,
     chapters,
     bookmarks,
     searchQuery,
