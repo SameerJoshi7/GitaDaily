@@ -39,17 +39,13 @@ export function Footer() {
             color: 'var(--text-secondary)', 
             textDecoration: 'none',
             fontWeight: 500,
-            transition: 'color 0.2s ease, border-bottom-color 0.2s ease',
-            borderBottom: '1px dotted rgba(255,255,255,0.2)',
-            paddingBottom: '1px'
+            transition: 'color 0.2s ease'
           }}
           onMouseOver={(e) => {
             e.currentTarget.style.color = 'var(--gold-primary)';
-            e.currentTarget.style.borderBottomColor = 'var(--gold-primary)';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.color = 'var(--text-secondary)';
-            e.currentTarget.style.borderBottomColor = 'rgba(255,255,255,0.2)';
           }}
         >
           Sameer Joshi
