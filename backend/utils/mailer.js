@@ -137,7 +137,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   const htmlContent = `
     <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; color: #e2e8f0; padding: 20px; text-align: center;">
       <!-- Main Card Container -->
-      <div style="max-width: 600px; margin: 0 auto; background-color: #0d0f16; background-image: linear-gradient(to bottom, rgba(13, 15, 22, 0.95), rgba(13, 15, 22, 0.98)), url('${activeArtwork}'); background-size: cover; background-position: center; border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #0d0f16; background-image: linear-gradient(to bottom, rgba(13, 15, 22, 0.75), rgba(13, 15, 22, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
         
         <!-- Header: Meta & Icon -->
         <div style="text-align: center; margin-bottom: 25px;">
