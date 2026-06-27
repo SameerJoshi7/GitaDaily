@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Download, Share, PlusSquare, X } from 'lucide-react';
 
 export function InstallPrompt() {
@@ -27,7 +27,7 @@ export function InstallPrompt() {
     };
     
     // In iOS Safari, we manually show our custom prompt after a small delay
-    if (isIos() && !window.navigator.standalone) {
+    if (isIos() && !(window.navigator as any).standalone) {
       const hasDismissed = localStorage.getItem('gitadaily_ios_install_dismissed');
       if (!hasDismissed) {
         setTimeout(() => setShowIosPrompt(true), 3000);

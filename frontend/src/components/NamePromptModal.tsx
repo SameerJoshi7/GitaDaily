@@ -55,7 +55,7 @@ export function NamePromptModal({ isOpen, onSave, loading }: NamePromptModalProp
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full pl-10 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="e.g. Sameer"
+                placeholder="e.g. Arjuna"
                 required
               />
             </div>

@@ -50,7 +50,7 @@ if (!vapidKeys.publicKey || !vapidKeys.privateKey) {
 }
 
 webpush.setVapidDetails(
-  'mailto:sameer9032@gmail.com',
+  'mailto:admin@krishnabodha.com',
   vapidKeys.publicKey,
   vapidKeys.privateKey
 );
@@ -765,7 +765,7 @@ ${reflection.mindfulnessTip}
 
 🎨 *Sacred Art:* ${artLink}
 
-Made with ❤️ by [Sameer Joshi](https://www.linkedin.com/in/sameer-joshi-691457146/)
+Made with ❤️ by Krishna Bodha Team
 
 ${footer}`;
 }

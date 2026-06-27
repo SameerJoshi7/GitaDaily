@@ -248,10 +248,12 @@ function App() {
       />
 
       {/* Welcome Modal for First-time Users */}
-      <WelcomeModal 
-        isOpen={isWelcomeModalOpen}
-        onClose={handleCloseWelcome}
-      />
+      {isWelcomeModalOpen && (
+        <WelcomeModal
+          isOpen={isWelcomeModalOpen}
+          onClose={handleCloseWelcome}
+        />
+      )}
 
       {/* Name Prompt Modal for Logged-In Users Without a Name */}
       <NamePromptModal

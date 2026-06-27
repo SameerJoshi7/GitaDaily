@@ -28,6 +28,11 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
+      },
+      injectRegister: 'auto',
+      devOptions: {
+        enabled: true,
+        type: 'module'
       }
     })
   ],
