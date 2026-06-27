@@ -160,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span>{T.nav.aboutKrishnaBodha}</span>
             </button>
           </li>
-          <li className="nav-item" style={{ marginTop: '0.5rem' }}>
+          <li className="nav-item">
             <button
               onClick={onOpenFeedback}
               className="nav-button"
