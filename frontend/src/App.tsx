@@ -91,6 +91,7 @@ function App() {
       <Sidebar
         activeTab={activeTab}
         email={email}
+        userName={userName}
         lang={lang}
         onRefreshDaily={fetchDailyShloka}
         onOpenPrefs={() => setIsPrefsModalOpen(true)}

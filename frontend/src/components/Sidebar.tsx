@@ -13,6 +13,7 @@ import { t } from '../i18n';
 interface SidebarProps {
   activeTab: string;
   email: string;
+  userName?: string;
   lang: string;
   onRefreshDaily: () => void;
   onOpenPrefs: () => void;
@@ -22,6 +23,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   email,
+  userName,
   lang,
   onRefreshDaily,
   onOpenPrefs,
@@ -162,6 +164,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="desktop-profile-container">
         {email ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ color: 'var(--gold-primary)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '0.2rem', fontWeight: 500 }}>
+              Welcome, {userName || email.split('@')[0]}
+            </div>
             <button
               onClick={onOpenPrefs}
               className="secondary-btn"

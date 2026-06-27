@@ -62,6 +62,11 @@ export function useApp() {
   const [editLang, setEditLang] = useState(lang);
   const [editName, setEditName] = useState(userName);
   const [isPrefsModalOpen, setIsPrefsModalOpen] = useState(false);
+
+  // Keep editName in sync if userName loads asynchronously
+  useEffect(() => {
+    setEditName(userName);
+  }, [userName]);
   // In-app toast notification
   const [toast, setToast] = useState<string | null>(null);
   const showToast = (msg: string) => {
@@ -164,9 +169,11 @@ export function useApp() {
     localStorage.removeItem('gitadaily_email');
     localStorage.removeItem('gitadaily_userId');
     localStorage.removeItem('gitadaily_pref');
+    localStorage.removeItem('gitadaily_name');
     // We intentionally DO NOT remove 'gitadaily_lang' so language persists post-logout
     setEmail('');
     setUserId('');
+    setUserName('');
     setPref('email');
     // We intentionally DO NOT reset lang to 'english'
     setDailyShloka(null);

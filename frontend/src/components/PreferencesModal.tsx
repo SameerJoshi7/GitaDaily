@@ -241,7 +241,7 @@ export function PreferencesModal({
             </h3>
             
             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              {T.sidebar.subscribedAs} <strong style={{ color: 'var(--text-primary)' }}>{email}</strong>
+              {T.sidebar.subscribedAs} <strong style={{ color: 'var(--text-primary)' }}>{editName ? `${editName} (${email})` : email}</strong>
             </div>
 
             <form onSubmit={async (e) => {
