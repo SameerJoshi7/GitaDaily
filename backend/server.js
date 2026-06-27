@@ -448,6 +448,38 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// 1a. Web Push Keys
+app.get('/api/vapidPublicKey', (req, res) => {
+  res.json({ publicKey: vapidKeys.publicKey });
+});
+
+// 1b. Subscribe to Web Push
+app.post('/api/push/subscribe', async (req, res) => {
+  const { userId, subscription } = req.body;
+  if (!userId || !subscription) {
+    return res.status(400).json({ error: 'User ID and subscription object are required.' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    user.pushSubscription = subscription;
+    // ensure pref is push if it was email
+    if (user.pref === 'email') {
+      user.pref = 'push';
+    }
+    await user.save();
+    
+    res.json({ success: true, message: 'Push subscription saved.' });
+  } catch (err) {
+    console.error("Error saving push subscription:", err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // 1b. Update User Preferences
 app.put('/api/user/preferences', async (req, res) => {
   const { email, pref, lang, name } = req.body;
