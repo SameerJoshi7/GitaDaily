@@ -16,6 +16,7 @@ import { User } from './models/User.js';
 import { Bookmark } from './models/Bookmark.js';
 import { History } from './models/History.js';
 import { QueryLog } from './models/QueryLog.js';
+import { Feedback } from './models/Feedback.js';
 
 dotenv.config();
 
@@ -308,6 +309,20 @@ app.post('/api/feedback', async (req, res) => {
     return res.status(400).json({ error: 'Ratings are required.' });
   }
 
+  try {
+    // 1. Store feedback in DB
+    await Feedback.create({
+      userEmail: userEmail || 'Anonymous',
+      guidanceRating,
+      appRating,
+      suggestions: suggestions || ''
+    });
+  } catch (dbError) {
+    console.error('[Feedback] Failed to save to database:', dbError);
+    // Continue anyway to send the email
+  }
+
+  // 2. Send email notification
   const result = await sendFeedbackEmail(userEmail, guidanceRating, appRating, suggestions);
   
   if (result.success) {
