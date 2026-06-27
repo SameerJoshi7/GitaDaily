@@ -73,7 +73,7 @@ function App() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
-  const handleFeedbackSubmit = async (guidanceRating: number, appRating: number, suggestions: string) => {
+  const handleFeedbackSubmit = async (guidanceRating: number, appRating: number, suggestions: string, isEdit: boolean, newName: string) => {
     try {
       const res = await fetch(`${API_BASE}/feedback`, {
         method: 'POST',
@@ -82,12 +82,14 @@ function App() {
           guidanceRating,
           appRating,
           suggestions,
-          userEmail: email // optional, will be empty string if guest
+          userEmail: email, // optional, will be empty string if guest
+          userName: newName,
+          isEdit
         })
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Thank you! Your feedback has been sent anonymously.');
+        alert(`Thank you! Your feedback has been ${isEdit ? 'updated' : 'submitted'}.`);
         setIsFeedbackModalOpen(false);
       } else {
         alert(data.error || 'Failed to submit feedback.');
@@ -267,11 +269,14 @@ function App() {
       />
 
       {/* Anonymous Feedback Modal */}
-      <FeedbackModal
-        isOpen={isFeedbackModalOpen}
+      <FeedbackModal 
+        isOpen={isFeedbackModalOpen} 
         onClose={() => setIsFeedbackModalOpen(false)}
         onSubmit={handleFeedbackSubmit}
-        loading={loading} // we can reuse global loading state or let it be handled directly
+        loading={false}
+        email={email}
+        userName={userName}
+        onNameUpdate={setUserName}
       />
       
       <InstallPrompt />

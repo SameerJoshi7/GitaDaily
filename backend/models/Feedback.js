@@ -3,7 +3,11 @@ import mongoose from 'mongoose';
 const feedbackSchema = new mongoose.Schema({
   userEmail: {
     type: String,
-    default: 'Anonymous'
+    default: ''
+  },
+  userName: {
+    type: String,
+    default: 'Guest'
   },
   guidanceRating: {
     type: Number,

@@ -302,28 +302,59 @@ async function getGeminiReflection(shloka, language = 'english') {
 // Routes
 
 // 0. Submit Feedback
+app.get('/api/feedback/:email', async (req, res) => {
+  try {
+    const feedback = await Feedback.findOne({ userEmail: req.params.email });
+    if (feedback) {
+      res.json({ success: true, feedback });
+    } else {
+      res.json({ success: false, message: 'No existing feedback' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 app.post('/api/feedback', async (req, res) => {
-  const { guidanceRating, appRating, suggestions, userEmail } = req.body;
+  const { guidanceRating, appRating, suggestions, userEmail, userName, isEdit } = req.body;
 
   if (!guidanceRating || !appRating) {
     return res.status(400).json({ error: 'Ratings are required.' });
   }
 
   try {
-    // 1. Store feedback in DB
-    await Feedback.create({
-      userEmail: userEmail || 'Anonymous',
-      guidanceRating,
-      appRating,
-      suggestions: suggestions || ''
-    });
+    // If user is subscribed and gave a new name, update their User profile
+    if (userEmail && userName) {
+      const user = await User.findOne({ email: userEmail });
+      if (user && !user.name) {
+        user.name = userName;
+        await user.save();
+      }
+    }
+
+    // Store/Update feedback in DB
+    if (isEdit && userEmail) {
+      await Feedback.findOneAndUpdate(
+        { userEmail },
+        { guidanceRating, appRating, suggestions: suggestions || '', userName },
+        { new: true, upsert: true }
+      );
+    } else {
+      await Feedback.create({
+        userEmail: userEmail || '',
+        userName: userName || 'Guest',
+        guidanceRating,
+        appRating,
+        suggestions: suggestions || ''
+      });
+    }
   } catch (dbError) {
     console.error('[Feedback] Failed to save to database:', dbError);
-    // Continue anyway to send the email
   }
 
-  // 2. Send email notification
-  const result = await sendFeedbackEmail(userEmail, guidanceRating, appRating, suggestions);
+  // Send email notification
+  const result = await sendFeedbackEmail(userEmail, userName, guidanceRating, appRating, suggestions, isEdit);
   
   if (result.success) {
     res.json({ message: 'Feedback submitted successfully.' });

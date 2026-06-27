@@ -313,17 +313,24 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   }
 };
 
-export const sendFeedbackEmail = async (userEmail, guidanceRating, appRating, suggestions) => {
-  const subject = `New Feedback Received for Krishna Bodha`;
-  const fromEmail = userEmail || 'Anonymous User';
+export const sendFeedbackEmail = async (userEmail, userName, guidanceRating, appRating, suggestions, isEdit) => {
+  const subjectPrefix = isEdit ? '[EDITED] ' : '';
+  const subject = `${subjectPrefix}New Feedback Received for Krishna Bodha`;
+  
+  let fromLabel = '';
+  if (userEmail) {
+    fromLabel = userName ? `${userName} (${userEmail})` : userEmail;
+  } else {
+    fromLabel = userName ? `${userName} (Guest)` : 'Anonymous (Guest)';
+  }
   
   const htmlContent = `
     <div style="font-family: 'Inter', Arial, sans-serif; background-color: #050508; color: #e2e8f0; padding: 20px; text-align: left;">
       <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.9); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 30px;">
-        <h2 style="color: #fbbf24; text-align: center; margin-bottom: 25px;">New User Feedback</h2>
+        <h2 style="color: #fbbf24; text-align: center; margin-bottom: 25px;">${isEdit ? 'Feedback Updated' : 'New User Feedback'}</h2>
         
         <div style="margin-bottom: 20px;">
-          <strong style="color: #d4af37;">From:</strong> ${fromEmail}
+          <strong style="color: #d4af37;">From:</strong> ${fromLabel}
         </div>
         
         <div style="margin-bottom: 20px; background-color: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
@@ -360,10 +367,10 @@ export const sendFeedbackEmail = async (userEmail, guidanceRating, appRating, su
           user_id: process.env.EMAILJS_PUBLIC_KEY,
           accessToken: process.env.EMAILJS_PRIVATE_KEY,
           template_params: {
-            userEmail: fromEmail,
+            userEmail: fromLabel,
             guidanceRating: guidanceRating,
             appRating: appRating,
-            suggestions: suggestions || 'None'
+            suggestions: (isEdit ? '[EDITED] ' : '') + (suggestions || 'None')
           }
         })
       });
