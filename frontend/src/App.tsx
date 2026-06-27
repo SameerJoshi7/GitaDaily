@@ -13,6 +13,7 @@ import { Toast } from './components/Toast';
 import { WelcomeModal } from './components/WelcomeModal';
 import { NamePromptModal } from './components/NamePromptModal';
 import { FeedbackModal } from './components/FeedbackModal';
+import { InstallPrompt } from './components/InstallPrompt';
 import { useApp } from './hooks/useApp';
 
 function App() {
@@ -269,6 +270,8 @@ function App() {
         onSubmit={handleFeedbackSubmit}
         loading={loading} // we can reuse global loading state or let it be handled directly
       />
+      
+      <InstallPrompt />
     </div>
   );
 }
