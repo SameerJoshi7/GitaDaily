@@ -346,7 +346,7 @@ export const sendFeedbackEmail = async (userEmail, guidanceRating, appRating, su
   // Send to the admin's email (using the EMAIL_USER address)
   const toEmail = process.env.EMAIL_USER;
 
-  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY) {
+  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY && process.env.EMAILJS_FEEDBACK_TEMPLATE_ID) {
     try {
       console.log(`[Mailer] Sending feedback email using EmailJS HTTP API...`);
       const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
@@ -375,8 +375,9 @@ export const sendFeedbackEmail = async (userEmail, guidanceRating, appRating, su
         throw new Error(errText || 'EmailJS API returned an error');
       }
     } catch (error) {
-      console.error('[Mailer] EmailJS HTTP API error:', error);
-      return { success: false, error: error.message };
+      console.error('[Mailer] EmailJS HTTP API error:', error.message);
+      console.log('[Mailer] Falling back to next available mailer...');
+      // We purposefully DO NOT return here, so it continues down to Resend or Nodemailer
     }
   }
 
