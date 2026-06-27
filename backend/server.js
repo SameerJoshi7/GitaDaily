@@ -151,9 +151,9 @@ if (groqKey) {
 async function generateContentWithFallback(prompt, responseMimeType = "text/plain", featureContext = "basic") {
   let models = [];
   if (featureContext === "guidance") {
-    models = ["groq-llama-3.3-70b-versatile", "gemini-1.5-flash"];
+    models = ["groq-llama-3.3-70b-versatile", "gemini-3.5-flash"];
   } else {
-    models = ["gemini-1.5-flash", "groq-llama-3.1-8b-instant"];
+    models = ["gemini-3.5-flash", "groq-llama-3.1-8b-instant"];
   }
 
   let lastError;
