@@ -65,6 +65,7 @@ export function useApp() {
 
   // Keep editName in sync if userName loads asynchronously
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEditName(userName);
   }, [userName]);
   // In-app toast notification

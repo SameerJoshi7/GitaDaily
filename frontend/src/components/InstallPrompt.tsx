@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Download, Share, PlusSquare, X } from 'lucide-react';
 
 export function InstallPrompt() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showIosPrompt, setShowIosPrompt] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -13,6 +14,7 @@ export function InstallPrompt() {
     }
 
     // Handle Android/Chrome Install Prompt
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -27,6 +29,7 @@ export function InstallPrompt() {
     };
     
     // In iOS Safari, we manually show our custom prompt after a small delay
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (isIos() && !(window.navigator as any).standalone) {
       const hasDismissed = localStorage.getItem('gitadaily_ios_install_dismissed');
       if (!hasDismissed) {

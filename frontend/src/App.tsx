@@ -101,6 +101,7 @@ function App() {
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('gitadaily_welcome_seen');
     if (!hasSeenWelcome && !email) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsWelcomeModalOpen(true);
     }
   }, [email]);

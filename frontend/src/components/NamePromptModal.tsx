@@ -13,6 +13,7 @@ export function NamePromptModal({ isOpen, onSave, loading }: NamePromptModalProp
   // Reset internal state if it opens
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName('');
     }
   }, [isOpen]);
