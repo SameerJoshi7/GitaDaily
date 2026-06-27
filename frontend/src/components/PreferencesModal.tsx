@@ -285,6 +285,7 @@ export function PreferencesModal({
                   <option value="email">{T.sidebar.emailOnly}</option>
                   <option value="push">{T.sidebar.webPushOnly}</option>
                   <option value="all">Email & Push Notifications</option>
+                  <option value="none">No Notifications</option>
                 </select>
               </div>
 
