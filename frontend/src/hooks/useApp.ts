@@ -324,15 +324,23 @@ export function useApp() {
       return;
     }
 
+    // CRITICAL FIX FOR iOS: Request permission IMMEDIATELY before any state updates
+    // If we call setLoading(true) first, the async delay breaks the "user gesture" requirement on Safari.
+    let permission;
+    try {
+      permission = await Notification.requestPermission();
+    } catch (e) {
+      console.error(e);
+      permission = Notification.permission;
+    }
+    
+    if (permission !== 'granted') {
+      alert('Permission for notifications was denied.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        alert('Permission for notifications was denied.');
-        setLoading(false);
-        return;
-      }
-
       const registration = await navigator.serviceWorker.ready;
       
       const subscribeOptions = {
