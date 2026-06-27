@@ -67,7 +67,8 @@ function App() {
     handleToggleBookmark,
     handleTopicClick,
     handleSearch,
-    API_BASE
+    API_BASE,
+    setUserName
   } = useApp();
 
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
