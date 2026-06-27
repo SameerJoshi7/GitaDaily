@@ -449,7 +449,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // 1a. Web Push Keys
-app.get('/api/vapidPublicKey', (req, res) => {
+app.get('/api/push/public-key', (req, res) => {
   res.json({ publicKey: vapidKeys.publicKey });
 });
 

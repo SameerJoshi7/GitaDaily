@@ -74,6 +74,26 @@ function App() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
+  // Track app opens and automatically show feedback modal for subscribers on 3rd open
+  useEffect(() => {
+    if (!sessionStorage.getItem('gitadaily_session_started')) {
+      sessionStorage.setItem('gitadaily_session_started', 'true');
+      const opens = parseInt(localStorage.getItem('gitadaily_app_opens') || '0', 10) + 1;
+      localStorage.setItem('gitadaily_app_opens', opens.toString());
+
+      // Subscriber check: must have email
+      // Query check: must have queried for guidance
+      if (
+        email && 
+        opens === 3 && 
+        localStorage.getItem('gitadaily_has_queried') === 'true' &&
+        localStorage.getItem('gitadaily_feedback_submitted') !== 'true'
+      ) {
+        setTimeout(() => setIsFeedbackModalOpen(true), 1500);
+      }
+    }
+  }, [email]);
+
   const handleFeedbackSubmit = async (guidanceRating: number, appRating: number, suggestions: string, isEdit: boolean, newName: string) => {
     try {
       const res = await fetch(`${API_BASE}/feedback`, {
@@ -90,6 +110,7 @@ function App() {
       });
       const data = await res.json();
       if (res.ok) {
+        localStorage.setItem('gitadaily_feedback_submitted', 'true');
         alert(`Thank you! Your feedback has been ${isEdit ? 'updated' : 'submitted'}.`);
         setIsFeedbackModalOpen(false);
       } else {
