@@ -10,7 +10,7 @@ import cron from 'node-cron';
 import twilio from 'twilio';
 import webpush from 'web-push';
 import { generateOTP, verifyOTP } from './utils/otp.js';
-import { sendEmailOTP, sendDailyShlokaEmail } from './utils/mailer.js';
+import { sendEmailOTP, sendDailyShlokaEmail, sendFeedbackEmail } from './utils/mailer.js';
 import mongoose from 'mongoose';
 import { User } from './models/User.js';
 import { Bookmark } from './models/Bookmark.js';
@@ -299,6 +299,23 @@ async function getGeminiReflection(shloka, language = 'english') {
 }
 
 // Routes
+
+// 0. Submit Feedback
+app.post('/api/feedback', async (req, res) => {
+  const { guidanceRating, appRating, suggestions, userEmail } = req.body;
+
+  if (!guidanceRating || !appRating) {
+    return res.status(400).json({ error: 'Ratings are required.' });
+  }
+
+  const result = await sendFeedbackEmail(userEmail, guidanceRating, appRating, suggestions);
+  
+  if (result.success) {
+    res.json({ message: 'Feedback submitted successfully.' });
+  } else {
+    res.status(500).json({ error: 'Failed to submit feedback. ' + result.error });
+  }
+});
 
 // 0a. Send OTP
 app.post('/api/auth/send-otp', async (req, res) => {

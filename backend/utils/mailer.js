@@ -312,3 +312,119 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
     return { success: false, error: error.message };
   }
 };
+
+export const sendFeedbackEmail = async (userEmail, guidanceRating, appRating, suggestions) => {
+  const subject = `New Feedback Received for Krishna Bodha`;
+  const fromEmail = userEmail || 'Anonymous User';
+  
+  const htmlContent = `
+    <div style="font-family: 'Inter', Arial, sans-serif; background-color: #050508; color: #e2e8f0; padding: 20px; text-align: left;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.9); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 30px;">
+        <h2 style="color: #fbbf24; text-align: center; margin-bottom: 25px;">New User Feedback</h2>
+        
+        <div style="margin-bottom: 20px;">
+          <strong style="color: #d4af37;">From:</strong> ${fromEmail}
+        </div>
+        
+        <div style="margin-bottom: 20px; background-color: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+          <div style="margin-bottom: 10px;">
+            <strong style="color: #fbbf24;">Guidance Accuracy Rating:</strong> ${guidanceRating} / 5
+          </div>
+          <div>
+            <strong style="color: #fbbf24;">Overall App Experience:</strong> ${appRating} / 5
+          </div>
+        </div>
+
+        <div style="background-color: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+          <strong style="color: #fbbf24; display: block; margin-bottom: 10px;">Suggestions / Improvements:</strong>
+          <p style="white-space: pre-wrap; margin: 0; color: #e5e7eb;">${suggestions || 'No suggestions provided.'}</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Send to the admin's email (using the EMAIL_USER address)
+  const toEmail = process.env.EMAIL_USER;
+
+  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY) {
+    try {
+      console.log(`[Mailer] Sending feedback email using EmailJS HTTP API...`);
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          service_id: process.env.EMAILJS_SERVICE_ID,
+          template_id: process.env.EMAILJS_FEEDBACK_TEMPLATE_ID,
+          user_id: process.env.EMAILJS_PUBLIC_KEY,
+          accessToken: process.env.EMAILJS_PRIVATE_KEY,
+          template_params: {
+            userEmail: fromEmail,
+            guidanceRating: guidanceRating,
+            appRating: appRating,
+            suggestions: suggestions || 'None'
+          }
+        })
+      });
+
+      if (response.ok) {
+        return { success: true };
+      } else {
+        const errText = await response.text();
+        throw new Error(errText || 'EmailJS API returned an error');
+      }
+    } catch (error) {
+      console.error('[Mailer] EmailJS HTTP API error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  if (process.env.RESEND_API_KEY) {
+    try {
+      console.log(`[Mailer] Sending feedback email using Resend HTTP API...`);
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Krishna Bodha <onboarding@resend.dev>',
+          to: toEmail,
+          subject: subject,
+          html: htmlContent
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        return { success: true };
+      } else {
+        throw new Error(data.message || 'Resend API returned an error');
+      }
+    } catch (error) {
+      console.error('[Mailer] Resend HTTP API error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  if (!transporter) {
+    return { success: false, error: 'Email configuration is missing on the server.' };
+  }
+
+  try {
+    const mailOptions = {
+      from: `"Krishna Bodha Feedback" <${process.env.EMAIL_USER}>`,
+      to: toEmail,
+      subject: subject,
+      html: htmlContent
+    };
+
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error(`[Mailer] Error sending feedback email:`, error);
+    return { success: false, error: error.message };
+  }
+};

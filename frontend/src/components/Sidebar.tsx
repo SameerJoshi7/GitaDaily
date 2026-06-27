@@ -6,7 +6,8 @@ import {
   Bookmark,
   Sparkles,
   Info,
-  Settings
+  Settings,
+  MessageSquare
 } from 'lucide-react';
 import { t } from '../i18n';
 
@@ -17,6 +18,7 @@ interface SidebarProps {
   lang: string;
   onRefreshDaily: () => void;
   onOpenPrefs: () => void;
+  onOpenFeedback: () => void;
   onLogout?: () => void;
 }
 
@@ -27,6 +29,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   lang,
   onRefreshDaily,
   onOpenPrefs,
+  onOpenFeedback,
   onLogout
 }) => {
   const T = t(lang);
@@ -155,6 +158,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <Info size={18} />
               <span>{T.nav.aboutKrishnaBodha}</span>
+            </button>
+          </li>
+          <li className="nav-item" style={{ marginTop: '0.5rem' }}>
+            <button
+              onClick={onOpenFeedback}
+              className="nav-button"
+              style={{ color: 'var(--gold-primary)' }}
+            >
+              <MessageSquare size={18} />
+              <span>Share Feedback</span>
             </button>
           </li>
         </ul>

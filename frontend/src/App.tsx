@@ -12,6 +12,7 @@ import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
 import { WelcomeModal } from './components/WelcomeModal';
 import { NamePromptModal } from './components/NamePromptModal';
+import { FeedbackModal } from './components/FeedbackModal';
 import { useApp } from './hooks/useApp';
 
 function App() {
@@ -69,6 +70,32 @@ function App() {
   } = useApp();
 
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+
+  const handleFeedbackSubmit = async (guidanceRating: number, appRating: number, suggestions: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guidanceRating,
+          appRating,
+          suggestions,
+          userEmail: email // optional, will be empty string if guest
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Thank you! Your feedback has been sent anonymously.');
+        setIsFeedbackModalOpen(false);
+      } else {
+        alert(data.error || 'Failed to submit feedback.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to connect to the server.');
+    }
+  };
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('gitadaily_welcome_seen');
@@ -95,6 +122,7 @@ function App() {
         lang={lang}
         onRefreshDaily={fetchDailyShloka}
         onOpenPrefs={() => setIsPrefsModalOpen(true)}
+        onOpenFeedback={() => setIsFeedbackModalOpen(true)}
         onLogout={handleLogout}
       />
 
@@ -232,6 +260,14 @@ function App() {
           setEditName(name);
           await handleSavePrefs(undefined, name);
         }}
+      />
+
+      {/* Anonymous Feedback Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+        onSubmit={handleFeedbackSubmit}
+        loading={loading} // we can reuse global loading state or let it be handled directly
       />
     </div>
   );
