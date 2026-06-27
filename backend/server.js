@@ -1374,7 +1374,7 @@ app.post('/api/guidance', async (req, res) => {
         actionStep = `1. ಈ ನಿರ್ದಿಷ್ಟ ಶ್ಲೋಕವನ್ನು ವಿರಾಮಗೊಳಿಸಲು ಮತ್ತು ಪ್ರತಿಬಿಂಬಿಸಲು ಇಂದು ಸ್ವಲ್ಪ ಸಮಯ ತೆಗೆದುಕೊಳ್ಳಿ.\n2. ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಪರಿಸ್ಥಿತಿಗೆ ಈ ಬುದ್ಧಿವಂತಿಕೆಯನ್ನು ಅನ್ವಯಿಸುವ ಒಂದು ಸಣ್ಣ, ಕಾರ್ಯಸಾಧ್ಯವಾದ ಮಾರ್ಗವನ್ನು ಬರೆಯಿರಿ.`;
       }
 
-      logQueryInBackground(bestShloka.chapter, bestShloka.verse);
+
 
       res.json({
         success: true,
