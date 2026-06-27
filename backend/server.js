@@ -1034,6 +1034,8 @@ app.post('/api/trigger-daily-broadcast', async (req, res) => {
   }
 });
 
+const guestLimits = new Map();
+
 // 14. Gita Guidance (Reflect by Mood/Problem) endpoint
 app.post('/api/guidance', async (req, res) => {
   const { userId, query, language, userName } = req.body;
@@ -1068,7 +1070,6 @@ app.post('/api/guidance', async (req, res) => {
         language: lang,
         suggestedChapter,
         suggestedVerse,
-        ipAddress: clientIp,
         location
       };
       if (userId) logEntry.userId = userId;
@@ -1079,14 +1080,12 @@ app.post('/api/guidance', async (req, res) => {
   };
 
   if (!userId) {
-    try {
-      const guestCount = await QueryLog.countDocuments({ ipAddress: clientIp, userId: { $exists: false } });
-      if (guestCount >= 2) {
-        return res.status(403).json({ error: 'Guest limit reached', requireSubscription: true });
-      }
-    } catch (err) {
-      console.error('[Guidance] IP check error:', err);
+    const count = guestLimits.get(clientIp) || 0;
+    if (count >= 2) {
+      return res.status(403).json({ error: 'Guest limit reached', requireSubscription: true });
     }
+    // We increment it immediately. If the query fails later, it still counts against their limit.
+    guestLimits.set(clientIp, count + 1);
   }
 
   const lang = ((await language) || 'english').toLowerCase();

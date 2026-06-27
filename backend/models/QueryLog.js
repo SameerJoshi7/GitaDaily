@@ -5,9 +5,7 @@ const queryLogSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-  ipAddress: {
-    type: String,
-  },
+
   query: {
     type: String,
     required: true,
