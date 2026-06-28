@@ -1470,6 +1470,56 @@ async function broadcastDailyShloka() {
   }
 }
 
+// Test Delivery route
+app.post('/api/test-delivery', async (req, res) => {
+  const { userId, chapter, verse } = req.body;
+  if (!userId) return res.status(400).json({ error: 'User ID is required' });
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    let shloka = gitaData.find(s => s.chapter === parseInt(chapter) && s.verse === parseInt(verse));
+    if (!shloka) shloka = gitaData[0]; // fallback
+
+    const language = user.lang || 'english';
+    const reflection = await getGeminiReflection(shloka, language);
+    let sentToThisUser = false;
+
+    // 1. Email Channel
+    if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
+      await sendDailyShlokaEmail(user.email, shloka, reflection, language);
+      sentToThisUser = true;
+    }
+
+    // 2. Web Push Channel
+    if ((user.pref === 'push' || user.pref === 'all') && user.pushSubscription) {
+      try {
+        const payload = JSON.stringify({
+          title: `🦚 Gita Ch ${shloka.chapter}, Verse ${shloka.verse} (Test)`,
+          body: reflection.translatedTranslation || shloka.translation,
+          image: getArtworkForShloka(shloka),
+          url: `/#/chapter/${shloka.chapter}/verse/${shloka.verse}`
+        });
+        await webpush.sendNotification(user.pushSubscription, payload);
+        sentToThisUser = true;
+      } catch (err) {
+        console.error(`[WebPush] Failed test delivery for ${user.email}:`, err.message);
+      }
+    }
+
+    if (sentToThisUser) {
+      res.json({ success: true, message: 'Test delivery dispatched successfully to subscribed channels.' });
+    } else {
+      res.status(400).json({ error: 'No channels configured. Please select Email or Push Notifications.' });
+    }
+
+  } catch (err) {
+    console.error('[Test Delivery] Error:', err);
+    res.status(500).json({ error: 'Failed to process test delivery.' });
+  }
+});
+
 // Schedule morning broadcast daily at 6:00 AM local time
 cron.schedule('0 6 * * *', async () => {
   console.log('[Cron] Triggering daily morning shloka broadcast...');
