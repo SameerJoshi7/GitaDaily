@@ -780,7 +780,7 @@ function getArtworkForShloka(shloka) {
 
 // Format message helper
 function formatShlokaMessage(shloka, reflection, language = 'english') {
-  const lang = language.then(lang => (lang || 'english').toLowerCase());
+  const lang = (language || 'english').toLowerCase();
 
   // Custom headers based on language selection
   let title = '🦚 *Krishna Bodha: Daily Wisdom & AI Reflection* 🦚';
