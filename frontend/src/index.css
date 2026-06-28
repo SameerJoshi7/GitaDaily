@@ -491,6 +491,8 @@ button, a, input, select, textarea {
   white-space: pre-line;
   letter-spacing: 0.5px;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .shloka-transliteration {
@@ -499,6 +501,8 @@ button, a, input, select, textarea {
   text-align: center;
   font-size: 1.05rem;
   margin-bottom: 1.5rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .shloka-translation-box {
@@ -521,6 +525,8 @@ button, a, input, select, textarea {
 .shloka-translation {
   font-size: 1.1rem;
   color: var(--text-primary);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* AI deep reflection panel */
