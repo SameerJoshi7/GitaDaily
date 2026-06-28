@@ -33,6 +33,16 @@ const userSchema = new mongoose.Schema({
   lastNotifiedAt: {
     type: Date,
   },
+  lastActiveAt: {
+    type: Date,
+  },
+  missedDaysCount: {
+    type: Number,
+    default: 0,
+  },
+  lastGuidanceAt: {
+    type: Date,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

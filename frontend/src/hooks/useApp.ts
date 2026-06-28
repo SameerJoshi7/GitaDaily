@@ -288,6 +288,14 @@ export function useApp() {
           shloka: data.shloka,
           counsel: data.counsel
         });
+        
+        // Silently update guidance tracking
+        fetch(`${API_BASE}/user/guidance-ping`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        }).catch(() => {});
+        
       } else if (res.status === 429) {
         setGuidanceRetryTimer(data.retryAfter || 30);
         setGuidanceError(data.error);
@@ -687,6 +695,15 @@ export function useApp() {
     fetchBookmarks();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchReadingHistory();
+
+    // Ping activity for analytics & daily nudge logic
+    if (userId) {
+      fetch(`${API_BASE}/user/active`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      }).catch(() => {});
+    }
 
     return () => window.removeEventListener('hashchange', handleHashChange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
