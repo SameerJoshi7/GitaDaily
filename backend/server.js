@@ -1431,8 +1431,12 @@ async function broadcastDailyShloka() {
 
         // 1. Email Channel
         if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
-          await sendDailyShlokaEmail(user.email, shloka, reflection, language);
-          sentToThisUser = true;
+          try {
+            await sendDailyShlokaEmail(user.email, shloka, reflection, language);
+            sentToThisUser = true;
+          } catch (emailErr) {
+            console.error(`[Email] Failed for ${user.email}:`, emailErr.message);
+          }
         }
 
 
@@ -1516,8 +1520,12 @@ app.post('/api/test-delivery', async (req, res) => {
 
     // 1. Email Channel
     if (user.pref === 'email' || user.pref === 'both' || user.pref === 'all') {
-      await sendDailyShlokaEmail(user.email, shloka, reflection, language);
-      sentToThisUser = true;
+      try {
+        await sendDailyShlokaEmail(user.email, shloka, reflection, language);
+        sentToThisUser = true;
+      } catch (emailErr) {
+        console.error(`[Email] Failed test delivery for ${user.email}:`, emailErr.message);
+      }
     }
 
     // 2. Web Push Channel
