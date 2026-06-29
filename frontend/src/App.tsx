@@ -308,6 +308,50 @@ function App() {
       />
       
       <InstallPrompt />
+
+      {/* PWA Update Banner */}
+      {needRefresh && (
+        <div style={{
+          position: 'fixed',
+          bottom: '80px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'var(--bg-tertiary)',
+          border: '1px solid var(--gold-primary)',
+          boxShadow: '0 4px 12px rgba(212, 175, 55, 0.2)',
+          padding: '1rem',
+          borderRadius: '12px',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.8rem',
+          width: '90%',
+          maxWidth: '400px',
+          textAlign: 'center'
+        }}>
+          <div style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+            <strong style={{ color: 'var(--gold-primary)' }}>New update available!</strong><br />
+            Click reload to get the latest features.
+          </div>
+          <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+            <button 
+              className="primary-btn" 
+              style={{ flex: 1, padding: '0.5rem', justifyContent: 'center' }}
+              onClick={() => updateServiceWorker(true)}
+            >
+              Reload
+            </button>
+            <button 
+              className="primary-btn" 
+              style={{ flex: 1, padding: '0.5rem', justifyContent: 'center', background: 'transparent', border: '1px solid var(--card-border)' }}
+              onClick={() => setNeedRefresh(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
