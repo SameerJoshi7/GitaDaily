@@ -27,49 +27,71 @@ export function NamePromptModal({ isOpen, onSave, loading }: NamePromptModalProp
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-        {/* Decorative background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-orange-500/10 blur-[60px] rounded-full pointer-events-none" />
-
-        <div className="relative text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-500/20 text-orange-400 mb-4">
-            <Sparkles className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">How should Krishna address you?</h2>
-          <p className="text-zinc-400 text-sm">
-            Please enter your name to make your divine guidance deeply personal.
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6 relative">
-          <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Your Name
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-zinc-500" />
-              </div>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full pl-10 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="e.g. Arjuna"
-                required
-              />
+    <div className="modal-overlay">
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* No close button rendered here, as requested */}
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', textAlign: 'center' }}>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ 
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', 
+              width: '4rem', height: '4rem', borderRadius: '50%', 
+              background: 'rgba(212, 175, 55, 0.1)', color: 'var(--gold-primary)' 
+            }}>
+              <Sparkles size={32} />
             </div>
+            
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+              How should Krishna address you?
+            </h2>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.95rem' }}>
+              Please enter your name to make your divine guidance deeply personal.
+            </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || !name.trim()}
-            className="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl py-3 px-4 font-medium transition-all shadow-lg hover:shadow-orange-500/20 active:scale-[0.98]"
-          >
-            {loading ? 'Saving...' : 'Save Name'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginTop: '1rem' }}>
+            <div className="form-group" style={{ marginBottom: 0, textAlign: 'left' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                Your Name
+              </label>
+              <div style={{ position: 'relative' }}>
+                <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+                  <User size={18} style={{ color: 'var(--text-muted)' }} />
+                </div>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input-field"
+                  style={{ paddingLeft: '2.8rem' }}
+                  placeholder="e.g. Arjuna"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="primary-btn"
+              style={{ background: 'linear-gradient(135deg, #fbbf24, #d97706)', color: '#000', padding: '0.8rem', justifyContent: 'center', fontSize: '1rem' }}
+              disabled={loading || !name.trim()}
+            >
+              {loading ? (
+                <div style={{
+                  width: '20px', height: '20px',
+                  border: '2px solid rgba(0,0,0,0.2)',
+                  borderTopColor: '#000',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+              ) : (
+                'Save My Name'
+              )}
+            </button>
+          </form>
+
+        </div>
       </div>
     </div>
   );
