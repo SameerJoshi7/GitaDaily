@@ -303,7 +303,7 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
                 textTransform: 'uppercase',
                 fontWeight: 500
               }}>
-                Krishna Bodha Team
+                By Sameer Joshi
               </span>
             </div>
 
