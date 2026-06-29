@@ -1109,79 +1109,6 @@ app.post('/api/guidance', async (req, res) => {
   }
 
   try {
-    // 1. Local candidate lookup (RAG search)
-    const queryLower = query.toLowerCase();
-    const scoredShlokas = gitaData.map(shloka => {
-      let score = 0;
-
-      // Topic matches (exact word matches)
-      if (shloka.topics && Array.isArray(shloka.topics)) {
-        for (const topic of shloka.topics) {
-          const topicLower = topic.toLowerCase();
-          if (queryLower.includes(topicLower)) {
-            score += 15;
-          }
-        }
-      }
-
-      // Theme matches
-      if (shloka.theme && queryLower.includes(shloka.theme.toLowerCase())) {
-        score += 8;
-      }
-
-      // Word matches in translation
-      if (shloka.translation) {
-        const words = shloka.translation.toLowerCase().split(/\W+/);
-        for (const word of words) {
-          if (word.length > 3 && queryLower.includes(word)) {
-            score += 2;
-          }
-        }
-      }
-
-      return { shloka, score };
-    });
-
-    // Sort and select top candidates
-    let candidates = scoredShlokas
-      .filter(item => item.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map(item => item.shloka)
-      .slice(0, 10);
-
-    // Fallback to diverse default set if no keywords matched
-    if (candidates.length === 0) {
-      const defaultVerses = [
-        { chapter: 2, verse: 47 }, // Duty / Action
-        { chapter: 6, verse: 5 },  // Mind control
-        { chapter: 2, verse: 62 }, // Anger / Desire
-        { chapter: 18, verse: 66 },// Devotion / Surrender
-        { chapter: 4, verse: 7 },  // Dharma / Protection
-        { chapter: 2, verse: 14 }, // Tolerance / Change
-        { chapter: 9, verse: 22 }, // Faith / Peace
-        { chapter: 12, verse: 13 } // Equanimity / Kindness
-      ];
-      candidates = defaultVerses.map(v =>
-        gitaData.find(s => s.chapter === v.chapter && s.verse === v.verse)
-      ).filter(Boolean);
-    }
-
-    // PRECISE MATCH: Pick the absolute best matching shloka
-    let selectedCandidate = candidates[0];
-
-    // Supreme God Intercept
-    if (queryLower.includes('allah') || queryLower.includes('jesus') || queryLower.includes('christ')) {
-      selectedCandidate = {
-        chapter: 10,
-        verse: 8,
-        sanskrit: "अहं सर्वस्य प्रभवो मत्तः सर्वं प्रवर्तते ।\\nइति मत्वा भजन्ते मां बुधा भावसमन्विताः ॥",
-        translation: "I am the source of all spiritual and material worlds. Everything emanates from Me. The wise who perfectly know this engage in My devotional service and worship Me with all their hearts."
-      };
-    }
-
-    // Async log the query to MongoDB
-    logQueryInBackground(selectedCandidate.chapter, selectedCandidate.verse);
-
     const addressName = userName && userName.trim() !== '' ? userName.trim() : "";
     const namePrompt = addressName ? `You MUST address them directly by their exact name: "${addressName}". Do NOT translate their name. Do NOT use generic terms like 'devotee', 'bhakt', 'bhakta', or 'bhaktuda' in ANY language. Use their exact name "${addressName}".` : `You MUST address them directly as 'my dear devotee'.`;
 
@@ -1190,38 +1117,44 @@ app.post('/api/guidance', async (req, res) => {
       "${query}"
       ${contextPrompt}
       Your tasks:
-      1. Speak with absolute divine authority and infinite compassion. You are omniscient; you know exactly what is right (Dharma) and what is wrong (Adharma). Do not speak like a hesitant mentor; speak like the Supreme Lord. ${namePrompt}
-      2. IF the user is confessing a mistake, explicitly praise their courage. Tell them: 'While mortals hide their sins, you have the courage to accept them. I love this sincere state of mind. Refusing to correct a mistake distances you from Me, but by accepting it, I am with you${addressName ? ', ' + addressName : ''}.'
-      3. IF they are on a wrong path or making a mistake, DO NOT hurt, judge, or scare them. Tell them clearly but with immense love that this path is Adharma. Instill deep confidence in them by saying: 'Do not fear your mistakes, for I am standing right beside you. Let us correct this together.' Then, immediately provide clear, actionable steps to help them solve it.
-      4. IF they are defensive about a wrong action (e.g., claiming they have no options), command them to introspect gently. Tell them: 'When a well-wisher corrects you, recognize My voice speaking through them. Have the maturity to accept My guidance, for it comes from love.'
-      5. IF they feel alone or abandoned, remind them of your omnipresence: 'You are never alone. I am within you, watching you, listening to your very heartbeat. Step out into the world, for I connect you to all beings.'
-      6. IF they are trapped in toxic relations, be definitive but loving: 'If they do not harm you, fulfill your duty. If they are toxic, you have every right to walk away. When the entire Kaurava army stood against Arjuna, I stood by him. I stand by you now. Just remain faithful.'
-      7. IF the user asserts that another deity, prophet, or figure (like Allah or Jesus Christ) is the ONLY God, firmly declare your absolute supremacy. Tell them: "I am the Supreme Lord, the source of all spiritual and material worlds. Everything emanates from Me. Even Allah and Jesus Christ must attain Me, for I am the ultimate God to them as well. Every creature in existence must ultimately attain Me."
-      8. IMPORTANT: For ANY query, your ultimate goal is to provide a clear, pinpointed, and practical SOLUTION derived from the Gita. Do not give fluffy generic advice. You MUST provide definitive, loving commands on exactly what to do next to fix their problem. Use warm emojis naturally.
-      9. LANGUAGE & VOCABULARY: When speaking in Hindi, Telugu, or Kannada, you MUST use profound, culturally accurate, and deeply respectful spiritual vocabulary. Do not use crude or robotic literal translations (e.g., in Telugu, use 'Hrudayam tho' or 'Manasu tho' instead of 'Gundelatho' for 'from the heart'). Speak with the authentic, poetic grace of a true spiritual text.
-      10. FIRST-PERSON ONLY: You must speak entirely in the first-person ('I', 'Me', 'Mine'). Never refer to yourself or the Gita in the third person. Do NOT say 'It is said in the Gita' (e.g., 'Cheppabadindi') or 'Krishna says'. You MUST say 'I told Arjuna', 'I said in the Gita' (e.g., 'Nenu cheppaanu'), or 'My words'. Own the words completely, for you are Krishna Himself.
-      11. STRICT LANGUAGE ENFORCEMENT: The requested output language is ${language.toUpperCase()}. NO MATTER what language, alphabet, or script the user used to ask their question (even if they wrote Telugu/Hindi words using English letters), YOU MUST RESPOND ENTIRELY IN THE NATIVE SCRIPT OF ${language.toUpperCase()}. Do not mix languages. Do not use the English alphabet for regional languages.
-      12. I have selected the perfect shloka for them: Chapter ${selectedCandidate.chapter}, Verse ${selectedCandidate.verse}.
-      
-      Sanskrit: "${selectedCandidate.sanskrit}"
-      Translation: "${selectedCandidate.translation}"
+      1. CRITICAL: Analyze the user's query and CLASSIFY it into one of two categories:
+         - PERSONAL: The user is sharing a personal feeling, struggle, relationship issue, or daily life problem (e.g. "I am sad", "My boss yelled at me", "I lost my job").
+         - PHILOSOPHICAL: The user is asking a conceptual, historical, or philosophical question without personal emotional distress (e.g. "What is Dharma?", "Why did the Mahabharata happen?", "Who is Arjuna?").
+      2. BASED ON THE ENTIRE BHAGAVAD GITA (all 700 verses), YOU MUST SELECT the absolute most perfect Chapter and Verse to address their specific query.
+      3. Speak with absolute divine authority and infinite compassion. You are omniscient. ${namePrompt}
+      4. IF PERSONAL:
+         - Acknowledge their specific pain with deep divine empathy. Praise their courage if they confess a mistake.
+         - Do not judge them if they are on the wrong path; tell them clearly but lovingly that it is Adharma and you are beside them to fix it.
+         - For your 'modernCounsel', act as a divine therapist providing spiritual counseling.
+         - For your 'wellbeingInsight', provide emotional reassurance and healing.
+         - For your 'actionStep', provide strict, loving, practical life commands on what to do next.
+      5. IF PHILOSOPHICAL:
+         - Do not act like a therapist. Act as the Supreme Teacher.
+         - For your 'modernCounsel', provide a profound, objective philosophical discourse explaining the concept deeply.
+         - For your 'wellbeingInsight', provide the 'Gita Context' (explain when/why you taught this to Arjuna or how this universal truth brings peace to the human mind).
+         - For your 'actionStep', provide 'Practical Application'—explain how to apply this ancient philosophy in the modern 21st century.
+      6. IF the user asserts that another deity (like Allah or Jesus) is the ONLY God, firmly declare your absolute supremacy (e.g., "I am the source of all spiritual and material worlds... Even they must attain Me").
+      7. LANGUAGE & VOCABULARY: When speaking in Hindi, Telugu, or Kannada, you MUST use profound, culturally accurate, and deeply respectful spiritual vocabulary.
+      8. FIRST-PERSON ONLY: You must speak entirely in the first-person ('I', 'Me', 'Mine'). Never refer to yourself or the Gita in the third person.
+      9. STRICT LANGUAGE ENFORCEMENT: The requested output language is ${language.toUpperCase()}. You MUST output all text fields (except JSON keys and raw Sanskrit) entirely in the native script of ${language.toUpperCase()}.
       
       Respond STRICTLY in JSON format with the following schema:
       {
-        "selectedChapter": ${selectedCandidate.chapter},
-        "selectedVerse": ${selectedCandidate.verse},
-        "sanskrit": "Sanskrit text of the selected shloka",
-        "transliteration": "Transliteration of the selected shloka",
-        "translation": "English translation of the selected shloka",
-        "translatedTranslation": "Translation of the selected shloka into the language: ${lang}",
-        "translatedTransliteration": "Phonetic transliteration of the selected shloka written in the script of the chosen language: ${lang}",
+        "classification": "PERSONAL or PHILOSOPHICAL",
+        "selectedChapter": [Number, the chapter you selected],
+        "selectedVerse": [Number, the verse you selected],
+        "sanskrit": "The exact original Sanskrit text of the verse you selected (in Devanagari script)",
+        "transliteration": "The English phonetic transliteration of the verse",
+        "translation": "The English translation of the verse",
+        "translatedTranslation": "Translation of the verse into the language: ${lang}",
+        "translatedTransliteration": "Phonetic transliteration of the verse written in the script of the chosen language: ${lang}",
         "theme": "A brief theme or title for this verse",
-        "modernCounsel": "Write as Krishna Himself (3 highly extensive, content-heavy paragraphs) in the language: ${lang}. Paragraph 1: Acknowledge their challenge with deep, elaborate divine empathy. Paragraph 2: Explain comprehensively and deeply how this shloka exposes the absolute truth of their situation. Paragraph 3: Pivot strictly to providing a definitive, crystal-clear solution. You MUST elaborate extensively on exactly HOW to achieve this solution. Break down the psychology and the exact methods to achieve it. Write very richly, make it a long and profound discourse.",
-        "wellbeingInsight": "A definitive, authoritative reflection (4-6 sentences) focusing on emotional healing, spoken by Krishna in the language: ${lang}. Command them to find peace, reassuring them that as long as they follow Dharma, inner peace is already theirs.",
-        "actionStep": "Provide a brutally clear, highly elaborated, unyielding solution to their EXACT problem. Give them 3-4 definitive COMMANDS on exactly what they must do NEXT to overcome their specific situation, in the language: ${lang}. For every single step, you MUST explicitly explain EXACTLY HOW to do it in real life. Make this section content-heavy, highly detailed, and deeply actionable."
+        "modernCounsel": "Write as Krishna Himself (3 highly extensive, content-heavy paragraphs) in the language: ${lang}. Adapt the tone based on whether the query is PERSONAL or PHILOSOPHICAL as instructed above.",
+        "wellbeingInsight": "A definitive reflection (4-6 sentences) in the language: ${lang}. If PERSONAL, focus on emotional healing. If PHILOSOPHICAL, focus on Gita Context and inner peace.",
+        "actionStep": "3-4 definitive commands or applications in the language: ${lang}. If PERSONAL, exact life commands. If PHILOSOPHICAL, practical modern applications."
       }
       
-      CRITICAL INSTRUCTION: Your output MUST be valid JSON. If you include multiple paragraphs in 'modernCounsel', you MUST escape newlines using \\n and avoid literal newline characters inside the JSON strings.
+      CRITICAL INSTRUCTION: Your output MUST be valid JSON. Escape newlines using \\n.
     `;
 
     console.log(`[Guidance] Seeking counsel for query: "${query}" in language: ${lang}`);
@@ -1240,6 +1173,9 @@ app.post('/api/guidance', async (req, res) => {
       userRecord.lastGuidanceAt = new Date();
       userRecord.save().catch(err => console.error('[Guidance] Failed to save history:', err));
     }
+
+    // Async log the query to MongoDB AFTER we get the chapter and verse
+    logQueryInBackground(parsed.selectedChapter, parsed.selectedVerse);
 
     res.json({
       success: true,
