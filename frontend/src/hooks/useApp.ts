@@ -180,6 +180,18 @@ export function useApp() {
     setDailyShloka(null);
     setBookmarks([]);
     setReadingHistory(null);
+    
+    // Clear Guidance state
+    setGuidanceQuery('');
+    setGuidanceResult(null);
+    sessionStorage.removeItem('gitadaily_guidanceQuery');
+    sessionStorage.removeItem('gitadaily_guidanceResult');
+    
+    // Clear Search state
+    setSearchQuery('');
+    setSearchResults([]);
+    sessionStorage.removeItem('gitadaily_searchQuery');
+    sessionStorage.removeItem('gitadaily_searchResults');
   };
 
   const handleDeleteAccount = async () => {
