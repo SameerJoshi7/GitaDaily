@@ -339,8 +339,8 @@ function App() {
               className="primary-btn" 
               style={{ flex: 1, padding: '0.5rem', justifyContent: 'center' }}
               onClick={() => {
+                setNeedRefresh(false);
                 updateServiceWorker(true);
-                window.location.reload();
               }}
             >
               Reload
