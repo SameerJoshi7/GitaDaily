@@ -60,9 +60,16 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
       // Wait a tiny bit just to let UI show loading state
       await new Promise(res => setTimeout(res, 100)); 
       
+      const width = shareRef.current.offsetWidth;
+      const height = shareRef.current.scrollHeight;
+
       const html2canvas = (await import('html2canvas')).default;
       const canvas = await html2canvas(shareRef.current, {
-        scale: 1, // we are already 1080x1350, so 1 is fine
+        scale: 1, 
+        width: width,
+        height: height,
+        windowWidth: width,
+        windowHeight: height,
         backgroundColor: '#0a0b10',
         useCORS: true,
         allowTaint: true,
