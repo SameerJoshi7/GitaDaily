@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
   lastGuidanceAt: {
     type: Date,
   },
+  guidanceHistory: [{
+    query: String,
+    timestamp: { type: Date, default: Date.now }
+  }],
   createdAt: {
     type: Date,
     default: Date.now,

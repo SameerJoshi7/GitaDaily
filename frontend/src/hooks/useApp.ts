@@ -277,6 +277,7 @@ export function useApp() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId,
+          email,
           query: guidanceQuery,
           language: lang,
           userName: userName

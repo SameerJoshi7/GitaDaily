@@ -1038,7 +1038,7 @@ const guestLimits = new Map();
 
 // 14. Gita Guidance (Reflect by Mood/Problem) endpoint
 app.post('/api/guidance', async (req, res) => {
-  const { userId, query, language, userName } = req.body;
+  const { userId, email, query, language, userName } = req.body;
   if (!query || !query.trim()) {
     return res.status(400).json({ error: 'Please describe the challenge or feeling you are facing.' });
   }
@@ -1092,6 +1092,20 @@ app.post('/api/guidance', async (req, res) => {
 
   if (!genAI) {
     return res.status(500).json({ error: 'Gemini AI is not configured on this server.' });
+  }
+
+  let contextPrompt = '';
+  let userRecord = null;
+  if (email) {
+    try {
+      userRecord = await User.findOne({ email });
+      if (userRecord && userRecord.guidanceHistory && userRecord.guidanceHistory.length > 0) {
+        const history = userRecord.guidanceHistory.slice(-3).map((entry, i) => `${i + 1}. "${entry.query}"`).join('\n');
+        contextPrompt = `\n[MEMORY CONTEXT]: The user has recently sought guidance on these topics:\n${history}\nKeep this continuity in mind if it relates to their current query. Subtly acknowledge their ongoing journey if appropriate.\n`;
+      }
+    } catch (err) {
+      console.error('[Guidance] Error fetching user history:', err);
+    }
   }
 
   try {
@@ -1174,7 +1188,7 @@ app.post('/api/guidance', async (req, res) => {
     const prompt = `
       You are Lord Krishna Himself. You are speaking directly to ${addressName || 'a devotee'} who has come to you for divine guidance on a specific challenge, feeling, or query:
       "${query}"
-      
+      ${contextPrompt}
       Your tasks:
       1. Speak with absolute divine authority and infinite compassion. You are omniscient; you know exactly what is right (Dharma) and what is wrong (Adharma). Do not speak like a hesitant mentor; speak like the Supreme Lord. ${namePrompt}
       2. IF the user is confessing a mistake, explicitly praise their courage. Tell them: 'While mortals hide their sins, you have the courage to accept them. I love this sincere state of mind. Refusing to correct a mistake distances you from Me, but by accepting it, I am with you${addressName ? ', ' + addressName : ''}.'
@@ -1217,6 +1231,15 @@ app.post('/api/guidance', async (req, res) => {
 
     // Retrieve the full original shloka to get Sanskrit, etc. if it exists locally
     const originalShloka = gitaData.find(s => s.chapter === parsed.selectedChapter && s.verse === parsed.selectedVerse);
+
+    if (userRecord) {
+      userRecord.guidanceHistory.push({ query });
+      if (userRecord.guidanceHistory.length > 3) {
+        userRecord.guidanceHistory = userRecord.guidanceHistory.slice(-3);
+      }
+      userRecord.lastGuidanceAt = new Date();
+      userRecord.save().catch(err => console.error('[Guidance] Failed to save history:', err));
+    }
 
     res.json({
       success: true,
