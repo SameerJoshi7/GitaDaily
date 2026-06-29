@@ -15,8 +15,14 @@ import { NamePromptModal } from './components/NamePromptModal';
 import { FeedbackModal } from './components/FeedbackModal';
 import { InstallPrompt } from './components/InstallPrompt';
 import { useApp } from './hooks/useApp';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 
 function App() {
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW();
+
   const {
     email,
     pref,
