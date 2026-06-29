@@ -113,15 +113,15 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
           ref={shareRef}
           style={{
             width: '1080px',
-            height: '1350px',
+            minHeight: '1350px',
+            height: 'max-content',
             backgroundColor: '#0a0b10',
             position: 'relative',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             padding: '3rem',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
+            boxSizing: 'border-box'
           }}
         >
           {/* Background Image & Overlay */}
