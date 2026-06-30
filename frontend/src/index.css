@@ -1033,6 +1033,17 @@ button, a, input, select, textarea {
   box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
 }
 
+.mobile-logout-btn {
+  border-color: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.05);
+}
+
+.mobile-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--error);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+}
+
 .glow-subscribe-text {
   font-size: 0.8rem;
   color: var(--gold-primary);

@@ -61,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
           {email && onLogout && (
             <button 
-              className="mobile-pref-btn" 
+              className="mobile-pref-btn mobile-logout-btn" 
               onClick={() => {
                 if(window.confirm('Are you sure you want to log out?')) onLogout();
               }}
