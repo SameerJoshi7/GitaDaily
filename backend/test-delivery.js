@@ -1,6 +1,6 @@
 // Rely on global fetch in Node.js 18+
 
-const email = process.argv[2] || 'sameer9032@gmail.com';
+const email = process.argv[2] || 'team.krishnabodha@gmail.com';
 const chapter = process.argv[3] || '2';
 const verse = process.argv[4] || '47';
 
