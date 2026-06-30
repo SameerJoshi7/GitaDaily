@@ -52,6 +52,16 @@ export function PreferencesModal({
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
 
+  React.useEffect(() => {
+    if (isOpen || !email) {
+      setAuthMode('subscribe');
+      setLoginStep('email');
+      setAuthEmailInput('');
+      setOtpCode('');
+      setOtpError('');
+    }
+  }, [isOpen, email]);
+
   if (!isOpen) return null;
 
   const T = t(lang);
