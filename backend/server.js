@@ -1517,12 +1517,12 @@ app.post('/api/test-delivery', async (req, res) => {
 });
 
 // Schedule morning broadcast daily at 6:00 AM local time
-cron.schedule('0 6 * * *', async () => {
-  console.log('[Cron] Triggering daily morning shloka broadcast...');
-  await broadcastDailyShloka();
-}, {
-  timezone: 'Asia/Kolkata'
-});
+// cron.schedule('0 6 * * *', async () => {
+//   console.log('[Cron] Triggering daily morning shloka broadcast...');
+//   await broadcastDailyShloka();
+// }, {
+//   timezone: 'Asia/Kolkata'
+// });
 
 // 1. Daily Evening Inactivity Nudge at 8:00 PM (20:00) IST
 cron.schedule('0 20 * * *', async () => {
