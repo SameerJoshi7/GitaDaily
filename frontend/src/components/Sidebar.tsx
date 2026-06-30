@@ -65,7 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => {
                 if(window.confirm('Are you sure you want to log out?')) onLogout();
               }}
-              style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.75rem', color: 'var(--error)' }}
+              style={{ color: 'var(--error)' }}
               aria-label="Logout"
             >
               <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>Logout</span>
