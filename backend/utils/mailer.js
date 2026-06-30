@@ -135,9 +135,32 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   const subject = `🦚 Krishna Bodha Ch ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})`;
 
   const htmlContent = `
-    <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; background-image: linear-gradient(to bottom, rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; color: #e2e8f0; padding: 20px; text-align: center;">
-      <!-- Main Card Container -->
-      <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="color-scheme" content="light dark">
+      <meta name="supported-color-schemes" content="light dark">
+      <style>
+        :root {
+          color-scheme: light dark;
+        }
+        /* Force Apple Mail to keep exact colors */
+        @media (prefers-color-scheme: dark) {
+          .email-bg {
+            background-color: #050508 !important;
+          }
+          .email-text {
+            color: #e2e8f0 !important;
+          }
+        }
+      </style>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #050508;">
+      <div class="email-bg email-text" style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; background-image: linear-gradient(to bottom, rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; color: #e2e8f0; padding: 20px; text-align: center;">
+        <!-- Main Card Container -->
+        <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
         
         <!-- Header: Logo & App Title -->
         <div style="text-align: center; margin-bottom: 25px;">
@@ -215,6 +238,8 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
         </div>
       </div>
     </div>
+  </body>
+  </html>
   `;
 
   if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY) {
