@@ -1544,7 +1544,7 @@ cron.schedule('0 20 * * *', async () => {
       try {
         const payload = JSON.stringify({
           title: 'Take a moment for yourself 🦚',
-          body: 'You haven\'t checked today\'s Shloka yet. Tap here to read your daily wisdom.',
+          body: 'Don\'t forget your daily moment of peace. Your Krishna Bodha Shloka is waiting for you.',
           url: '/'
         });
         await webpush.sendNotification(user.pushSubscription, payload);
