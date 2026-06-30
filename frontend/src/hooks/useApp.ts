@@ -334,6 +334,24 @@ export function useApp() {
     return outputArray;
   };
 
+  const syncExistingPushSubscription = (uid: string) => {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.pushManager.getSubscription().then(sub => {
+          if (sub) {
+            fetch(`${API_BASE}/push/subscribe`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: uid, subscription: sub })
+            }).then(res => {
+              if (res.ok) setIsPushSubscribed(true);
+            }).catch(console.error);
+          }
+        }).catch(console.error);
+      }).catch(console.error);
+    }
+  };
+
   const handleEnableNotifications = async () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
       alert('Your browser does not support web push notifications.');
@@ -423,6 +441,7 @@ export function useApp() {
       if (!data.isNewUser && data.user) {
         // Log them in!
         loginUser(data.user);
+        syncExistingPushSubscription(data.user._id);
         fetchChapters();
         fetchBookmarks();
         fetchDailyShloka();
@@ -452,6 +471,7 @@ export function useApp() {
       const data = await res.json();
       if (res.ok) {
         loginUser(data);
+        syncExistingPushSubscription(data._id);
         
         // Sync local storage bookmarks to backend database
         const localBookmarksStr = localStorage.getItem('gitadaily_local_bookmarks') || '[]';
