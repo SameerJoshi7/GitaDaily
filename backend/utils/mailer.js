@@ -38,7 +38,15 @@ export const sendEmailOTP = async (toEmail, otp) => {
           accessToken: process.env.EMAILJS_PRIVATE_KEY,
           template_params: {
             to_email: toEmail,
-            otp: otp
+            otp: otp,
+            htmlContent: `
+              <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                <h2><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha</h2>
+                <p>Your verification code is:</p>
+                <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
+                <p>This code will expire in 5 minutes.</p>
+              </div>
+            `
           }
         })
       });
@@ -267,7 +275,8 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
             reflection: reflection.modernReflection,
             wellbeing: reflection.emotionalWellbeing,
             career: reflection.careerApplication,
-            mindfulness: reflection.mindfulnessTip
+            mindfulness: reflection.mindfulnessTip,
+            htmlContent: htmlContent
           }
         })
       });
