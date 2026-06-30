@@ -51,6 +51,28 @@ export function Footer() {
           Sameer Joshi
         </a>
       </div>
+      
+      <div style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
+        <a 
+          href="mailto:team.krishnabodha@gmail.com?subject=Krishna Bodha Support" 
+          style={{ 
+            color: 'var(--text-muted)', 
+            textDecoration: 'none',
+            transition: 'color 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem'
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+          Contact Us
+        </a>
+      </div>
     </footer>
   );
 }
