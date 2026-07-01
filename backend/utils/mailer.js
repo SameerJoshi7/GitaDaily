@@ -75,7 +75,7 @@ export const sendEmailOTP = async (toEmail, otp) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Krishna Bodha <onboarding@resend.dev>',
+          from: 'Krishna Bodha <team@krishnabodha.in>',
           to: toEmail,
           subject: 'Your Krishna Bodha Verification Code',
           html: `
@@ -304,7 +304,7 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Krishna Bodha <onboarding@resend.dev>',
+          from: 'Krishna Bodha <team@krishnabodha.in>',
           to: toEmail,
           subject: subject,
           html: htmlContent
@@ -432,7 +432,7 @@ export const sendFeedbackEmail = async (userEmail, userName, guidanceRating, app
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Krishna Bodha <onboarding@resend.dev>',
+          from: 'Krishna Bodha <team@krishnabodha.in>',
           to: toEmail,
           subject: subject,
           html: htmlContent
