@@ -54,7 +54,7 @@ export function Footer() {
       
       <div style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
         <a 
-          href="mailto:team.krishnabodha@gmail.com?subject=Krishna Bodha Support" 
+          href="mailto:help@krishnabodha.in?subject=Krishna Bodha Support" 
           style={{ 
             color: 'var(--text-muted)', 
             textDecoration: 'none',
