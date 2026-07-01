@@ -164,6 +164,7 @@ export function useApp() {
     if (userData._id) setUserId(userData._id);
     setPref(userData.pref || 'email');
     setLang(userData.lang || 'english');
+    setEditPref(userData.pref || 'email');
   };
 
   const handleLogout = () => {
