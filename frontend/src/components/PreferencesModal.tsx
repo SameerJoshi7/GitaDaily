@@ -105,7 +105,7 @@ export function PreferencesModal({
                 setOtpError('');
                 const form = e.currentTarget;
                 const emailVal = (form.elements.namedItem('guestEmail') as HTMLInputElement).value;
-                const prefVal = (form.elements.namedItem('guestPref') as HTMLSelectElement).value;
+                const prefVal = 'none';
                 const res = await handleGuestSubscribe(emailVal, prefVal);
                 if (res.success) {
                   onClose();
@@ -135,14 +135,6 @@ export function PreferencesModal({
                     placeholder="email@example.com"
                     required
                   />
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <select name="guestPref" className="input-field">
-                    <option value="email">Email Only</option>
-                    <option value="push">Web Push</option>
-                    <option value="all">Email &amp; Push Notifications</option>
-                  </select>
                 </div>
 
                 <button

@@ -14,6 +14,7 @@ import { WelcomeModal } from './components/WelcomeModal';
 import { NamePromptModal } from './components/NamePromptModal';
 import { FeedbackModal } from './components/FeedbackModal';
 import { InstallPrompt } from './components/InstallPrompt';
+import { NotificationPrompt } from './components/NotificationPrompt';
 import { useApp } from './hooks/useApp';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
@@ -68,6 +69,7 @@ function App() {
     handleSendOtp,
     handleVerifyOtp,
     handleGuestSubscribe,
+    handleUpgradePreference,
     handleGuestLangChange,
     fetchDailyShloka,
     handleToggleBookmark,
@@ -79,6 +81,7 @@ function App() {
 
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [showInitialOnboarding, setShowInitialOnboarding] = useState(false);
 
   // Track app opens and automatically show feedback modal for subscribers on 3rd open
   useEffect(() => {
@@ -145,6 +148,20 @@ function App() {
     <div className="app-container">
       {/* Global In-App Toast */}
       <Toast message={toast} />
+
+      <NotificationPrompt
+        email={email}
+        pref={pref}
+        handleEnableNotifications={handleEnableNotifications}
+        handleUpgradePreference={handleUpgradePreference}
+        showInitialOnboarding={showInitialOnboarding}
+        onInitialOnboardingComplete={(skipped) => {
+          setShowInitialOnboarding(false);
+          if (skipped) {
+            alert('You can update your notification preferences anytime from Settings.');
+          }
+        }}
+      />
 
 
       <Sidebar
@@ -269,7 +286,13 @@ function App() {
 
         isPushSubscribed={isPushSubscribed}
 
-        handleGuestSubscribe={handleGuestSubscribe}
+        handleGuestSubscribe={async (emailVal, prefVal) => {
+          const res = await handleGuestSubscribe(emailVal, prefVal);
+          if (res.success) {
+            setShowInitialOnboarding(true);
+          }
+          return res;
+        }}
         handleSendOtp={handleSendOtp}
         handleVerifyOtp={handleVerifyOtp}
         handleSavePrefs={handleSavePrefs}

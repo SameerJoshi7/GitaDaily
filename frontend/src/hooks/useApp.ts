@@ -251,6 +251,27 @@ export function useApp() {
     }
   };
 
+  const handleUpgradePreference = async (newPref: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/user/preferences`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, pref: newPref, lang, name: userName }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('gitadaily_pref', data.pref || 'email');
+        setPref(data.pref || 'email');
+        setEditPref(data.pref || 'email');
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
   const handleSendTestDelivery = async () => {
     setLoading(true);
     try {
@@ -802,6 +823,7 @@ export function useApp() {
     handleLogout,
     handleDeleteAccount,
     handleSavePrefs,
+    handleUpgradePreference,
     handleSendTestDelivery,
     handleSeekGuidance,
     handleEnableNotifications,
