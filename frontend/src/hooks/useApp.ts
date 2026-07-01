@@ -165,6 +165,7 @@ export function useApp() {
     setPref(userData.pref || 'email');
     setLang(userData.lang || 'english');
     setEditPref(userData.pref || 'email');
+    setEditLang(userData.lang || 'english');
   };
 
   const handleLogout = () => {
