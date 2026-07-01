@@ -155,7 +155,7 @@ export const AboutTab: React.FC<AboutTabProps> = ({ onSeekGuidanceClick }) => {
           <span style={{ background: 'rgba(255, 255, 255, 0.03)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '0.4rem 0.8rem', borderRadius: '30px', fontSize: '0.8rem', fontWeight: 500 }}>TypeScript</span>
           <span style={{ background: 'rgba(212, 175, 55, 0.06)', color: 'var(--gold-primary)', border: '1px solid rgba(212, 175, 55, 0.25)', padding: '0.4rem 0.8rem', borderRadius: '30px', fontSize: '0.8rem', fontWeight: 600 }}>Google Gemini AI (gemini-flash-latest)</span>
           <span style={{ background: 'rgba(255, 255, 255, 0.03)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '0.4rem 0.8rem', borderRadius: '30px', fontSize: '0.8rem', fontWeight: 500 }}>Node.js & Express</span>
-          <span style={{ background: 'rgba(255, 255, 255, 0.03)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '0.4rem 0.8rem', borderRadius: '30px', fontSize: '0.8rem', fontWeight: 500 }}>EmailJS secure HTTP API</span>
+          <span style={{ background: 'rgba(255, 255, 255, 0.03)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '0.4rem 0.8rem', borderRadius: '30px', fontSize: '0.8rem', fontWeight: 500 }}>Resend HTTP API</span>
           <span style={{ background: 'rgba(255, 255, 255, 0.03)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '0.4rem 0.8rem', borderRadius: '30px', fontSize: '0.8rem', fontWeight: 500 }}>VAPID Web Push Protocol</span>
         </div>
       </div>

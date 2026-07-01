@@ -22,47 +22,6 @@ if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
 }
 
 export const sendEmailOTP = async (toEmail, otp) => {
-  // If EmailJS is configured, prioritize sending via HTTP (avoids SMTP blocks on Render)
-  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY) {
-    try {
-      console.log(`[Mailer] Sending OTP to ${toEmail} using EmailJS HTTP API...`);
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          service_id: process.env.EMAILJS_SERVICE_ID,
-          template_id: process.env.EMAILJS_OTP_TEMPLATE_ID,
-          user_id: process.env.EMAILJS_PUBLIC_KEY,
-          accessToken: process.env.EMAILJS_PRIVATE_KEY,
-          template_params: {
-            to_email: toEmail,
-            otp: otp,
-            htmlContent: `
-              <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-                <h2><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha</h2>
-                <p>Your verification code is:</p>
-                <h1 style="color: #FACC15; font-size: 32px; letter-spacing: 4px;">${otp}</h1>
-                <p>This code will expire in 5 minutes.</p>
-              </div>
-            `
-          }
-        })
-      });
-
-      if (response.ok) {
-        console.log(`[Mailer] EmailJS OTP sent successfully to ${toEmail}`);
-        return { success: true };
-      } else {
-        const errText = await response.text();
-        throw new Error(errText || 'EmailJS API returned an error');
-      }
-    } catch (error) {
-      console.error('[Mailer] EmailJS HTTP API error:', error);
-      return { success: false, error: error.message };
-    }
-  }
 
   // If Resend API Key is configured, prioritize sending via HTTP (avoids Render SMTP block)
   if (process.env.RESEND_API_KEY) {
@@ -250,49 +209,6 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
   </html>
   `;
 
-  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY) {
-    try {
-      console.log(`[Mailer] Sending daily email to ${toEmail} using EmailJS HTTP API...`);
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          service_id: process.env.EMAILJS_SERVICE_ID,
-          template_id: process.env.EMAILJS_SHLOKA_TEMPLATE_ID,
-          user_id: process.env.EMAILJS_PUBLIC_KEY,
-          accessToken: process.env.EMAILJS_PRIVATE_KEY,
-          template_params: {
-            to_email: toEmail,
-            chapter: shloka.chapter,
-            verse: shloka.verse,
-            language: language.toUpperCase(),
-            artwork: activeArtwork,
-            sanskrit: shloka.sanskrit,
-            transliteration: reflection.translatedTransliteration || shloka.transliteration,
-            translation: reflection.translatedTranslation || shloka.translation,
-            reflection: reflection.modernReflection,
-            wellbeing: reflection.emotionalWellbeing,
-            career: reflection.careerApplication,
-            mindfulness: reflection.mindfulnessTip,
-            htmlContent: htmlContent
-          }
-        })
-      });
-
-      if (response.ok) {
-        console.log(`[Mailer] EmailJS Daily email sent successfully to ${toEmail}`);
-        return { success: true };
-      } else {
-        const errText = await response.text();
-        throw new Error(errText || 'EmailJS API returned an error');
-      }
-    } catch (error) {
-      console.error('[Mailer] EmailJS HTTP API error:', error);
-      return { success: false, error: error.message };
-    }
-  }
 
   if (process.env.RESEND_API_KEY) {
     try {
@@ -387,40 +303,6 @@ export const sendFeedbackEmail = async (userEmail, userName, guidanceRating, app
   // Send to the admin's email (using the EMAIL_USER address)
   const toEmail = process.env.EMAIL_USER;
 
-  if (process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_PUBLIC_KEY && process.env.EMAILJS_FEEDBACK_TEMPLATE_ID) {
-    try {
-      console.log(`[Mailer] Sending feedback email using EmailJS HTTP API...`);
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          service_id: process.env.EMAILJS_SERVICE_ID,
-          template_id: process.env.EMAILJS_FEEDBACK_TEMPLATE_ID,
-          user_id: process.env.EMAILJS_PUBLIC_KEY,
-          accessToken: process.env.EMAILJS_PRIVATE_KEY,
-          template_params: {
-            userEmail: fromLabel,
-            guidanceRating: guidanceRating,
-            appRating: appRating,
-            suggestions: (isEdit ? '[EDITED] ' : '') + (suggestions || 'None')
-          }
-        })
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errText = await response.text();
-        throw new Error(errText || 'EmailJS API returned an error');
-      }
-    } catch (error) {
-      console.error('[Mailer] EmailJS HTTP API error:', error.message);
-      console.log('[Mailer] Falling back to next available mailer...');
-      // We purposefully DO NOT return here, so it continues down to Resend or Nodemailer
-    }
-  }
 
   if (process.env.RESEND_API_KEY) {
     try {
