@@ -1072,8 +1072,19 @@ app.post('/api/guidance', async (req, res) => {
         suggestedVerse,
         location
       };
-      if (userId) logEntry.userId = userId;
-      await QueryLog.create(logEntry);
+      if (userId) {
+        logEntry.userId = userId;
+        await QueryLog.create(logEntry);
+        
+        // Optimize DB storage: Keep only the 5 most recent queries per user
+        const userQueries = await QueryLog.find({ userId }).sort({ createdAt: -1 });
+        if (userQueries.length > 5) {
+          const queriesToDelete = userQueries.slice(5).map(q => q._id);
+          await QueryLog.deleteMany({ _id: { $in: queriesToDelete } });
+        }
+      } else {
+        await QueryLog.create(logEntry);
+      }
     } catch (err) {
       console.error('[Guidance] Failed to log query:', err);
     }
