@@ -597,7 +597,13 @@ export function useApp() {
   };
 
   const fetchReadingHistory = async () => {
-    if (!userId) return;
+    if (!userId) {
+      const local = localStorage.getItem('gitadaily_local_history');
+      if (local) {
+        setReadingHistory(JSON.parse(local));
+      }
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/history?userId=${encodeURIComponent(userId)}`);
       if (res.ok) {
@@ -712,8 +718,10 @@ export function useApp() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, chapter, verse })
           }).catch(() => {});
-          setReadingHistory({ chapter, verse });
+        } else {
+          localStorage.setItem('gitadaily_local_history', JSON.stringify({ chapter, verse }));
         }
+        setReadingHistory({ chapter, verse });
       } else if (path.startsWith('/browse')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
