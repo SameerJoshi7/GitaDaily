@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { ShlokaCard } from './ShlokaCard';
 import type { Shloka } from './ShlokaCard';
 import { t } from '../i18n';
@@ -18,6 +19,7 @@ export function DailyTab({
   lang,
 }: DailyTabProps) {
   const T = t(lang);
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -28,7 +30,7 @@ export function DailyTab({
 
       {/* Seek Guidance Promo Banner */}
       <div
-        onClick={() => { window.location.hash = '#/guidance'; }}
+        onClick={() => { navigate('/guidance'); }}
         style={{
           cursor: 'pointer',
           background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.08) 0%, rgba(79, 70, 229, 0.03) 100%)',

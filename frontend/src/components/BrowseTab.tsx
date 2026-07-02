@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bookmark, ArrowLeft, ChevronLeft, ChevronRight, Loader2, Sparkles, Heart, Compass } from 'lucide-react';
 import { t } from '../i18n';
 import type { Shloka } from './ShlokaCard';
@@ -34,6 +35,7 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
   readingHistory
 }) => {
   const T = t(lang);
+  const navigate = useNavigate();
 
   const getNavLabels = (l: string) => {
     switch (l.toLowerCase()) {
@@ -110,32 +112,31 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
 
   // Handle chapter selection
   const handleChapterClick = (chapter: Chapter) => {
-    // eslint-disable-next-line react-hooks/immutability
-    window.location.hash = `#/browse/chapter/${chapter.chapterNumber}/verse/1`;
+    navigate(`/browse/chapter/${chapter.chapterNumber}/verse/1`);
   };
 
   // Navigation handlers
   const handleNext = () => {
     if (!selectedChapter) return;
     if (currentVerse < selectedChapter.verses.length) {
-      window.location.hash = `#/browse/chapter/${selectedChapter.chapterNumber}/verse/${currentVerse + 1}`;
+      navigate(`/browse/chapter/${selectedChapter.chapterNumber}/verse/${currentVerse + 1}`);
     }
   };
 
   const handlePrev = () => {
     if (!selectedChapter) return;
     if (currentVerse > 1) {
-      window.location.hash = `#/browse/chapter/${selectedChapter.chapterNumber}/verse/${currentVerse - 1}`;
+      navigate(`/browse/chapter/${selectedChapter.chapterNumber}/verse/${currentVerse - 1}`);
     }
   };
 
   const handleVerseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (!selectedChapter) return;
-    window.location.hash = `#/browse/chapter/${selectedChapter.chapterNumber}/verse/${e.target.value}`;
+    navigate(`/browse/chapter/${selectedChapter.chapterNumber}/verse/${e.target.value}`);
   };
 
   const handleBackToChapters = () => {
-    window.location.hash = '#/browsechapters';
+    navigate('/browse');
   };
 
   const isBookmarked = shloka
@@ -153,7 +154,7 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
 
         {readingHistory && (
           <div 
-            onClick={() => window.location.hash = `#/browse/chapter/${readingHistory.chapter}/verse/${readingHistory.verse}`}
+            onClick={() => navigate(`/browse/chapter/${readingHistory.chapter}/verse/${readingHistory.verse}`)}
             style={{
               background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%)',
               border: '1px solid rgba(212, 175, 55, 0.3)',
