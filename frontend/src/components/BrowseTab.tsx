@@ -174,11 +174,16 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
               <div style={{ background: 'rgba(212, 175, 55, 0.2)', padding: '0.75rem', borderRadius: '50%' }}>
                 <Bookmark size={24} color="var(--gold-primary)" />
               </div>
-              <div>
+              <div style={{ flex: 1 }}>
                 <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.1rem' }}>Continue Reading</h3>
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                   {T.browse.chapter} {readingHistory.chapter}, {T.browse.verse} {readingHistory.verse}
-                </span>
+                </div>
+                {!email && (
+                  <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.4rem', lineHeight: 1.3 }}>
+                    *Saved locally. <span style={{ color: 'var(--gold-primary)', textDecoration: 'underline' }}>Subscribe</span> to sync progress across devices.
+                  </div>
+                )}
               </div>
             </div>
             <ChevronRight size={24} color="var(--gold-primary)" />
