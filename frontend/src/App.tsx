@@ -202,6 +202,7 @@ function App() {
                 browseChapterNumber={browseChapterNumber}
                 browseVerseNumber={browseVerseNumber}
                 readingHistory={readingHistory}
+                onSubscribeClick={() => setIsPrefsModalOpen(true)}
               />
             } />
 

@@ -21,6 +21,7 @@ interface BrowseTabProps {
   browseChapterNumber?: number | null;
   browseVerseNumber?: number | null;
   readingHistory?: { chapter: number, verse: number } | null;
+  onSubscribeClick?: () => void;
 }
 
 export const BrowseTab: React.FC<BrowseTabProps> = ({
@@ -32,7 +33,8 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
   apiBase,
   browseChapterNumber,
   browseVerseNumber,
-  readingHistory
+  readingHistory,
+  onSubscribeClick
 }) => {
   const T = t(lang);
   const navigate = useNavigate();
@@ -181,7 +183,13 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
                 </div>
                 {!email && (
                   <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.4rem', lineHeight: 1.3 }}>
-                    *Saved locally. <span style={{ color: 'var(--gold-primary)', textDecoration: 'underline' }}>Subscribe</span> to sync progress across devices.
+                    *Saved locally. <span 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSubscribeClick?.();
+                      }}
+                      style={{ color: 'var(--gold-primary)', textDecoration: 'underline', cursor: 'pointer' }}
+                    >Subscribe</span> to sync progress across devices.
                   </div>
                 )}
               </div>
