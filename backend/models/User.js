@@ -19,8 +19,8 @@ const userSchema = new mongoose.Schema({
   },
   pref: {
     type: String,
-    enum: ['email', 'push', 'all'],
-    default: 'email',
+    enum: ['none', 'email', 'push', 'all'],
+    default: 'none',
   },
   lang: {
     type: String,
