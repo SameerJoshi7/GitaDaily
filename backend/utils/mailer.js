@@ -107,106 +107,91 @@ export const sendDailyShlokaEmail = async (toEmail, shloka, reflection, language
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="color-scheme" content="light dark">
-      <meta name="supported-color-schemes" content="light dark">
-      <style>
-        :root {
-          color-scheme: light dark;
-        }
-        /* Force Apple Mail to keep exact colors */
-        @media (prefers-color-scheme: dark) {
-          .email-bg {
-            background-color: #050508 !important;
-          }
-          .email-text {
-            color: #e2e8f0 !important;
-          }
-        }
-      </style>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #050508;">
-      <div class="email-bg email-text" style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #050508; background-image: linear-gradient(to bottom, rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.95)), url('${activeArtwork}'); background-size: cover; background-position: center; color: #e2e8f0; padding: 20px; text-align: center;">
-        <!-- Main Card Container -->
-        <div style="max-width: 600px; margin: 0 auto; background-color: rgba(13, 15, 22, 0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+    <body style="margin: 0; padding: 0; background-color: #f1f5f9;">
+      <div style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: #f1f5f9; background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.8)), url('${activeArtwork}'); background-size: cover; background-position: center; color: #1e293b; padding: 20px; text-align: center;">
         
-        <!-- Header: Logo & App Title -->
-        <div style="text-align: center; margin-bottom: 25px;">
-          <div style="margin-bottom: 8px;">
-            <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5)); vertical-align: middle; margin-right: 8px;" />
-            <span style="font-size: 24px; font-weight: 700; color: #d4af37; font-family: 'Georgia', serif; vertical-align: middle;">कृष्णबोध</span>
+        <!-- Main Card Container (Bright Frosted Glass -> Inverts to Dark Frosted Glass) -->
+        <div style="max-width: 600px; margin: 0 auto; background-color: rgba(255, 255, 255, 0.85); border: 1px solid rgba(0,0,0,0.1); border-radius: 16px; overflow: hidden; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+          
+          <!-- Header: Logo & App Title -->
+          <div style="text-align: center; margin-bottom: 25px;">
+            <div style="margin-bottom: 8px;">
+              <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(180, 83, 9, 0.3)); vertical-align: middle; margin-right: 8px;" />
+              <span style="font-size: 24px; font-weight: 700; color: #92400e; font-family: 'Georgia', serif; vertical-align: middle;">कृष्णबोध</span>
+            </div>
+            <div style="font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 3px; font-family: 'Cinzel', serif;">Krishna Bodha</div>
           </div>
-          <div style="font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 3px; font-family: 'Cinzel', serif;">Krishna Bodha</div>
+
+          <!-- Meta Chapter & Verse (Dark Bronze -> Inverts to Light Gold) -->
+          <div style="text-align: center; margin-bottom: 25px;">
+            <h2 style="color: #b45309; font-size: 14px; margin: 0; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Chapter ${shloka.chapter}, Verse ${shloka.verse} (${language.toUpperCase()})</h2>
+          </div>
+
+          <!-- Sanskrit & Transliteration -->
+          <div style="margin-bottom: 30px;">
+            <div style="font-size: 22px; font-weight: bold; color: #92400e; line-height: 1.6; margin-bottom: 10px; font-family: 'Rozha One', 'Georgia', serif;">
+              ${shloka.sanskrit}
+            </div>
+            <div style="font-size: 14px; font-style: italic; color: #475569; line-height: 1.5;">
+              ${reflection.translatedTransliteration || shloka.transliteration}
+            </div>
+          </div>
+
+          <!-- Translation Box -->
+          <div style="background-color: rgba(0, 0, 0, 0.04); border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left;">
+            <div style="font-size: 11px; color: #b45309; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; font-weight: 700;">Translation</div>
+            <p style="font-size: 15px; color: #0f172a; line-height: 1.6; margin: 0; font-weight: 500;">${reflection.translatedTranslation || shloka.translation}</p>
+          </div>
+
+          <!-- AI Deep Understanding -->
+          <div style="text-align: left;">
+            <h3 style="color: #92400e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 15px 0; border-bottom: 1px solid rgba(180, 83, 9, 0.2); padding-bottom: 10px;">
+              ✨ AI Deep Understanding
+            </h3>
+
+            <!-- Reflection Cards -->
+            <div style="background-color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <div style="color: #c2410c; font-size: 13px; font-weight: 700; margin-bottom: 8px;">🧠 Modern Relevance</div>
+              <p style="font-size: 14px; color: #334155; line-height: 1.5; margin: 0;">${reflection.modernReflection}</p>
+            </div>
+
+            <div style="background-color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <div style="color: #c2410c; font-size: 13px; font-weight: 700; margin-bottom: 8px;">❤️ Emotional Well-being</div>
+              <p style="font-size: 14px; color: #334155; line-height: 1.5; margin: 0;">${reflection.emotionalWellbeing}</p>
+            </div>
+
+            <div style="background-color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <div style="color: #c2410c; font-size: 13px; font-weight: 700; margin-bottom: 8px;">💼 Career & Focus</div>
+              <p style="font-size: 14px; color: #334155; line-height: 1.5; margin: 0;">${reflection.careerApplication}</p>
+            </div>
+
+            <!-- Mindfulness Banner -->
+            <div style="background-color: rgba(180, 83, 9, 0.08); border: 1px solid rgba(180, 83, 9, 0.2); border-radius: 10px; padding: 15px; text-align: center;">
+              <div style="font-size: 20px; margin-bottom: 8px;">🧘</div>
+              <div style="color: #b45309; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Mindful Practice for Today</div>
+              <p style="font-size: 14px; color: #1e293b; font-style: italic; margin: 0;">"${reflection.mindfulnessTip}"</p>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Meta Chapter & Verse -->
-        <div style="text-align: center; margin-bottom: 25px;">
-          <h2 style="color: #fbbf24; font-size: 14px; margin: 0; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Chapter ${shloka.chapter}, Verse ${shloka.verse}</h2>
-        </div>
-
-        <!-- Sanskrit & Transliteration -->
-        <div style="margin-bottom: 30px;">
-          <div style="font-size: 22px; font-weight: bold; color: #fbbf24; line-height: 1.6; margin-bottom: 10px; font-family: 'Rozha One', 'Georgia', serif; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
-            ${shloka.sanskrit}
+        <!-- Footer / Watermark -->
+        <div style="text-align: center; margin-top: 30px;">
+          <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; color: #92400e; letter-spacing: 1px; margin-bottom: 6px;">
+            श्रीकृष्णार्पणमस्तु
           </div>
-          <div style="font-size: 14px; font-style: italic; color: #9ca3af; line-height: 1.5;">
-            ${reflection.translatedTransliteration || shloka.transliteration}
+          <div style="font-size: 12px; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; margin-bottom: 15px;">
+            <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: inherit; text-decoration: none;">By Sameer Joshi</a>
           </div>
-        </div>
-
-        <!-- Translation Box -->
-        <div style="background-color: rgba(25, 28, 43, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left;">
-          <div style="font-size: 11px; color: #fbbf24; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600;">Translation</div>
-          <p style="font-size: 15px; color: #ffffff; line-height: 1.6; margin: 0;">${reflection.translatedTranslation || shloka.translation}</p>
-        </div>
-
-        <!-- AI Deep Understanding -->
-        <div style="text-align: left;">
-          <h3 style="color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 15px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 10px;">
-            ✨ AI Deep Understanding
-          </h3>
-
-          <!-- Reflection Cards (Stacked for Email Compatibility) -->
-          <div style="background-color: rgba(18, 20, 31, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">🧠 Modern Relevance</div>
-            <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.modernReflection}</p>
-          </div>
-
-          <div style="background-color: rgba(18, 20, 31, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">❤️ Emotional Well-being</div>
-            <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.emotionalWellbeing}</p>
-          </div>
-
-          <div style="background-color: rgba(18, 20, 31, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 15px; margin-bottom: 25px;">
-            <div style="color: #f59e0b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">💼 Career & Focus</div>
-            <p style="font-size: 14px; color: #e5e7eb; line-height: 1.5; margin: 0;">${reflection.careerApplication}</p>
-          </div>
-
-          <!-- Mindfulness Banner -->
-          <div style="background-color: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 10px; padding: 15px; text-align: center;">
-            <div style="font-size: 20px; margin-bottom: 8px;">🧘</div>
-            <div style="color: #fbbf24; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Mindful Practice for Today</div>
-            <p style="font-size: 14px; color: #ffffff; font-style: italic; margin: 0;">"${reflection.mindfulnessTip}"</p>
+          
+          <div style="font-size: 11px; color: #94a3b8; line-height: 1.5;">
+            You received this because you subscribed to daily reflections.
           </div>
         </div>
-
       </div>
-
-      <!-- Footer / Watermark -->
-      <div style="text-align: center; margin-top: 30px;">
-        <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; color: #d4af37; letter-spacing: 1px; text-shadow: 0 2px 6px rgba(0,0,0,0.5); margin-bottom: 6px;">
-          श्रीकृष्णार्पणमस्तु
-        </div>
-        <div style="font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-transform: uppercase; font-weight: 500; margin-bottom: 15px;">
-          <a href="https://www.linkedin.com/in/sameer-joshi-691457146/" target="_blank" style="color: inherit; text-decoration: none;">By Sameer Joshi</a>
-        </div>
-        
-        <div style="font-size: 11px; color: #6b7280; line-height: 1.5;">
-          You received this because you subscribed to daily reflections.
-        </div>
-      </div>
-    </div>
-  </body>
-  </html>
+    </body>
+    </html>
   `;
 
 
