@@ -1054,11 +1054,13 @@ app.post('/api/guidance', async (req, res) => {
       let location = 'unknown';
       if (clientIp !== 'unknown' && clientIp !== '127.0.0.1' && clientIp !== '::1') {
         try {
-          const geoRes = await fetch(`http://ip-api.com/json/${clientIp}?fields=status,city,country`);
+          const geoRes = await fetch(`https://get.geojs.io/v1/ip/geo/${clientIp}.json`);
           if (geoRes.ok) {
             const geo = await geoRes.json();
-            if (geo.status === 'success') {
+            if (geo.city && geo.country) {
               location = `${geo.city}, ${geo.country}`;
+            } else if (geo.country) {
+              location = geo.country;
             }
           }
         } catch (e) {
