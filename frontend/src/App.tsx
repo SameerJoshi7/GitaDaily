@@ -191,7 +191,7 @@ function App() {
               />
             } />
 
-            <Route path="/browse" element={
+            <Route path="/browse/*" element={
               <BrowseTab
                 chapters={chapters}
                 lang={lang}
