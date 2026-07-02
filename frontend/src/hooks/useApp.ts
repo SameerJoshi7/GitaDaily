@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import type { Shloka } from '../components/ShlokaCard';
 import type { Chapter } from '../components/BrowseTab';
 import { t } from '../i18n';
@@ -8,6 +9,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backen
 export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'about' | 'shloka-detail';
 
 export function useApp() {
+  const location = useLocation();
   const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
   const [userId, setUserId] = useState<string>(() => localStorage.getItem('gitadaily_userId') || '');
   const [userName, setUserName] = useState<string>(() => localStorage.getItem('gitadaily_name') || '');
@@ -681,12 +683,12 @@ export function useApp() {
     }
   };
 
-  // Run initial fetches on email state change
+  // Run initial fetches on email state change or route change
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash;
-      const matchSpecific = hash.match(/#\/chapter\/(\d+)\/verse\/(\d+)/);
-      const matchBrowseSpecific = hash.match(/#\/browse\/chapter\/(\d+)\/verse\/(\d+)/);
+    const handleLocationChange = () => {
+      const path = location.pathname;
+      const matchSpecific = path.match(/^\/chapter\/(\d+)\/verse\/(\d+)/);
+      const matchBrowseSpecific = path.match(/^\/browse\/chapter\/(\d+)\/verse\/(\d+)/);
       
       if (matchSpecific) {
         setBrowseChapterNumber(null);
@@ -694,6 +696,7 @@ export function useApp() {
         const chapter = parseInt(matchSpecific[1]);
         const verse = parseInt(matchSpecific[2]);
         fetchSpecificShloka(chapter, verse);
+        setActiveTab('shloka-detail');
       } else if (matchBrowseSpecific) {
         const chapter = parseInt(matchBrowseSpecific[1]);
         const verse = parseInt(matchBrowseSpecific[2]);
@@ -711,41 +714,37 @@ export function useApp() {
           }).catch(() => {});
           setReadingHistory({ chapter, verse });
         }
-      } else if (hash === '#/browsechapters') {
+      } else if (path.startsWith('/browse')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
         setActiveTab('browse');
         fetchChapters();
-      } else if (hash === '#/searchinsights') {
+      } else if (path.startsWith('/searchinsights')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
         setActiveTab('search');
-      } else if (hash === '#/guidance') {
+      } else if (path.startsWith('/guidance')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
         setActiveTab('guidance');
-      } else if (hash === '#/bookmarks') {
+      } else if (path.startsWith('/bookmarks')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
         setActiveTab('bookmarks');
         fetchBookmarks();
-      } else if (hash === '#/dailyinsights') {
+      } else if (path.startsWith('/dailyinsights')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
         setActiveTab('daily');
         fetchDailyShloka();
-      } else if (hash === '#/about') {
+      } else if (path.startsWith('/about')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);
         setActiveTab('about');
-      } else {
-        // Default route
-        window.location.hash = '#/guidance';
       }
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    handleHashChange(); // Run on mount/email changes
+    handleLocationChange(); // Run on mount/email/location changes
 
     fetchChapters();
     fetchBookmarks();
@@ -761,9 +760,8 @@ export function useApp() {
       }).catch(() => {});
     }
 
-    return () => window.removeEventListener('hashchange', handleHashChange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, userId, lang]);
+  }, [email, userId, lang, location.pathname]);
 
   // Handle topic click
   const handleTopicClick = (topic: string) => {

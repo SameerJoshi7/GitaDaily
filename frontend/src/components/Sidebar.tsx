@@ -9,6 +9,7 @@ import {
   Settings,
   MessageSquare
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { t } from '../i18n';
 
 interface SidebarProps {
@@ -38,13 +39,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="sidebar">
       {/* Top Header Row for mobile / Standard brand alignment for desktop */}
       <div className="sidebar-header-row">
-        <a href="#/dailyinsights" onClick={(e) => { e.preventDefault(); window.location.hash = '#/dailyinsights'; }} className="brand" style={{ gap: '0.6rem' }}>
+        <Link to="/dailyinsights" className="brand" style={{ gap: '0.6rem' }}>
           <img src="/flute-icon.png" alt="Krishna Bodha Logo" className="brand-icon" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.3 }}>
             <span className="brand-name-sanskrit">कृष्णबोध</span>
             <span className="brand-subtitle">Krishna Bodha</span>
           </div>
-        </a>
+        </Link>
 
         {/* Mobile Preferences Trigger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -85,10 +86,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="nav-wrapper">
         <ul className="nav-links">
           <li className="nav-item" style={{ marginBottom: '0.4rem' }}>
-            <button
-              onClick={() => { window.location.hash = '#/guidance'; }}
+            <Link
+              to="/guidance"
               className={`nav-button ${activeTab === 'guidance' ? 'active' : ''}`}
-              style={activeTab === 'guidance' ? {} : {
+              style={activeTab === 'guidance' ? { display: 'flex', alignItems: 'center' } : {
+                display: 'flex', alignItems: 'center',
                 border: '1px dashed rgba(212, 175, 55, 0.4)',
                 background: 'rgba(212, 175, 55, 0.03)',
                 boxShadow: '0 0 10px rgba(212, 175, 55, 0.05)'
@@ -107,58 +109,63 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>{T.nav.newBadge}</span>
-            </button>
+            </Link>
           </li>
           <li className="nav-item">
-            <button
-              onClick={() => {
-                if (window.location.hash === '#/dailyinsights') {
+            <Link
+              to="/dailyinsights"
+              onClick={(e) => {
+                if (activeTab === 'daily') {
+                  e.preventDefault();
                   onRefreshDaily();
-                } else {
-                  window.location.hash = '#/dailyinsights';
                 }
               }}
               className={`nav-button ${activeTab === 'daily' ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center' }}
             >
               <Compass size={18} />
               <span>{T.nav.dailyInsight}</span>
-            </button>
+            </Link>
           </li>
           <li className="nav-item">
-            <button
-              onClick={() => { window.location.hash = '#/browsechapters'; }}
+            <Link
+              to="/browse"
               className={`nav-button ${activeTab === 'browse' ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center' }}
             >
               <BookOpen size={18} />
               <span>{T.nav.browseChapters}</span>
-            </button>
+            </Link>
           </li>
           <li className="nav-item">
-            <button
-              onClick={() => { window.location.hash = '#/searchinsights'; }}
+            <Link
+              to="/searchinsights"
               className={`nav-button ${activeTab === 'search' ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center' }}
             >
               <Search size={18} />
               <span>{T.nav.searchTopics}</span>
-            </button>
+            </Link>
           </li>
           <li className="nav-item">
-            <button
-              onClick={() => { window.location.hash = '#/bookmarks'; }}
+            <Link
+              to="/bookmarks"
               className={`nav-button ${activeTab === 'bookmarks' ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center' }}
             >
               <Bookmark size={18} />
               <span>{T.nav.myBookmarks}</span>
-            </button>
+            </Link>
           </li>
           <li className="nav-item">
-            <button
-              onClick={() => { window.location.hash = '#/about'; }}
+            <Link
+              to="/about"
               className={`nav-button ${activeTab === 'about' ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center' }}
             >
               <Info size={18} />
               <span>{T.nav.aboutKrishnaBodha}</span>
-            </button>
+            </Link>
           </li>
           <li className="nav-item">
             <button

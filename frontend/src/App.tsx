@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { DailyTab } from './components/DailyTab';
 import { AboutTab } from './components/AboutTab';
@@ -19,6 +20,7 @@ import { useApp } from './hooks/useApp';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 function App() {
+  const navigate = useNavigate();
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
@@ -178,92 +180,96 @@ function App() {
       {/* Main Panel */}
       <main className="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 100px)', justifyContent: 'space-between' }}>
         <div style={{ flexGrow: 1 }}>
-          {activeTab === 'daily' && (
-            <DailyTab
-              loading={loading}
-              dailyShloka={dailyShloka}
-              bookmarks={bookmarks}
-              onToggleBookmark={handleToggleBookmark}
-              lang={lang}
-            />
-          )}
+          <Routes>
+            <Route path="/dailyinsights" element={
+              <DailyTab
+                loading={loading}
+                dailyShloka={dailyShloka}
+                bookmarks={bookmarks}
+                onToggleBookmark={handleToggleBookmark}
+                lang={lang}
+              />
+            } />
 
-          {activeTab === 'browse' && (
-            <BrowseTab
-              chapters={chapters}
-              lang={lang}
-              bookmarks={bookmarks}
-              onToggleBookmark={handleToggleBookmark}
-              email={email}
-              apiBase={API_BASE}
-              browseChapterNumber={browseChapterNumber}
-              browseVerseNumber={browseVerseNumber}
-              readingHistory={readingHistory}
-            />
-          )}
+            <Route path="/browse" element={
+              <BrowseTab
+                chapters={chapters}
+                lang={lang}
+                bookmarks={bookmarks}
+                onToggleBookmark={handleToggleBookmark}
+                email={email}
+                apiBase={API_BASE}
+                browseChapterNumber={browseChapterNumber}
+                browseVerseNumber={browseVerseNumber}
+                readingHistory={readingHistory}
+              />
+            } />
 
-          {activeTab === 'search' && (
-            <SearchTab
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              searchResults={searchResults}
-              searchError={searchError}
-              searchRetryTimer={searchRetryTimer}
-              activeTopic={activeTopic}
-              topics={topics}
-              onTopicClick={handleTopicClick}
-              onSearchSubmit={handleSearch}
-              onVerseSelect={(chapter, verse) => {
-                window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
-              }}
-              lang={lang}
-            />
-          )}
+            <Route path="/searchinsights" element={
+              <SearchTab
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                searchResults={searchResults}
+                searchError={searchError}
+                searchRetryTimer={searchRetryTimer}
+                activeTopic={activeTopic}
+                topics={topics}
+                onTopicClick={handleTopicClick}
+                onSearchSubmit={handleSearch}
+                onVerseSelect={(chapter, verse) => {
+                  navigate(`/chapter/${chapter}/verse/${verse}`);
+                }}
+                lang={lang}
+              />
+            } />
 
-          {activeTab === 'shloka-detail' && (
-            <ShlokaDetailTab
-              shloka={specificShloka}
-              loading={loading}
-              bookmarks={bookmarks}
-              onToggleBookmark={handleToggleBookmark}
-              lang={lang}
-            />
-          )}
+            <Route path="/chapter/:chapter/verse/:verse" element={
+              <ShlokaDetailTab
+                shloka={specificShloka}
+                loading={loading}
+                bookmarks={bookmarks}
+                onToggleBookmark={handleToggleBookmark}
+                lang={lang}
+              />
+            } />
 
-          {activeTab === 'bookmarks' && (
-            <BookmarksTab
-              bookmarks={bookmarks}
-              onToggleBookmark={handleToggleBookmark}
-              onBookmarkSelect={(chapter, verse) => {
-                window.location.hash = `#/chapter/${chapter}/verse/${verse}`;
-              }}
-              lang={lang}
-            />
-          )}
+            <Route path="/bookmarks" element={
+              <BookmarksTab
+                bookmarks={bookmarks}
+                onToggleBookmark={handleToggleBookmark}
+                onBookmarkSelect={(chapter, verse) => {
+                  navigate(`/chapter/${chapter}/verse/${verse}`);
+                }}
+                lang={lang}
+              />
+            } />
 
-          {activeTab === 'guidance' && (
-            <GuidanceTab
-              guidanceQuery={guidanceQuery}
-              setGuidanceQuery={setGuidanceQuery}
-              guidanceLoading={guidanceLoading}
-              guidanceResult={guidanceResult}
-              guidanceError={guidanceError}
-              guidanceRetryTimer={guidanceRetryTimer}
-              onSubmit={handleSeekGuidance}
-              bookmarks={bookmarks}
-              onToggleBookmark={handleToggleBookmark}
-              lang={lang}
-              onSubscribeClick={() => setIsPrefsModalOpen(true)}
-            />
-          )}
-          
-          {activeTab === 'about' && (
-            <AboutTab
-              onSeekGuidanceClick={() => {
-                window.location.hash = '#/guidance';
-              }}
-            />
-          )}
+            <Route path="/guidance" element={
+              <GuidanceTab
+                guidanceQuery={guidanceQuery}
+                setGuidanceQuery={setGuidanceQuery}
+                guidanceLoading={guidanceLoading}
+                guidanceResult={guidanceResult}
+                guidanceError={guidanceError}
+                guidanceRetryTimer={guidanceRetryTimer}
+                onSubmit={handleSeekGuidance}
+                bookmarks={bookmarks}
+                onToggleBookmark={handleToggleBookmark}
+                lang={lang}
+                onSubscribeClick={() => setIsPrefsModalOpen(true)}
+              />
+            } />
+            
+            <Route path="/about" element={
+              <AboutTab
+                onSeekGuidanceClick={() => {
+                  navigate('/guidance');
+                }}
+              />
+            } />
+
+            <Route path="*" element={<Navigate to="/guidance" replace />} />
+          </Routes>
         </div>
 
         {/* Global Footer */}
