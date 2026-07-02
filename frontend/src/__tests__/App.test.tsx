@@ -17,7 +17,7 @@ describe('App Component Integration', () => {
   beforeEach(() => {
     localStorage.clear();
     // Mock the global fetch so useApp hooks don't fail immediately
-    global.fetch = vi.fn(() =>
+    globalThis.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve([]),

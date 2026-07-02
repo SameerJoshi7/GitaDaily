@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { useApp } from '../hooks/useApp';
@@ -15,7 +15,7 @@ window.matchMedia = window.matchMedia || function() {
 describe('useApp Hook', () => {
   beforeEach(() => {
     localStorage.clear();
-    global.fetch = vi.fn(() =>
+    globalThis.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve([]),

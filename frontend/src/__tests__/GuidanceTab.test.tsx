@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { GuidanceTab } from '../components/GuidanceTab';
 import '@testing-library/jest-dom';
@@ -39,7 +39,7 @@ describe('GuidanceTab Component', () => {
         wellbeingInsight: 'Letting go of outcomes reduces anxiety.',
         actionStep: 'Focus on the process today.'
       }
-    };
+    } as any;
 
     render(<GuidanceTab {...defaultProps} guidanceResult={result} />);
     expect(screen.getByText(/Divine AI Counsel for your query/i)).toBeInTheDocument();
