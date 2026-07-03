@@ -4,14 +4,13 @@ import { vi } from 'vitest';
 import App from '../App';
 import '@testing-library/jest-dom';
 
-// Mock matchMedia
-window.matchMedia = window.matchMedia || function() {
+window.matchMedia = window.matchMedia || (function() {
   return {
     matches: false,
     addListener: function() {},
     removeListener: function() {}
   };
-};
+} as any);
 
 describe('App Component Integration', () => {
   beforeEach(() => {

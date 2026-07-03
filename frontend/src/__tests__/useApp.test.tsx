@@ -4,13 +4,13 @@ import { vi } from 'vitest';
 import { useApp } from '../hooks/useApp';
 
 // Mock matchMedia
-window.matchMedia = window.matchMedia || function() {
+window.matchMedia = window.matchMedia || (function() {
   return {
     matches: false,
     addListener: function() {},
     removeListener: function() {}
   };
-};
+} as any);
 
 describe('useApp Hook', () => {
   beforeEach(() => {
