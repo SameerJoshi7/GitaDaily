@@ -285,9 +285,8 @@ export const sendFeedbackEmail = async (userEmail, userName, guidanceRating, app
     </div>
   `;
 
-  // Send to the admin's email (using the EMAIL_USER address)
-  const toEmail = process.env.EMAIL_USER;
-
+  // Send to the dedicated feedback email address
+  const toEmail = 'feedbacks@krishnabodha.in';
 
   if (process.env.RESEND_API_KEY) {
     try {
