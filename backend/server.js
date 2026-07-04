@@ -10,7 +10,7 @@ import cron from 'node-cron';
 import twilio from 'twilio';
 import webpush from 'web-push';
 import { generateOTP, verifyOTP } from './utils/otp.js';
-import { sendEmailOTP, sendDailyShlokaEmail, sendFeedbackEmail } from './utils/mailer.js';
+import { sendEmailOTP, sendDailyShlokaEmail, sendFeedbackEmail, sendDailySubscribersReport } from './utils/mailer.js';
 import mongoose from 'mongoose';
 import { User } from './models/User.js';
 import { Bookmark } from './models/Bookmark.js';
@@ -1632,6 +1632,35 @@ cron.schedule('0 18 * * 3', async () => {
     }
   } catch (err) {
     console.error('[Cron] Error processing Wednesday reminder:', err);
+  }
+}, { timezone: 'Asia/Kolkata' });
+
+// 4. Daily Admin Report: New Subscribers at 11:59 PM IST
+cron.schedule('59 23 * * *', async () => {
+  console.log('[Cron] Triggering Daily Subscribers Report...');
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const todaySubscribers = await User.find({
+      createdAt: { $gte: startOfDay, $lte: endOfDay }
+    });
+
+    if (todaySubscribers && todaySubscribers.length > 0) {
+      const result = await sendDailySubscribersReport(todaySubscribers);
+      if (result.success) {
+        console.log(`[Cron] Successfully sent daily report with ${todaySubscribers.length} new subscribers.`);
+      } else {
+        console.error('[Cron] Failed to send daily report:', result.error);
+      }
+    } else {
+      console.log('[Cron] No new subscribers today. Skipping report.');
+    }
+  } catch (err) {
+    console.error('[Cron] Error processing daily subscribers report:', err);
   }
 }, { timezone: 'Asia/Kolkata' });
 

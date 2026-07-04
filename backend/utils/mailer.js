@@ -336,3 +336,67 @@ export const sendFeedbackEmail = async (userEmail, userName, guidanceRating, app
     return { success: false, error: error.message };
   }
 };
+
+export const sendDailySubscribersReport = async (subscribers) => {
+  const toEmail = 'info@krishnabodha.in';
+  const subject = `Daily Subscribers Report - ${new Date().toLocaleDateString()}`;
+  
+  let listHtml = subscribers.map(sub => `<li>${sub.email} - ${sub.name || 'No Name'} (${sub.phone || 'No Phone'})</li>`).join('');
+  
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>Daily New Subscribers Report</h2>
+      <p>Today, ${subscribers.length} new user(s) subscribed to Krishna Bodha.</p>
+      <ul>
+        ${listHtml}
+      </ul>
+    </div>
+  `;
+
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Krishna Bodha <team@krishnabodha.in>',
+          to: toEmail,
+          subject: subject,
+          html: htmlContent
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        return { success: true };
+      } else {
+        throw new Error(data.message || 'Resend API returned an error');
+      }
+    } catch (error) {
+      console.error('[Mailer] Resend HTTP API error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  if (!transporter) {
+    return { success: false, error: 'Email configuration is missing on the server.' };
+  }
+
+  try {
+    const mailOptions = {
+      from: `"Krishna Bodha Admin" <${process.env.EMAIL_USER}>`,
+      to: toEmail,
+      subject: subject,
+      html: htmlContent
+    };
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error(`[Mailer] Error sending subscribers report:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
