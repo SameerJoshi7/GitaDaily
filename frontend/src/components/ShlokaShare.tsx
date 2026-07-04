@@ -120,8 +120,7 @@ export const ShlokaShare: React.FC<ShlokaShareProps> = ({ shloka, customCounsel 
           ref={shareRef}
           style={{
             width: '1080px',
-            minHeight: '1350px',
-            height: 'max-content',
+            height: '1920px', // Perfect 9:16 aspect ratio for WhatsApp & Insta Stories
             backgroundColor: '#0a0b10',
             position: 'relative',
             display: 'flex',
