@@ -151,19 +151,17 @@ if (groqKey) {
 async function generateContentWithFallback(prompt, responseMimeType = "text/plain", featureContext = "basic") {
   let models = [];
   if (featureContext === "guidance") {
-    // Deep fallback chain to prevent 429 High Traffic errors
+    // Deep fallback chain, strictly using ONLY models capable of perfect multilingual (Hindi/Telugu/Kannada) output
     models = [
       "groq-llama-3.3-70b-versatile",
       "gemini-1.5-flash",
-      "groq-llama-3.1-8b-instant",
-      "gemini-1.5-flash-8b",
-      "groq-mixtral-8x7b-32768"
+      "gemini-1.5-flash-8b"
     ];
   } else {
     models = [
       "gemini-1.5-flash", 
-      "groq-llama-3.1-8b-instant",
-      "gemini-1.5-flash-8b"
+      "gemini-1.5-flash-8b",
+      "groq-llama-3.3-70b-versatile"
     ];
   }
 
