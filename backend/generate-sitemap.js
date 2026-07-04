@@ -45,35 +45,25 @@ for (const route of staticRoutes) {
 // In the current routing setup, it seems the standalone verse view is /chapter/:chapter/verse/:verse
 // Let's add them for all chapters and verses.
 
-for (const chapter of gitaData) {
-  const chapterNum = chapter.chapter;
+for (const item of gitaData) {
+  const chapterNum = item.chapter;
+  const verseNum = item.verse;
   
-  // Chapter root page (if it exists, we route through /browse typically)
+  // Top-level verse view route
   xml += `  <url>
-    <loc>${BASE_URL}/browse/chapter/${chapterNum}/verse/1</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>\n`;
-
-  const verses = Object.keys(chapter.verses || {});
-  for (const verseNum of verses) {
-    // Top-level verse view route as defined in App.tsx line 227
-    xml += `  <url>
     <loc>${BASE_URL}/chapter/${chapterNum}/verse/${verseNum}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>\n`;
     
-    // Nested browse view route (since BrowseTab also manages state, though usually same content)
-    xml += `  <url>
+  // Nested browse view route
+  xml += `  <url>
     <loc>${BASE_URL}/browse/chapter/${chapterNum}/verse/${verseNum}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>\n`;
-  }
 }
 
 xml += `</urlset>`;
