@@ -66,8 +66,6 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 const GITA_DATA_PATH = path.join(__dirname, 'gita_data.json');
-const USERS_PATH = path.join(DATA_DIR, 'users.json');
-const BOOKMARKS_PATH = path.join(DATA_DIR, 'bookmarks.json');
 const REFLECTIONS_CACHE_PATH = path.join(DATA_DIR, 'reflections.json');
 
 // Initialize local JSON DB files
@@ -77,8 +75,6 @@ const initFile = (filePath, defaultData) => {
   }
 };
 
-// initFile(USERS_PATH, []);
-// initFile(BOOKMARKS_PATH, []);
 initFile(REFLECTIONS_CACHE_PATH, {});
 
 // Read data helper
