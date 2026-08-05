@@ -1028,7 +1028,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // 13. Trigger daily broadcast manually (for external cron schedules)
-app.post('/api/trigger-daily-broadcast', async (req, res) => {
+app.all('/api/trigger-daily-broadcast', async (req, res) => {
   try {
     console.log('[API] Triggering daily morning shloka broadcast manually...');
     await broadcastDailyShloka();
