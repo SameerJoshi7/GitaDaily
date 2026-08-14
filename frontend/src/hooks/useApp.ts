@@ -19,6 +19,8 @@ export function useApp() {
   const [browseChapterNumber, setBrowseChapterNumber] = useState<number | null>(null);
   const [browseVerseNumber, setBrowseVerseNumber] = useState<number | null>(null);
   const [readingHistory, setReadingHistory] = useState<{ chapter: number, verse: number } | null>(null);
+  const [currentStreak, setCurrentStreak] = useState<number>(() => parseInt(localStorage.getItem('gitadaily_currentStreak') || '0', 10));
+  const [longestStreak, setLongestStreak] = useState<number>(() => parseInt(localStorage.getItem('gitadaily_longestStreak') || '0', 10));
   
   // Seek Guidance States
   const [guidanceQuery, setGuidanceQuery] = useState(() => sessionStorage.getItem('gitadaily_guidanceQuery') || '');
@@ -153,7 +155,7 @@ export function useApp() {
   const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
 
   // Helper: save user to localStorage and state
-  const loginUser = (userData: { email: string; pref: string; lang: string; name?: string; _id?: string }) => {
+  const loginUser = (userData: { email: string; pref: string; lang: string; name?: string; _id?: string; currentStreak?: number; longestStreak?: number }) => {
     localStorage.setItem('gitadaily_email', userData.email);
     if (userData._id) localStorage.setItem('gitadaily_userId', userData._id);
     localStorage.setItem('gitadaily_pref', userData.pref || 'email');
@@ -167,7 +169,14 @@ export function useApp() {
     setPref(userData.pref || 'email');
     setLang(userData.lang || 'english');
     setEditPref(userData.pref || 'email');
-    setEditLang(userData.lang || 'english');
+    if (userData.currentStreak !== undefined) {
+      localStorage.setItem('gitadaily_currentStreak', userData.currentStreak.toString());
+      setCurrentStreak(userData.currentStreak);
+    }
+    if (userData.longestStreak !== undefined) {
+      localStorage.setItem('gitadaily_longestStreak', userData.longestStreak.toString());
+      setLongestStreak(userData.longestStreak);
+    }
   };
 
   const handleLogout = () => {
@@ -175,9 +184,13 @@ export function useApp() {
     localStorage.removeItem('gitadaily_userId');
     localStorage.removeItem('gitadaily_pref');
     localStorage.removeItem('gitadaily_name');
+    localStorage.removeItem('gitadaily_currentStreak');
+    localStorage.removeItem('gitadaily_longestStreak');
     // We intentionally DO NOT remove 'gitadaily_lang' so language persists post-logout
     setEmail('');
     setUserId('');
+    setCurrentStreak(0);
+    setLongestStreak(0);
     setUserName('');
     setPref('email');
     // We intentionally DO NOT reset lang to 'english'
@@ -765,7 +778,17 @@ export function useApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
-      }).catch(() => {});
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.currentStreak !== undefined) {
+          setCurrentStreak(data.currentStreak);
+          setLongestStreak(data.longestStreak);
+          localStorage.setItem('gitadaily_currentStreak', data.currentStreak.toString());
+          localStorage.setItem('gitadaily_longestStreak', data.longestStreak.toString());
+        }
+      })
+      .catch(() => {});
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -796,6 +819,8 @@ export function useApp() {
     browseChapterNumber,
     browseVerseNumber,
     readingHistory,
+    currentStreak,
+    longestStreak,
     guidanceQuery,
     setGuidanceQuery,
     guidanceLoading,

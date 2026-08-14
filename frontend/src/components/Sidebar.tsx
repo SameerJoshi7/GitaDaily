@@ -17,6 +17,7 @@ interface SidebarProps {
   email: string;
   userName?: string;
   lang: string;
+  currentStreak?: number;
   onRefreshDaily: () => void;
   onOpenPrefs: () => void;
   onOpenFeedback: () => void;
@@ -28,6 +29,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   email,
   userName,
   lang,
+  currentStreak,
   onRefreshDaily,
   onOpenPrefs,
   onOpenFeedback,
@@ -49,6 +51,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Mobile Preferences Trigger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {email && currentStreak !== undefined && currentStreak > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#fbbf24', fontSize: '0.85rem', fontWeight: 600 }}>
+              🔥 {currentStreak}
+            </div>
+          )}
           <button className="mobile-pref-btn" onClick={onOpenPrefs} aria-label="Settings">
             {email ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--gold-primary)', fontWeight: 500 }}>
@@ -187,6 +194,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div style={{ color: 'var(--gold-primary)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '0.2rem', fontWeight: 500 }}>
               Welcome, {userName || email.split('@')[0]}
             </div>
+            {currentStreak !== undefined && currentStreak > 0 && (
+              <div style={{ textAlign: 'center', marginBottom: '0.4rem' }}>
+                <span style={{ background: 'rgba(251, 191, 36, 0.1)', padding: '0.3rem 0.6rem', borderRadius: '12px', color: '#fbbf24', fontSize: '0.85rem', fontWeight: 600 }}>
+                  🔥 {currentStreak} Day Streak
+                </span>
+              </div>
+            )}
             <button
               onClick={onOpenPrefs}
               className="secondary-btn"

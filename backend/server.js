@@ -17,6 +17,7 @@ import { Bookmark } from './models/Bookmark.js';
 import { History } from './models/History.js';
 import { QueryLog } from './models/QueryLog.js';
 import { Feedback } from './models/Feedback.js';
+import { calculateStreak } from './utils/streak.js';
 
 dotenv.config();
 
@@ -1457,12 +1458,26 @@ app.post('/api/user/active', async (req, res) => {
   const { userId } = req.body;
   if (!userId) return res.status(400).json({ error: 'User ID required' });
   try {
-    await User.findByIdAndUpdate(userId, { 
-      lastActiveAt: new Date(),
-      missedDaysCount: 0 
-    });
-    res.json({ success: true });
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const now = new Date();
+    const { currentStreak, longestStreak } = calculateStreak(
+      user.lastActiveAt, 
+      user.currentStreak, 
+      user.longestStreak, 
+      now
+    );
+
+    user.lastActiveAt = now;
+    user.missedDaysCount = 0;
+    user.currentStreak = currentStreak;
+    user.longestStreak = longestStreak;
+    await user.save();
+
+    res.json({ success: true, currentStreak, longestStreak });
   } catch (err) {
+    console.error('Failed to update activity:', err);
     res.status(500).json({ error: 'Failed to update activity' });
   }
 });

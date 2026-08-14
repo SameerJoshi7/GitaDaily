@@ -400,3 +400,80 @@ export const sendDailySubscribersReport = async (subscribers) => {
   }
 };
 
+export const sendReleaseNotesEmail = async (toEmail, version) => {
+  const subject = `🚀 Krishna Bodha ${version} is here!`;
+  
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: 'Inter', Arial, sans-serif;">
+      <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; padding: 40px 30px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+        
+        <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 48px; height: 48px; margin-bottom: 20px;" />
+        <h1 style="color: #92400e; font-size: 24px; margin: 0 0 10px 0;">Krishna Bodha Update</h1>
+        <h2 style="color: #b45309; font-size: 16px; font-weight: normal; margin: 0 0 30px 0;">Version ${version} is now live!</h2>
+        
+        <div style="text-align: left; background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+          <h3 style="color: #d97706; margin: 0 0 15px 0; font-size: 18px;">🔥 Introducing Sadhana Streaks</h3>
+          <p style="color: #334155; line-height: 1.6; margin: 0;">
+            Track your daily wisdom habit! Your profile now displays a streak counter. Read your daily shloka consistently to keep your streak alive and track your longest spiritual consistency.
+          </p>
+        </div>
+
+        <div style="text-align: left; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+          <h3 style="color: #475569; margin: 0 0 15px 0; font-size: 18px;">✨ Performance Polish</h3>
+          <p style="color: #334155; line-height: 1.6; margin: 0;">
+            We've smoothed out the offline caching and app performance so your reading experience is more fluid than ever.
+          </p>
+        </div>
+
+        <a href="https://krishnabodha.in" style="display: inline-block; background-color: #fbbf24; color: #000; text-decoration: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; font-size: 16px;">
+          Open App
+        </a>
+      </div>
+    </body>
+    </html>
+  `;
+
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Krishna Bodha <team@krishnabodha.in>',
+          to: toEmail,
+          subject: subject,
+          html: htmlContent
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        return { success: true };
+      } else {
+        throw new Error(data.message || 'Resend API returned an error');
+      }
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  if (!transporter) return { success: false, error: 'Email config missing' };
+
+  try {
+    await transporter.sendMail({
+      from: `"Krishna Bodha Team" <${process.env.EMAIL_USER}>`,
+      to: toEmail,
+      subject: subject,
+      html: htmlContent
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+

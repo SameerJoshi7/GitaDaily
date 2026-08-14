@@ -40,6 +40,14 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  currentStreak: {
+    type: Number,
+    default: 0,
+  },
+  longestStreak: {
+    type: Number,
+    default: 0,
+  },
   lastGuidanceAt: {
     type: Date,
   },

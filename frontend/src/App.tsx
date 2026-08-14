@@ -14,6 +14,7 @@ import { Toast } from './components/Toast';
 import { WelcomeModal } from './components/WelcomeModal';
 import { NamePromptModal } from './components/NamePromptModal';
 import { FeedbackModal } from './components/FeedbackModal';
+import { ReleaseNotesModal } from './components/ReleaseNotesModal';
 import { InstallPrompt } from './components/InstallPrompt';
 import { NotificationPrompt } from './components/NotificationPrompt';
 import { useApp } from './hooks/useApp';
@@ -34,6 +35,8 @@ function App() {
     browseChapterNumber,
     browseVerseNumber,
     readingHistory,
+    currentStreak,
+    longestStreak,
     guidanceQuery,
     setGuidanceQuery,
     guidanceLoading,
@@ -83,7 +86,27 @@ function App() {
 
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [isReleaseNotesModalOpen, setIsReleaseNotesModalOpen] = useState(false);
   const [showInitialOnboarding, setShowInitialOnboarding] = useState(false);
+
+  const APP_VERSION = 'v1.1.0';
+
+  // Release Notes Modal Logic
+  useEffect(() => {
+    // Wait a brief moment to not clash with welcome modal
+    const timer = setTimeout(() => {
+      const storedVersion = localStorage.getItem('gitadaily_version');
+      if (storedVersion !== APP_VERSION) {
+        setIsReleaseNotesModalOpen(true);
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleCloseReleaseNotes = () => {
+    setIsReleaseNotesModalOpen(false);
+    localStorage.setItem('gitadaily_version', APP_VERSION);
+  };
 
   // Track app opens and automatically show feedback modal for subscribers on 3rd open
   useEffect(() => {
@@ -171,6 +194,7 @@ function App() {
         email={email}
         userName={userName}
         lang={lang}
+        currentStreak={currentStreak}
         onRefreshDaily={fetchDailyShloka}
         onOpenPrefs={() => setIsPrefsModalOpen(true)}
         onOpenFeedback={() => setIsFeedbackModalOpen(true)}
@@ -308,13 +332,16 @@ function App() {
         handleDeleteAccount={handleDeleteAccount}
       />
 
-      {/* Welcome Modal for First-time Users */}
-      {isWelcomeModalOpen && (
-        <WelcomeModal
-          isOpen={isWelcomeModalOpen}
-          onClose={handleCloseWelcome}
-        />
-      )}
+      <WelcomeModal 
+        isOpen={isWelcomeModalOpen}
+        onClose={handleCloseWelcome}
+      />
+
+      <ReleaseNotesModal
+        isOpen={isReleaseNotesModalOpen}
+        onClose={handleCloseReleaseNotes}
+        version={APP_VERSION}
+      />
 
       {/* Name Prompt Modal for Logged-In Users Without a Name */}
       <NamePromptModal
