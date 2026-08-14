@@ -36,7 +36,6 @@ function App() {
     browseVerseNumber,
     readingHistory,
     currentStreak,
-    longestStreak,
     guidanceQuery,
     setGuidanceQuery,
     guidanceLoading,
