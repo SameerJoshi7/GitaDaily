@@ -1029,15 +1029,15 @@ app.get('/api/config', (req, res) => {
 });
 
 // 13. Trigger daily broadcast manually (for external cron schedules)
-app.all('/api/trigger-daily-broadcast', async (req, res) => {
-  try {
-    console.log('[API] Triggering daily morning shloka broadcast manually...');
-    await broadcastDailyShloka();
-    res.json({ success: true, message: 'Broadcast triggered successfully.' });
-  } catch (error) {
-    console.error('[API] Error during broadcast:', error);
-    res.status(500).json({ error: 'Broadcast failed.' });
-  }
+app.all('/api/trigger-daily-broadcast', (req, res) => {
+  console.log('[API] Triggering daily morning shloka broadcast manually in the background...');
+  
+  // Fire and forget so we don't hit Render's 30s-60s HTTP timeout limits
+  broadcastDailyShloka().catch(error => {
+    console.error('[API] Error during background broadcast:', error);
+  });
+  
+  res.json({ success: true, message: 'Broadcast triggered in the background successfully.' });
 });
 
 const guestLimits = new Map();
