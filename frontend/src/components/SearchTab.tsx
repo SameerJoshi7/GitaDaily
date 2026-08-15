@@ -13,6 +13,7 @@ interface SearchTabProps {
   onSearchSubmit: (queryStr: string) => void;
   onVerseSelect: (chapter: number, verse: number) => void;
   lang?: string;
+  email?: string;
   searchError?: string | null;
   searchRetryTimer?: number;
 }
@@ -27,6 +28,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
   onSearchSubmit,
   onVerseSelect,
   lang = 'english',
+  email: _email,
   searchError,
   searchRetryTimer,
 }) => {

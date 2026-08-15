@@ -8,6 +8,7 @@ interface BookmarksTabProps {
   onToggleBookmark: (shloka: Shloka) => void;
   onBookmarkSelect: (chapter: number, verse: number) => void;
   lang?: string;
+  email?: string;
 }
 
 export const BookmarksTab: React.FC<BookmarksTabProps> = ({
@@ -15,6 +16,7 @@ export const BookmarksTab: React.FC<BookmarksTabProps> = ({
   onToggleBookmark,
   onBookmarkSelect,
   lang = 'english',
+  email: _email,
 }) => {
   const T = t(lang);
   return (

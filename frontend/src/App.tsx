@@ -8,6 +8,7 @@ import { SearchTab } from './components/SearchTab';
 import { ShlokaDetailTab } from './components/ShlokaDetailTab';
 import { BrowseTab } from './components/BrowseTab';
 import { BookmarksTab } from './components/BookmarksTab';
+import { JournalTab } from './components/JournalTab';
 import { PreferencesModal } from './components/PreferencesModal';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
@@ -211,6 +212,7 @@ function App() {
                 bookmarks={bookmarks}
                 onToggleBookmark={handleToggleBookmark}
                 lang={lang}
+                email={email}
               />
             } />
 
@@ -244,6 +246,7 @@ function App() {
                   navigate(`/chapter/${chapter}/verse/${verse}`);
                 }}
                 lang={lang}
+                email={email}
               />
             } />
 
@@ -254,6 +257,7 @@ function App() {
                 bookmarks={bookmarks}
                 onToggleBookmark={handleToggleBookmark}
                 lang={lang}
+                email={email}
               />
             } />
 
@@ -266,6 +270,10 @@ function App() {
                 }}
                 lang={lang}
               />
+            } />
+
+            <Route path="/journal" element={
+              <JournalTab email={email} lang={lang} />
             } />
 
             <Route path="/guidance" element={

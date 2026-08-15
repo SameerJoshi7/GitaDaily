@@ -6,7 +6,7 @@ import { t } from '../i18n';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
 
-export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'about' | 'shloka-detail';
+export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'about' | 'shloka-detail' | 'journal';
 
 export function useApp() {
   const location = useLocation();
@@ -758,6 +758,10 @@ export function useApp() {
         setBrowseVerseNumber(null);
         setActiveTab('daily');
         fetchDailyShloka();
+      } else if (path.startsWith('/journal')) {
+        setBrowseChapterNumber(null);
+        setBrowseVerseNumber(null);
+        setActiveTab('journal');
       } else if (path.startsWith('/about')) {
         setBrowseChapterNumber(null);
         setBrowseVerseNumber(null);

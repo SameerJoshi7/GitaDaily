@@ -17,6 +17,7 @@ import { Bookmark } from './models/Bookmark.js';
 import { History } from './models/History.js';
 import { QueryLog } from './models/QueryLog.js';
 import { Feedback } from './models/Feedback.js';
+import { Journal } from './models/Journal.js';
 import { calculateStreak } from './utils/streak.js';
 
 dotenv.config();
@@ -757,6 +758,46 @@ app.delete('/api/bookmarks', async (req, res) => {
     res.json({ message: 'Bookmark removed successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to remove bookmark' });
+  }
+});
+
+// 9. Get User Journals
+app.get('/api/journal', async (req, res) => {
+  const { email } = req.query;
+  if (!email) {
+    return res.status(400).json({ error: 'Email parameter is required.' });
+  }
+
+  try {
+    const journals = await Journal.find({ email: email.toLowerCase() }).sort({ updatedAt: -1 });
+    res.json(journals);
+  } catch (err) {
+    res.status(500).json({ error: 'Database error fetching journals' });
+  }
+});
+
+// 10. Save/Update Journal Entry
+app.post('/api/journal', async (req, res) => {
+  const { email, chapter, verse, note } = req.body;
+  if (!email || !chapter || !verse || note === undefined) {
+    return res.status(400).json({ error: 'Email, chapter, verse, and note are required.' });
+  }
+
+  try {
+    if (note.trim() === '') {
+      // If note is empty, delete it
+      await Journal.findOneAndDelete({ email: email.toLowerCase(), chapter, verse });
+      return res.json({ message: 'Journal entry deleted' });
+    }
+
+    const journal = await Journal.findOneAndUpdate(
+      { email: email.toLowerCase(), chapter, verse },
+      { email: email.toLowerCase(), chapter, verse, note },
+      { upsert: true, new: true }
+    );
+    res.json({ message: 'Journal entry saved', journal });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save journal entry' });
   }
 });
 

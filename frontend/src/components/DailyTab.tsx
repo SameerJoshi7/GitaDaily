@@ -9,6 +9,7 @@ interface DailyTabProps {
   bookmarks: Shloka[];
   onToggleBookmark: (shloka: Shloka) => void;
   lang: string;
+  email?: string;
 }
 
 export function DailyTab({
@@ -17,6 +18,7 @@ export function DailyTab({
   bookmarks,
   onToggleBookmark,
   lang,
+  email,
 }: DailyTabProps) {
   const T = t(lang);
   const navigate = useNavigate();
@@ -80,6 +82,7 @@ export function DailyTab({
           isBookmarked={bookmarks.some(b => b.chapter === dailyShloka.chapter && b.verse === dailyShloka.verse)}
           onToggleBookmark={() => onToggleBookmark(dailyShloka)}
           lang={lang}
+          email={email}
         />
       ) : (
         <div className="empty-state">

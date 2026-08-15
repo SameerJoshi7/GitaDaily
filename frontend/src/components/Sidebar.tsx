@@ -7,7 +7,8 @@ import {
   Sparkles,
   Info,
   Settings,
-  MessageSquare
+  MessageSquare,
+  PenLine
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { t } from '../i18n';
@@ -152,6 +153,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <Search size={18} />
               <span>{T.nav.searchTopics}</span>
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link
+              to="/journal"
+              className={`nav-button ${activeTab === 'journal' ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
+              <PenLine size={18} />
+              <span>My Journal</span>
             </Link>
           </li>
           <li className="nav-item">

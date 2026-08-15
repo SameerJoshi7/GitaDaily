@@ -2,7 +2,10 @@ import React from 'react';
 import { Bookmark, Sparkles, Brain, Heart, Briefcase } from 'lucide-react';
 import { ShlokaShare } from './ShlokaShare';
 import { AudioPlayer } from './AudioPlayer';
+import { JournalSection } from './JournalSection';
 import { t } from '../i18n';
+
+const AUDIO_ENABLED = false; // TODO: Enable when OpenAI TTS generation is complete
 
 export interface Reflection {
   modernReflection: string;
@@ -29,6 +32,7 @@ interface ShlokaCardProps {
   isBookmarked: boolean;
   onToggleBookmark: () => void;
   lang?: string;
+  email?: string;
 }
 
 export const ShlokaCard: React.FC<ShlokaCardProps> = ({
@@ -36,6 +40,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
   isBookmarked,
   onToggleBookmark,
   lang = 'english',
+  email,
 }) => {
   const T = t(lang);
   const { reflection } = shloka;
@@ -96,7 +101,7 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
           <p className="shloka-translation" style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{reflection?.translatedTranslation || shloka.translation}</p>
         </div>
 
-        <AudioPlayer chapter={shloka.chapter} verse={shloka.verse} />
+        {AUDIO_ENABLED && <AudioPlayer chapter={shloka.chapter} verse={shloka.verse} />}
 
         {reflection && (
           <div className="ai-section">
@@ -141,6 +146,10 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
               </div>
             </div>
           </div>
+        )}
+
+        {email && (
+          <JournalSection chapter={shloka.chapter} verse={shloka.verse} email={email} lang={lang} />
         )}
       </div>
     </div>

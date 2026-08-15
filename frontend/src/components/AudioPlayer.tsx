@@ -15,7 +15,7 @@ export function AudioPlayer({ chapter, verse }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Construct URL for open source Gita recitation
-  const audioUrl = `https://raw.githubusercontent.com/gita/gita/main/data/verse_recitation/${chapter}/${verse}.mp3`;
+  const audioUrl = `/audio/verse_recitation/${chapter}/${verse}.mp3`;
 
   useEffect(() => {
     // Reset state when chapter/verse changes

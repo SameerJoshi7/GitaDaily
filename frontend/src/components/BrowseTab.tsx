@@ -5,6 +5,9 @@ import { t } from '../i18n';
 import type { Shloka } from './ShlokaCard';
 import { ShlokaShare } from './ShlokaShare';
 import { AudioPlayer } from './AudioPlayer';
+import { JournalSection } from './JournalSection';
+
+const AUDIO_ENABLED = false; // TODO: Enable when OpenAI TTS generation is complete
 
 export interface Chapter {
   chapterNumber: number;
@@ -404,7 +407,7 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
                 </p>
               </div>
 
-              <AudioPlayer chapter={shloka.chapter} verse={shloka.verse} />
+              {AUDIO_ENABLED && <AudioPlayer chapter={shloka.chapter} verse={shloka.verse} />}
 
               {/* Reflection / Guidance section (styled like a friendly talk card) */}
               <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -443,6 +446,10 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
                 </div>
 
               </div>
+
+              {email && (
+                <JournalSection chapter={shloka.chapter} verse={shloka.verse} email={email} lang={lang} />
+              )}
             </div>
           </div>
         </div>

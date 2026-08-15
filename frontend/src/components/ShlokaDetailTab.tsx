@@ -8,6 +8,7 @@ interface ShlokaDetailTabProps {
   bookmarks: Shloka[];
   onToggleBookmark: (shloka: Shloka) => void;
   lang: string;
+  email?: string;
 }
 
 export function ShlokaDetailTab({
@@ -16,6 +17,7 @@ export function ShlokaDetailTab({
   bookmarks,
   onToggleBookmark,
   lang,
+  email,
 }: ShlokaDetailTabProps) {
 
   const handleBack = () => {
@@ -61,6 +63,7 @@ export function ShlokaDetailTab({
           isBookmarked={bookmarks.some(b => b.chapter === shloka.chapter && b.verse === shloka.verse)}
           onToggleBookmark={() => onToggleBookmark(shloka)}
           lang={lang}
+          email={email}
         />
       ) : (
         <div className="empty-state">
