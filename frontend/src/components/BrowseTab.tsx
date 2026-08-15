@@ -4,6 +4,7 @@ import { Bookmark, ArrowLeft, ChevronLeft, ChevronRight, Loader2, Sparkles, Hear
 import { t } from '../i18n';
 import type { Shloka } from './ShlokaCard';
 import { ShlokaShare } from './ShlokaShare';
+import { AudioPlayer } from './AudioPlayer';
 
 export interface Chapter {
   chapterNumber: number;
@@ -402,6 +403,8 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
                   {shloka.reflection?.translatedTranslation || shloka.translation}
                 </p>
               </div>
+
+              <AudioPlayer chapter={shloka.chapter} verse={shloka.verse} />
 
               {/* Reflection / Guidance section (styled like a friendly talk card) */}
               <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
