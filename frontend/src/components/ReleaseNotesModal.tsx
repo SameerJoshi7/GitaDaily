@@ -1,4 +1,4 @@
-import { Flame, Star, CheckCircle } from 'lucide-react';
+import { Flame, Star, CheckCircle, Volume2 } from 'lucide-react';
 
 interface ReleaseNotesModalProps {
   isOpen: boolean;
@@ -30,21 +30,21 @@ export function ReleaseNotesModal({ isOpen, onClose, version }: ReleaseNotesModa
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <Flame size={24} color="#fbbf24" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <Volume2 size={24} color="#fbbf24" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <h3 style={{ fontSize: '1.05rem', color: '#f3f4f6', margin: '0 0 0.4rem 0' }}>Sadhana Streaks</h3>
+              <h3 style={{ fontSize: '1.05rem', color: '#f3f4f6', margin: '0 0 0.4rem 0' }}>Sanskrit Audio Recitations</h3>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Track your daily wisdom habit! Your profile now displays a streak counter. Read daily to keep your streak alive and track your longest consistency.
+                Immerse yourself completely. You can now listen to authentic, human-chanted Sanskrit recitations for every single verse in the Gita right from your shloka cards!
               </p>
             </div>
           </div>
           
           <div style={{ display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <CheckCircle size={24} color="var(--gold-secondary)" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <Flame size={24} color="var(--gold-secondary)" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <h3 style={{ fontSize: '1.05rem', color: '#f3f4f6', margin: '0 0 0.4rem 0' }}>Performance Polish</h3>
+              <h3 style={{ fontSize: '1.05rem', color: '#f3f4f6', margin: '0 0 0.4rem 0' }}>Streaks & Polish</h3>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                We've smoothed out the offline caching and app performance so your reading experience is more fluid than ever.
+                Your daily streak is going strong. We've smoothed out a few rough edges in the backend to make your reading experience even more fluid.
               </p>
             </div>
           </div>

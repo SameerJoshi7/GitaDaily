@@ -88,7 +88,7 @@ function App() {
   const [isReleaseNotesModalOpen, setIsReleaseNotesModalOpen] = useState(false);
   const [showInitialOnboarding, setShowInitialOnboarding] = useState(false);
 
-  const APP_VERSION = 'v1.1.0';
+  const APP_VERSION = 'v1.2.0';
 
   // Release Notes Modal Logic
   useEffect(() => {

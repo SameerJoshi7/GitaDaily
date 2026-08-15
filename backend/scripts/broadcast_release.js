@@ -20,7 +20,11 @@ if (publicVapidKey && privateVapidKey) {
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function broadcastReleaseNotes() {
-  const version = 'v1.1.0';
+  const RELEASE_VERSION = 'v1.2.0';
+  const FEATURES = [
+    '🎧 Sanskrit Audio Recitations: Listen to authentic, human-chanted recitations for every verse.',
+    '🔥 Streaks & Polish: We smoothed out backend performance so your streak tracking is faster.'
+  ];
   const isTest = process.argv.includes('--test');
 
   if (!process.env.MONGODB_URI) {
@@ -54,7 +58,7 @@ async function broadcastReleaseNotes() {
 
     // 1. Send Email
     if (['email', 'all'].includes(user.pref)) {
-      const emailResult = await sendReleaseNotesEmail(user.email, version);
+      const emailResult = await sendReleaseNotesEmail(user.email, RELEASE_VERSION);
       if (emailResult.success) {
         emailCount++;
       } else {
@@ -69,8 +73,8 @@ async function broadcastReleaseNotes() {
         console.error(`  - Skipping push for ${user.email}: VAPID keys not configured`);
       } else {
         const payload = JSON.stringify({
-          title: `Krishna Bodha ${version} is here!`,
-          body: `Check out the new 🔥 Sadhana Streaks feature in the app.`,
+          title: `Krishna Bodha ${RELEASE_VERSION} is here!`,
+          body: `Check out the new 🎧 Audio Recitations feature in the app.`,
           icon: '/flute-icon.png',
           url: '/'
         });

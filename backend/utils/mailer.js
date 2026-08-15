@@ -414,16 +414,16 @@ export const sendReleaseNotesEmail = async (toEmail, version) => {
         <h2 style="color: #b45309; font-size: 16px; font-weight: normal; margin: 0 0 30px 0;">Version ${version} is now live!</h2>
         
         <div style="text-align: left; background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-          <h3 style="color: #d97706; margin: 0 0 15px 0; font-size: 18px;">🔥 Introducing Sadhana Streaks</h3>
+          <h3 style="color: #d97706; margin: 0 0 15px 0; font-size: 18px;">🎧 Sanskrit Audio Recitations</h3>
           <p style="color: #334155; line-height: 1.6; margin: 0;">
-            Track your daily wisdom habit! Your profile now displays a streak counter. Read your daily shloka consistently to keep your streak alive and track your longest spiritual consistency.
+            Immerse yourself completely. You can now listen to authentic, human-chanted Sanskrit recitations for every single verse in the Gita right from your shloka cards!
           </p>
         </div>
 
         <div style="text-align: left; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-          <h3 style="color: #475569; margin: 0 0 15px 0; font-size: 18px;">✨ Performance Polish</h3>
+          <h3 style="color: #475569; margin: 0 0 15px 0; font-size: 18px;">✨ Streaks & Polish</h3>
           <p style="color: #334155; line-height: 1.6; margin: 0;">
-            We've smoothed out the offline caching and app performance so your reading experience is more fluid than ever.
+            Your daily streak is going strong. We've smoothed out a few rough edges in the backend to make your reading experience even more fluid.
           </p>
         </div>
 

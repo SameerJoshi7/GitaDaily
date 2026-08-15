@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bookmark, Sparkles, Brain, Heart, Briefcase } from 'lucide-react';
 import { ShlokaShare } from './ShlokaShare';
+import { AudioPlayer } from './AudioPlayer';
 import { t } from '../i18n';
 
 export interface Reflection {
@@ -94,6 +95,8 @@ export const ShlokaCard: React.FC<ShlokaCardProps> = ({
           <div className="shloka-translation-label">{T.card.translationLabel}</div>
           <p className="shloka-translation" style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{reflection?.translatedTranslation || shloka.translation}</p>
         </div>
+
+        <AudioPlayer chapter={shloka.chapter} verse={shloka.verse} />
 
         {reflection && (
           <div className="ai-section">
