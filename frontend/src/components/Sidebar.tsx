@@ -51,16 +51,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </Link>
 
         {/* Mobile Preferences Trigger */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
           {email && currentStreak !== undefined && currentStreak > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#fbbf24', fontSize: '0.85rem', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#fbbf24', fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
               🔥 {currentStreak}
             </div>
           )}
-          <button className="mobile-pref-btn" onClick={onOpenPrefs} aria-label="Settings">
+          <button className="mobile-pref-btn" onClick={onOpenPrefs} aria-label="Settings" style={{ padding: '0.4rem 0.6rem' }}>
             {email ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--gold-primary)', fontWeight: 500 }}>
-                <Settings size={14} /> Settings
+              <span style={{ display: 'flex', alignItems: 'center', color: 'var(--gold-primary)' }}>
+                <Settings size={18} />
               </span>
             ) : (
               <span className="glow-subscribe-text">
@@ -74,10 +74,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => {
                 if(window.confirm('Are you sure you want to log out?')) onLogout();
               }}
-              style={{ color: 'var(--error)' }}
+              style={{ color: 'var(--error)', padding: '0.4rem 0.6rem' }}
               aria-label="Logout"
             >
-              <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>Logout</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 500, whiteSpace: 'nowrap' }}>Logout</span>
             </button>
           )}
         </div>
