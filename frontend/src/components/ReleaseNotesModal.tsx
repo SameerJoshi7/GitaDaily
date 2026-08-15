@@ -1,4 +1,4 @@
-import { Flame, Star, Volume2 } from 'lucide-react';
+import { Flame, Star, Volume2, PenLine } from 'lucide-react';
 
 interface ReleaseNotesModalProps {
   isOpen: boolean;
@@ -39,6 +39,15 @@ export function ReleaseNotesModal({ isOpen, onClose, version }: ReleaseNotesModa
             </div>
           </div>
           
+          <div style={{ display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <PenLine size={24} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <h3 style={{ fontSize: '1.05rem', color: '#f3f4f6', margin: '0 0 0.4rem 0' }}>Spiritual Journal</h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                You can now write and save your personal reflections directly on any verse. Access all your saved journal entries from the new 'My Journal' tab in the sidebar!
+              </p>
+            </div>
+          </div>
           <div style={{ display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
             <Flame size={24} color="var(--gold-secondary)" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
