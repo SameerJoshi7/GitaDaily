@@ -150,7 +150,7 @@ async function generateContentWithFallback(prompt, responseMimeType = "text/plai
   if (featureContext === "guidance") {
     // Deep fallback chain, strictly using ONLY models capable of perfect multilingual (Hindi/Telugu/Kannada) output
     models = [
-      "groq-llama-3.3-70b-versatile",
+      "groq-gpt-oss-20b",
       "gemini-1.5-flash",
       "gemini-1.5-flash-8b"
     ];
@@ -158,7 +158,7 @@ async function generateContentWithFallback(prompt, responseMimeType = "text/plai
     models = [
       "gemini-1.5-flash", 
       "gemini-1.5-flash-8b",
-      "groq-llama-3.3-70b-versatile"
+      "groq-gpt-oss-20b"
     ];
   }
 

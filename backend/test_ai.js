@@ -15,7 +15,7 @@ if (groqKey) {
 const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
 
 async function generateContentWithFallback(prompt, responseMimeType = "text/plain", featureContext = "guidance") {
-  let models = ["groq-llama3-70b-8192", "gemini-1.5-pro", "gemini-1.5-flash"];
+  let models = ["groq-gpt-oss-20b", "gemini-1.5-pro", "gemini-1.5-flash"];
   let lastError;
 
   for (const modelName of models) {
