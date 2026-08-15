@@ -8,6 +8,7 @@ interface JournalTabProps {
 }
 
 export const JournalTab: React.FC<JournalTabProps> = ({ email, lang: _lang = 'english' }) => {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
   const navigate = useNavigate();
   const [journals, setJournals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({ email, lang: _lang = 'en
     
     const fetchJournals = async () => {
       try {
-        const res = await fetch(`/api/journal?email=${encodeURIComponent(email)}`);
+        const res = await fetch(`${API_BASE}/journal?email=${encodeURIComponent(email)}`);
         if (res.ok) {
           const data = await res.json();
           setJournals(data);

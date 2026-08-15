@@ -14,6 +14,7 @@ export const JournalSection: React.FC<JournalSectionProps> = ({
   email,
   lang: _lang = 'english',
 }) => {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
   const [note, setNote] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -25,7 +26,7 @@ export const JournalSection: React.FC<JournalSectionProps> = ({
       if (!email) return;
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/journal?email=${encodeURIComponent(email)}`);
+        const res = await fetch(`${API_BASE}/journal?email=${encodeURIComponent(email)}`);
         if (res.ok) {
           const journals = await res.json();
           const existing = journals.find((j: any) => j.chapter === chapter && j.verse === verse);
@@ -47,7 +48,7 @@ export const JournalSection: React.FC<JournalSectionProps> = ({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await fetch('/api/journal', {
+      await fetch(`${API_BASE}/journal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, chapter, verse, note })
@@ -63,7 +64,7 @@ export const JournalSection: React.FC<JournalSectionProps> = ({
   const handleDelete = async () => {
     setIsSaving(true);
     try {
-      await fetch('/api/journal', {
+      await fetch(`${API_BASE}/journal`, {
         method: 'POST', // The backend handles empty string as delete
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, chapter, verse, note: '' })
