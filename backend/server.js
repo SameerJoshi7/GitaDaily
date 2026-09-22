@@ -17,6 +17,7 @@ import interactionRoutes from './routes/interaction.routes.js';
 import { initCronJobs } from './cron/scheduler.js';
 import { getGenAIInstance } from './services/ai.service.js';
 import { getGitaData } from './services/data.service.js';
+import { triggerWelcome } from './scripts/trigger-welcome.js';
 
 dotenv.config();
 
@@ -103,6 +104,18 @@ app.all('/api/v1/trigger-daily-broadcast', (req, res) => {
   });
   
   res.json({ success: true, message: 'Broadcast triggered in the background successfully.' });
+});
+
+// Trigger Welcome Broadcast manually (for free tier users without shell)
+app.all('/api/v1/trigger-welcome-broadcast', (req, res) => {
+  console.log('[API] Triggering welcome broadcast manually in the background...');
+  
+  // Fire and forget
+  triggerWelcome().catch(error => {
+    console.error('[API] Error during welcome broadcast:', error);
+  });
+  
+  res.json({ success: true, message: 'Welcome broadcast triggered in the background. Check server logs for completion.' });
 });
 
 // Start Server

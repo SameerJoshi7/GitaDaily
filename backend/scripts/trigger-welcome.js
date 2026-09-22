@@ -50,7 +50,7 @@ const WELCOME_BODY_HTML = `
   </div>
 `;
 
-async function triggerWelcome() {
+export async function triggerWelcome() {
   try {
     if (!process.env.MONGO_URI) {
       throw new Error('MONGO_URI is missing');
@@ -118,12 +118,10 @@ async function triggerWelcome() {
     console.log(`\n🎉 Welcome Broadcast Complete!`);
     console.log(`Emails sent: ${emailCount}`);
     console.log(`Push notifications sent: ${pushCount}`);
-    process.exit(0);
+    return { emailCount, pushCount };
 
   } catch (err) {
     console.error('[Script Error]', err);
-    process.exit(1);
+    throw err;
   }
 }
-
-triggerWelcome();
