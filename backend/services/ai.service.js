@@ -63,6 +63,7 @@ export const generateContentWithFallback = async (prompt, responseMimeType = "te
         model: "qwen/qwen3.8-27b", // Verified active Groq model 2026
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
+        max_tokens: 800,
         response_format: responseFormat
       });
 
