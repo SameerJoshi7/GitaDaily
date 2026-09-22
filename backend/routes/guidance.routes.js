@@ -104,6 +104,7 @@ router.post('/', guestGuidanceLimiter, async (req, res) => {
     const addressName = userName && userName.trim() !== '' ? userName.trim() : "";
     const prompt = GUIDANCE_PROMPT(query, addressName, contextPrompt, language);
 
+    console.log(`[Guidance] userName from req.body: "${userName}", addressName resolved to: "${addressName}"`);
     console.log(`[Guidance] Seeking counsel for query: "${query}" in language: ${lang}`);
     const result = await generateContentWithFallback(prompt, "application/json", "guidance");
     const responseText = result.response.text();
