@@ -17,7 +17,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
       registerType: 'prompt',
-      includeAssets: ['flute-icon.png', 'flute-icon-maskable.png'],
+      includeAssets: ['app-icon.png'],
       manifest: {
         name: 'Krishna Bodha',
         short_name: 'KrishnaBodha',
@@ -27,12 +27,12 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'flute-icon.png',
+            src: 'app-icon.png',
             sizes: '192x192 512x512',
             type: 'image/png'
           },
           {
-            src: 'flute-icon-maskable.png',
+            src: 'app-icon.png',
             sizes: '192x192 512x512',
             type: 'image/png',
             purpose: 'any maskable'
