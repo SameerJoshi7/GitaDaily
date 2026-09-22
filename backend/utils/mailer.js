@@ -400,6 +400,55 @@ export const sendDailySubscribersReport = async (subscribers) => {
   }
 };
 
+export const sendWelcomeBackEmail = async (toEmail) => {
+  if (process.env.RESEND_API_KEY) {
+    try {
+      console.log(`[Mailer] Sending Welcome Back email to ${toEmail} using Resend HTTP API...`);
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Krishna Bodha <team@krishnabodha.in>',
+          to: toEmail,
+          subject: 'Krishna Bodha is Back! Stronger and Faster 🚀',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+              <div style="text-align: center; padding: 20px;">
+                <h2><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha</h2>
+              </div>
+              <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+                <h3 style="color: #d97706; text-align: center;">We Are Back Online!</h3>
+                <p>Namaste,</p>
+                <p>Thank you for your patience during our recent downtime. We are thrilled to announce that Krishna Bodha is fully restored, healthy, and running stronger than ever!</p>
+                <p>All services including Daily Shlokas, streaks, and Divine Guidance are fully operational. Your historical data and streaks are safe.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="https://krishnabodha.in" style="background-color: #eab308; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Continue Your Spiritual Journey</a>
+                </div>
+                <p>Thank you for being a part of our spiritual community.</p>
+                <p>In devotion,<br/>The Krishna Bodha Team</p>
+              </div>
+            </div>
+          `,
+        })
+      });
+
+      if (response.ok) {
+        return { success: true };
+      }
+      const data = await response.json();
+      throw new Error(data.message || 'Resend API returned an error');
+    } catch (error) {
+      console.error('[Mailer] Resend HTTP API error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  return { success: false, error: 'No email service configured' };
+};
+
 export const sendReleaseNotesEmail = async (toEmail, version) => {
   const subject = `🚀 Krishna Bodha ${version} is here!`;
   
