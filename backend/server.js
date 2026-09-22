@@ -67,6 +67,26 @@ mongoose.connect(process.env.MONGO_URI, {
   initCronJobs();
 }).catch((err) => console.error('[DB] MongoDB connection error:', err));
 
+// URL Rewrite Middleware for root-level frontend aliases
+app.use((req, res, next) => {
+  const rewrites = {
+    '/api/search': '/api/shloka/search',
+    '/api/v1/search': '/api/v1/shloka/search',
+    '/api/chapters': '/api/shloka/chapters',
+    '/api/v1/chapters': '/api/v1/shloka/chapters',
+    '/api/test-delivery': '/api/push/test-delivery',
+    '/api/v1/test-delivery': '/api/v1/push/test-delivery',
+    '/api/register': '/api/auth/register',
+    '/api/v1/register': '/api/v1/auth/register'
+  };
+  
+  if (rewrites[req.path]) {
+    console.log(`[Router] Rewriting alias ${req.path} -> ${rewrites[req.path]}`);
+    req.url = req.url.replace(req.path, rewrites[req.path]);
+  }
+  next();
+});
+
 // API Routes (v1 & legacy backward-compatibility)
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);
@@ -85,16 +105,6 @@ app.use('/api/guidance', guidanceRoutes);
 
 app.use('/api/v1', interactionRoutes);
 app.use('/api', interactionRoutes);
-
-// Fix Root-level aliases used by frontend
-app.get('/api/v1/search', (req, res) => res.redirect(307, `/api/v1/shloka/search?${new URLSearchParams(req.query).toString()}`));
-app.get('/api/search', (req, res) => res.redirect(307, `/api/shloka/search?${new URLSearchParams(req.query).toString()}`));
-
-app.get('/api/v1/chapters', (req, res) => res.redirect(307, `/api/v1/shloka/chapters?${new URLSearchParams(req.query).toString()}`));
-app.get('/api/chapters', (req, res) => res.redirect(307, `/api/shloka/chapters?${new URLSearchParams(req.query).toString()}`));
-
-app.post('/api/v1/test-delivery', (req, res) => res.redirect(307, `/api/v1/push/test-delivery`));
-app.post('/api/test-delivery', (req, res) => res.redirect(307, `/api/push/test-delivery`));
 
 // Health Check Endpoint (Keep at root /api/ for load balancers)
 app.get('/api/health', (req, res) => {
