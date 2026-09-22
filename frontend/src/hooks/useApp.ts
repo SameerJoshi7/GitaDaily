@@ -132,7 +132,7 @@ export function useApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          userId, 
+          email, 
           chapter: dailyShloka?.chapter || 2, 
           verse: dailyShloka?.verse || 47 
         }),
@@ -268,7 +268,7 @@ export function useApp() {
       const res = await fetch(`${API_BASE}/push/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, subscription })
+        body: JSON.stringify({ email, pushSubscription: subscription, pref: editPref, language: editLang })
       });
 
       if (res.ok) {
