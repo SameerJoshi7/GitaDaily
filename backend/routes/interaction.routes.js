@@ -7,11 +7,15 @@ const router = express.Router();
 
 // --- Bookmarks ---
 router.get('/bookmarks', async (req, res) => {
-  const { email } = req.query;
-  if (!email) return res.status(400).json({ error: 'Email required' });
+  const { email, userId } = req.query;
+  if (!email && !userId) return res.status(400).json({ error: 'Email or User ID required' });
 
   try {
-    const bookmarks = await Bookmark.find({ email }).sort({ createdAt: -1 });
+    let query = {};
+    if (email) query.email = email;
+    else if (userId) query.userId = userId;
+    
+    const bookmarks = await Bookmark.find(query).sort({ createdAt: -1 });
     res.json(bookmarks);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
@@ -95,11 +99,15 @@ router.delete('/journal/:chapter/:verse', async (req, res) => {
 
 // --- History ---
 router.get('/history', async (req, res) => {
-  const { email } = req.query;
-  if (!email) return res.status(400).json({ error: 'Email required' });
+  const { email, userId } = req.query;
+  if (!email && !userId) return res.status(400).json({ error: 'Email or User ID required' });
 
   try {
-    const history = await History.find({ email }).sort({ viewedAt: -1 }).limit(50);
+    let query = {};
+    if (email) query.email = email;
+    else if (userId) query.userId = userId;
+
+    const history = await History.find(query).sort({ viewedAt: -1 }).limit(50);
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
