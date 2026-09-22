@@ -69,7 +69,7 @@ async function broadcastWelcomeBack() {
       } else {
         const payload = JSON.stringify({
           title: `Krishna Bodha is Back! 🚀`,
-          body: `We are back online! Tip: To see the latest updates, please reinstall the app and ensure push & email notifications are enabled.`,
+          body: `We are back online! Tip: To see the latest updates, please reinstall the app from krishnabodha.in and ensure push & email notifications are enabled.`,
           icon: '/app-icon.png',
           url: '/'
         });
