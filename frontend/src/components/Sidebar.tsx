@@ -43,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Top Header Row for mobile / Standard brand alignment for desktop */}
       <div className="sidebar-header-row">
         <Link to="/dailyinsights" className="brand" style={{ gap: '0.6rem' }}>
-          <img src="/flute-logo.svg" alt="Krishna Bodha Logo" className="brand-icon" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+          <img src="/flute-icon.png" alt="Krishna Bodha Logo" className="brand-icon" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.3 }}>
             <span className="brand-name-sanskrit">कृष्णबोध</span>
             <span className="brand-subtitle">Krishna Bodha</span>
