@@ -147,6 +147,14 @@ app.all('/api/v1/trigger-welcome-broadcast', (req, res) => {
   res.json({ success: true, message: 'Welcome broadcast triggered in the background. Check server logs for completion.' });
 });
 
+// Backward compatibility for old frontend clients
+app.get('/api/config', (req, res) => {
+  res.json({ 
+    publicVapidKey: process.env.VAPID_PUBLIC_KEY,
+    publicKey: process.env.VAPID_PUBLIC_KEY 
+  });
+});
+
 // Start Server
 const server = app.listen(PORT, () => {
   console.log(`[Server] Backend running on port ${PORT}`);
