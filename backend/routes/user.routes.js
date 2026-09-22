@@ -5,7 +5,7 @@ const router = express.Router();
 
 // 1. Update Preferences (Without Web Push data, e.g. from Profile page)
 router.put('/preferences', async (req, res) => {
-  const { email, pref, language } = req.body;
+  const { email, pref, language, lang, name } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
 
   try {
@@ -13,10 +13,16 @@ router.put('/preferences', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     if (pref) user.pref = pref;
-    if (language) user.lang = language;
+    if (language || lang) user.lang = language || lang;
+    if (name !== undefined) user.name = name;
     
     await user.save();
-    return res.json({ message: 'Preferences updated successfully', user });
+    return res.json({ 
+      message: 'Preferences updated successfully', 
+      pref: user.pref, 
+      lang: user.lang, 
+      name: user.name 
+    });
   } catch (err) {
     console.error('Failed to update preferences:', err);
     res.status(500).json({ error: 'Server error' });

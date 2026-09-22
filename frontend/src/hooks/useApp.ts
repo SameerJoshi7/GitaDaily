@@ -73,7 +73,7 @@ export function useApp() {
       const res = await fetch(`${API_BASE}/user/preferences`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, pref: editPref, lang: editLang, name: payloadName }),
+        body: JSON.stringify({ email, pref: editPref, lang: lang, name: payloadName }),
       });
       const data = await res.json();
       if (res.ok) {
