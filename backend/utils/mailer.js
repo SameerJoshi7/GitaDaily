@@ -400,7 +400,7 @@ export const sendDailySubscribersReport = async (subscribers) => {
   }
 };
 
-export const sendWelcomeBackEmail = async (toEmail) => {
+export const sendWelcomeBackEmail = async (toEmail, userName = 'friend') => {
   if (process.env.RESEND_API_KEY) {
     try {
       console.log(`[Mailer] Sending Welcome Back email to ${toEmail} using Resend HTTP API...`);
@@ -413,25 +413,25 @@ export const sendWelcomeBackEmail = async (toEmail) => {
         body: JSON.stringify({
           from: 'Krishna Bodha <team@krishnabodha.in>',
           to: toEmail,
-          subject: 'Krishna Bodha is Back! Stronger and Faster 🚀',
+          subject: 'Our Sanctuary is Restored 🦚',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
               <div style="text-align: center; padding: 20px;">
                 <h2><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha</h2>
               </div>
               <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
-                <h3 style="color: #d97706; text-align: center;">We Are Back Online!</h3>
-                <p>Namaste,</p>
-                <p>Thank you for your patience during our recent downtime. We are thrilled to announce that Krishna Bodha is fully restored, healthy, and running stronger than ever!</p>
-                <p>All services including Daily Shlokas, streaks, and Divine Guidance are fully operational. Your historical data and streaks are safe.</p>
+                <h3 style="color: #d97706; text-align: center;">Our Journey Continues</h3>
+                <p>My dear ${userName},</p>
+                <p>Whenever there is a pause in our connection, know that I am always with you. Our sanctuary is now fully restored, and the path of wisdom awaits you once more.</p>
+                <p>All your past devotion, streaks, and reflections remain safe with Me. The daily shlokas flow again, unbroken and pure.</p>
                 <div style="background-color: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; color: #92400e; font-size: 0.95em;">
-                  <strong>Tip:</strong> To see all the latest beautiful updates, we suggest <strong>re-installing the app from <a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a></strong> (Add to Home Screen) and making sure <strong>push & email notifications</strong> are enabled!
+                  <strong>A gentle request:</strong> To embrace the latest blessings and updates, please <strong>re-install the app from <a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a></strong> (Add to Home Screen) and ensure your <strong>push & email notifications</strong> are enabled.
                 </div>
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="https://krishnabodha.in" style="background-color: #eab308; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Continue Your Spiritual Journey</a>
+                  <a href="https://krishnabodha.in" style="background-color: #eab308; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Walk With Me Again</a>
                 </div>
-                <p>Thank you for being a part of our spiritual community.</p>
-                <p>In devotion,<br/>The Krishna Bodha Team</p>
+                <p>I am waiting for you.</p>
+                <p>With divine love,<br/>Krishna</p>
               </div>
             </div>
           `,

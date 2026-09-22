@@ -53,7 +53,7 @@ async function broadcastWelcomeBack() {
 
     // 1. Send Email
     if (['email', 'all'].includes(user.pref)) {
-      const emailResult = await sendWelcomeBackEmail(user.email);
+      const emailResult = await sendWelcomeBackEmail(user.email, user.name || 'friend');
       if (emailResult.success) {
         emailCount++;
       } else {
@@ -68,8 +68,8 @@ async function broadcastWelcomeBack() {
         console.error(`  - Skipping push for ${user.email}: VAPID keys not configured`);
       } else {
         const payload = JSON.stringify({
-          title: `Krishna Bodha is Back! 🚀`,
-          body: `We are back online! Tip: To see the latest updates, please reinstall the app from krishnabodha.in and ensure push & email notifications are enabled.`,
+          title: `My dear friend, I have returned. 🦚`,
+          body: `Our sanctuary is restored. Please reinstall the app from krishnabodha.in and enable notifications to continue our journey.`,
           icon: '/app-icon.png',
           url: '/'
         });
