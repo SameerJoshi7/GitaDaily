@@ -37,7 +37,7 @@ export const generateContentWithFallback = async (prompt, responseMimeType = "te
   if (genAI) {
     try {
       console.log(`[AI] Attempting generation with Gemini (Context: ${context})...`);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
       const result = await model.generateContent({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
@@ -60,7 +60,7 @@ export const generateContentWithFallback = async (prompt, responseMimeType = "te
       const responseFormat = responseMimeType === "application/json" ? { type: "json_object" } : null;
       
       const completion = await groq.chat.completions.create({
-        model: "llama-3.1-8b-instant", // Updated Groq model
+        model: "qwen/qwen3.8-27b", // Verified active Groq model 2026
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         response_format: responseFormat
