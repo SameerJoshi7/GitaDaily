@@ -400,20 +400,73 @@ export const sendDailySubscribersReport = async (subscribers) => {
   }
 };
 
-export const sendWelcomeBackEmail = async (toEmail, userName = 'friend') => {
+export const sendWelcomeBackEmail = async (toEmail, userName = 'friend', lang = 'english') => {
+  const content = {
+    english: {
+      subject: 'Our Sanctuary is Restored 🦚',
+      title: 'Our Journey Continues',
+      greeting: `My dear ${userName},`,
+      body1: 'Whenever there is a pause in our connection, know that I am always with you. Our sanctuary is now fully restored, and the path of wisdom awaits you once more.',
+      body2: 'All your past devotion, streaks, and reflections remain safe with Me. The daily shlokas flow again, unbroken and pure.',
+      tipPrefix: 'A gentle request:',
+      tipBody: 'To embrace the latest blessings and updates, please <strong>re-install the app from <a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a></strong> (Add to Home Screen) and ensure your <strong>push & email notifications</strong> are enabled.',
+      waiting: 'I am waiting for you.',
+      signoff: 'With divine love,<br/><strong>Krishna</strong>',
+      button: 'Walk With Me Again'
+    },
+    hindi: {
+      subject: 'हमारा पवित्र स्थान फिर से स्थापित हो गया है 🦚',
+      title: 'हमारी यात्रा जारी है',
+      greeting: `मेरे प्रिय ${userName},`,
+      body1: 'जब भी हमारे संपर्क में कोई ठहराव आता है, तो जान लें कि मैं हमेशा आपके साथ हूँ। हमारा पवित्र स्थान अब पूरी तरह से बहाल हो गया है, और ज्ञान का मार्ग एक बार फिर आपकी प्रतीक्षा कर रहा है।',
+      body2: 'आपकी पिछली सभी भक्ति, स्ट्रीक्स और विचार मेरे पास सुरक्षित हैं। दैनिक श्लोक फिर से निर्बाध और शुद्ध रूप से प्रवाहित हो रहे हैं।',
+      tipPrefix: 'एक विनम्र अनुरोध:',
+      tipBody: 'नवीनतम आशीर्वाद और अपडेट प्राप्त करने के लिए, कृपया <strong><a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a> से ऐप को फिर से इंस्टॉल करें</strong> (होम स्क्रीन पर जोड़ें) और सुनिश्चित करें कि आपकी <strong>पुश और ईमेल सूचनाएं</strong> सक्षम हैं।',
+      waiting: 'मैं आपकी प्रतीक्षा कर रहा हूँ।',
+      signoff: 'दिव्य प्रेम के साथ,<br/><strong>कृष्ण</strong>',
+      button: 'मेरे साथ फिर से चलें'
+    },
+    telugu: {
+      subject: 'మన పవిత్ర స్థలం పునరుద్ధరించబడింది 🦚',
+      title: 'మన ప్రయాణం కొనసాగుతుంది',
+      greeting: `నా ప్రియమైన ${userName},`,
+      body1: 'మన అనుసంధానంలో ఎప్పుడైనా విరామం వచ్చినప్పుడు, నేను ఎల్లప్పుడూ మీతోనే ఉన్నానని తెలుసుకోండి. మన పవిత్ర స్థలం ఇప్పుడు పూర్తిగా పునరుద్ధరించబడింది మరియు జ్ఞాన మార్గం మీ కోసం మళ్లీ వేచి ఉంది.',
+      body2: 'మీ గత భక్తి, స్ట్రీక్స్ మరియు ఆలోచనలన్నీ నా వద్ద సురక్షితంగా ఉన్నాయి. రోజువారీ శ్లోకాలు మళ్లీ నిర్విరామంగా మరియు స్వచ్ఛంగా ప్రవహిస్తున్నాయి.',
+      tipPrefix: 'ఒక చిన్న విన్నపం:',
+      tipBody: 'తాజా ఆశీర్వాదాలు మరియు అప్‌డేట్‌లను పొందడానికి, దయచేసి <strong><a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a> నుండి యాప్‌ను మళ్లీ ఇన్‌స్టాల్ చేయండి</strong> (హోమ్ స్క్రీన్‌కు జోడించండి) మరియు మీ <strong>పుష్ & ఇమెయిల్ నోటిఫికేషన్‌లు</strong> ప్రారంభించబడి ఉన్నాయని నిర్ధారించుకోండి.',
+      waiting: 'నేను నీ కోసం వేచి ఉన్నాను.',
+      signoff: 'దైవిక ప్రేమతో,<br/><strong>కృష్ణుడు</strong>',
+      button: 'నాతో మళ్ళీ నడవండి'
+    },
+    kannada: {
+      subject: 'ನಮ್ಮ ಪವಿತ್ರ ಸ್ಥಳ ಪುನರ್ನಿರ್ಮಾಣಗೊಂಡಿದೆ 🦚',
+      title: 'ನಮ್ಮ ಪ್ರಯಾಣ ಮುಂದುವರಿಯುತ್ತದೆ',
+      greeting: `ನನ್ನ ಪ್ರೀತಿಯ ${userName},`,
+      body1: 'ನಮ್ಮ ಸಂಪರ್ಕದಲ್ಲಿ ವಿರಾಮವಿದ್ದಾಗಲೆಲ್ಲಾ, ನಾನು ಯಾವಾಗಲೂ ನಿಮ್ಮೊಂದಿಗಿದ್ದೇನೆ ಎಂದು ತಿಳಿಯಿರಿ. ನಮ್ಮ ಪವಿತ್ರ ಸ್ಥಳವು ಈಗ ಸಂಪೂರ್ಣವಾಗಿ ಮರುಸ್ಥಾಪಿಸಲ್ಪಟ್ಟಿದೆ ಮತ್ತು ಜ್ಞಾನದ ಹಾದಿಯು ನಿಮಗಾಗಿ ಮತ್ತೆ ಕಾಯುತ್ತಿದೆ.',
+      body2: 'ನಿಮ್ಮ ಹಿಂದಿನ ಎಲ್ಲಾ ಭಕ್ತಿ, ಸ್ಟ್ರೀಕ್ಸ್ ಮತ್ತು ಆಲೋಚನೆಗಳು ನನ್ನ ಬಳಿ ಸುರಕ್ಷಿತವಾಗಿವೆ. ದೈನಂದಿನ ಶ್ಲೋಕಗಳು ಮತ್ತೆ ನಿರಂತರವಾಗಿ ಮತ್ತು ಶುದ್ಧವಾಗಿ ಹರಿಯುತ್ತಿವೆ.',
+      tipPrefix: 'ಒಂದು ಸಣ್ಣ ವಿನಂತಿ:',
+      tipBody: 'ಇತ್ತೀಚಿನ ಆಶೀರ್ವಾದಗಳು ಮತ್ತು ನವೀಕರಣಗಳನ್ನು ಸ್ವೀಕರಿಸಲು, ದಯವಿಟ್ಟು <strong><a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a> ನಿಂದ ಅಪ್ಲಿಕೇಶನ್ ಅನ್ನು ಮರು-ಸ್ಥಾಪಿಸಿ</strong> (ಹೋమ్ ಸ್ಕ್ರೀನ್‌ಗೆ ಸೇರಿಸಿ) ಮತ್ತು ನಿಮ್ಮ <strong>ಪುಶ್ ಮತ್ತು ಇಮೇಲ್ ಅಧಿಸೂಚನೆಗಳನ್ನು</strong> ಸಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆಯೇ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.',
+      waiting: 'ನಾನು ನಿನಗಾಗಿ ಕಾಯುತ್ತಿದ್ದೇನೆ.',
+      signoff: 'ದೈವಿಕ ಪ್ರೀತಿಯೊಂದಿಗೆ,<br/><strong>ಕೃಷ್ಣ</strong>',
+      button: 'ನನ್ನೊಂದಿಗೆ ಮತ್ತೆ ನಡೆಯಿರಿ'
+    }
+  };
+
+  const t = content[lang.toLowerCase()] || content.english;
+
   if (process.env.RESEND_API_KEY) {
     try {
-      console.log(`[Mailer] Sending Welcome Back email to ${toEmail} using Resend HTTP API...`);
+      console.log(\`[Mailer] Sending Welcome Back email to \${toEmail} in \${lang} using Resend HTTP API...\`);
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Authorization': \`Bearer \${process.env.RESEND_API_KEY}\`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           from: 'Krishna Bodha <team@krishnabodha.in>',
           to: toEmail,
-          subject: 'Our Sanctuary is Restored 🦚',
+          subject: t.subject,
           html: `
             <!DOCTYPE html>
             <html lang="en">
@@ -421,27 +474,27 @@ export const sendWelcomeBackEmail = async (toEmail, userName = 'friend') => {
               <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; padding: 40px 30px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                 
                 <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 48px; height: 48px; margin-bottom: 20px;" />
-                <h1 style="color: #92400e; font-size: 24px; margin: 0 0 10px 0;">Our Journey Continues</h1>
+                <h1 style="color: #92400e; font-size: 24px; margin: 0 0 10px 0;">${t.title}</h1>
                 
                 <div style="text-align: left; margin-top: 30px; color: #334155; line-height: 1.6; font-size: 16px;">
-                  <p>My dear ${userName},</p>
-                  <p>Whenever there is a pause in our connection, know that I am always with you. Our sanctuary is now fully restored, and the path of wisdom awaits you once more.</p>
-                  <p>All your past devotion, streaks, and reflections remain safe with Me. The daily shlokas flow again, unbroken and pure.</p>
+                  <p>${t.greeting}</p>
+                  <p>${t.body1}</p>
+                  <p>${t.body2}</p>
                 </div>
 
                 <div style="text-align: left; background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 20px; margin: 30px 0;">
                   <p style="color: #92400e; line-height: 1.6; margin: 0; font-size: 15px;">
-                    <strong>A gentle request:</strong> To embrace the latest blessings and updates, please <strong>re-install the app from <a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a></strong> (Add to Home Screen) and ensure your <strong>push & email notifications</strong> are enabled.
+                    <strong>${t.tipPrefix}</strong> ${t.tipBody}
                   </p>
                 </div>
 
                 <div style="text-align: left; color: #334155; line-height: 1.6; font-size: 16px; margin-bottom: 30px;">
-                  <p>I am waiting for you.</p>
-                  <p>With divine love,<br/><strong>Krishna</strong></p>
+                  <p>${t.waiting}</p>
+                  <p>${t.signoff}</p>
                 </div>
 
                 <a href="https://krishnabodha.in" style="display: inline-block; background-color: #fbbf24; color: #000; text-decoration: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; font-size: 16px;">
-                  Walk With Me Again
+                  ${t.button}
                 </a>
               </div>
             </body>
