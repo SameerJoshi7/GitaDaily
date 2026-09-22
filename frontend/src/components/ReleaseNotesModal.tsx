@@ -29,16 +29,7 @@ export function ReleaseNotesModal({ isOpen, onClose, version }: ReleaseNotesModa
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <Volume2 size={24} color="#fbbf24" style={{ flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <h3 style={{ fontSize: '1.05rem', color: '#f3f4f6', margin: '0 0 0.4rem 0' }}>Sanskrit Audio Recitations</h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Immerse yourself completely. You can now listen to authentic, human-chanted Sanskrit recitations for every single verse in the Gita right from your shloka cards!
-              </p>
-            </div>
-          </div>
-          
+
           <div style={{ display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
             <PenLine size={24} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
