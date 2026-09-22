@@ -1,4 +1,4 @@
-import { Flame, Star, Volume2, PenLine } from 'lucide-react';
+import { Flame, Star, PenLine } from 'lucide-react';
 
 interface ReleaseNotesModalProps {
   isOpen: boolean;
