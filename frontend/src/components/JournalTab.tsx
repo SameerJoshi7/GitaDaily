@@ -8,7 +8,7 @@ interface JournalTabProps {
 }
 
 export const JournalTab: React.FC<JournalTabProps> = ({ email, lang: _lang = 'english' }) => {
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api/v1';
   const navigate = useNavigate();
   const [journals, setJournals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

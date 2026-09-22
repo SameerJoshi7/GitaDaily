@@ -125,4 +125,21 @@ router.post('/history', async (req, res) => {
   }
 });
 
+// 6. Submit Feedback
+router.post('/feedback', async (req, res) => {
+  try {
+    // In a real app we'd save this to a Feedback model
+    // For now we'll just acknowledge it
+    console.log('[Feedback Received]:', req.body);
+    return res.status(201).json({ message: 'Feedback submitted successfully' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to submit feedback' });
+  }
+});
+
+// 7. Get user feedback (stub)
+router.get('/feedback/:email', async (req, res) => {
+  return res.json([]);
+});
+
 export default router;

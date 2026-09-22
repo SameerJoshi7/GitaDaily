@@ -78,4 +78,32 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
+// 0c. Register New User
+router.post('/register', async (req, res) => {
+  const { email, userName, language, pref } = req.body;
+  if (!email || !userName) {
+    return res.status(400).json({ error: 'Email and Name are required.' });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists. Please verify OTP to login.' });
+    }
+
+    const newUser = new User({
+      email: email.toLowerCase(),
+      userName,
+      lang: language || 'english',
+      pref: pref || 'none'
+    });
+
+    await newUser.save();
+    return res.status(201).json({ message: 'User registered successfully', user: newUser });
+  } catch (err) {
+    console.error("Error registering user:", err);
+    return res.status(500).json({ error: 'Database error during registration' });
+  }
+});
+
 export default router;

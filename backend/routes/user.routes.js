@@ -98,4 +98,24 @@ router.post('/active', async (req, res) => {
   }
 });
 
+// Check guidance limits
+router.get('/guidance-ping', async (req, res) => {
+  const { email } = req.query;
+  if (!email) {
+    return res.status(400).json({ error: 'Email required' });
+  }
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    return res.json({ 
+      guidanceUsedToday: user.guidanceUsedToday || 0 
+    });
+  } catch (err) {
+    console.error('[Guidance Ping Error]', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

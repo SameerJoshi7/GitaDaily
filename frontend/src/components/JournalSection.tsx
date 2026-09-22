@@ -14,7 +14,7 @@ export const JournalSection: React.FC<JournalSectionProps> = ({
   email,
   lang: _lang = 'english',
 }) => {
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api/v1';
   const [note, setNote] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
