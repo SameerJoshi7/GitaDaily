@@ -39,7 +39,11 @@ router.get('/daily', async (req, res) => {
 
 // 2. Get Chapters List
 router.get('/chapters', (req, res) => {
-  res.json(getChapters());
+  const chapters = getChapters().map(ch => ({
+    ...ch,
+    verses: Array.from({ length: ch.versesCount }, (_, i) => i + 1)
+  }));
+  res.json(chapters);
 });
 
 // 3. Search Shlokas
