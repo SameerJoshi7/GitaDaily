@@ -67,13 +67,24 @@ mongoose.connect(process.env.MONGO_URI, {
   initCronJobs();
 }).catch((err) => console.error('[DB] MongoDB connection error:', err));
 
-// API Routes (v1)
+// API Routes (v1 & legacy backward-compatibility)
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/auth', authRoutes);
+
 app.use('/api/v1/push', pushRoutes);
+app.use('/api/push', pushRoutes);
+
 app.use('/api/v1/user', userRoutes);
+app.use('/api/user', userRoutes);
+
 app.use('/api/v1/shloka', shlokaRoutes);
+app.use('/api/shloka', shlokaRoutes);
+
 app.use('/api/v1/guidance', guidanceRoutes);
+app.use('/api/guidance', guidanceRoutes);
+
 app.use('/api/v1', interactionRoutes);
+app.use('/api', interactionRoutes);
 
 // Health Check Endpoint (Keep at root /api/ for load balancers)
 app.get('/api/health', (req, res) => {
