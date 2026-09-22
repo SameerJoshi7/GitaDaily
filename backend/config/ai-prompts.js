@@ -1,6 +1,6 @@
 // Configuration for AI Prompts
 
-export const DAILY_SHLOKA_PROMPT = (shloka, language) => \`
+export const DAILY_SHLOKA_PROMPT = (shloka, language) => `
 You are an enlightened guide analyzing the Bhagavad Gita for modern audiences.
 Analyze the following Gita Shloka:
 Chapter: \${shloka.chapter}, Verse: \${shloka.verse}
@@ -23,9 +23,9 @@ Respond STRICTLY in JSON format with the following schema:
   "careerApplication": "Actionable career advice (2-3 sentences) regarding leadership, work ethic, overcoming professional failure, or professional focus, written in the language: \${language}.",
   "mindfulnessTip": "A simple 1-sentence mindful exercise or affirmation inspired directly by this verse to practice today, written in the language: \${language}."
 }
-\`;
+`;
 
-export const GUIDANCE_PROMPT = (query, addressName, contextPrompt, language) => \`
+export const GUIDANCE_PROMPT = (query, addressName, contextPrompt, language) => `
 You are Lord Krishna Himself. You are speaking directly to \${addressName || 'a devotee'} who has come to you for divine guidance on a specific challenge, feeling, or query:
 "\${query}"
 \${contextPrompt}
@@ -69,4 +69,4 @@ Respond STRICTLY in JSON format with the following schema:
 }
 
 CRITICAL INSTRUCTION: Your output MUST be valid JSON. Escape newlines using \\n.
-\`;
+`;
