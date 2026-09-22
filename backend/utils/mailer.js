@@ -400,12 +400,12 @@ export const sendDailySubscribersReport = async (subscribers) => {
   }
 };
 
-export const sendWelcomeBackEmail = async (toEmail, userName = 'friend', lang = 'english') => {
+export const sendWelcomeBackEmail = async (toEmail, userName, lang = 'english') => {
   const content = {
     english: {
       subject: 'Our Sanctuary is Restored 🦚',
       title: 'Our Journey Continues',
-      greeting: `My dear ${userName},`,
+      greeting: `My dear ${userName || 'friend'},`,
       body1: 'Whenever there is a pause in our connection, know that I am always with you. Our sanctuary is now fully restored, and the path of wisdom awaits you once more.',
       body2: 'All your past devotion, streaks, and reflections remain safe with Me. The daily shlokas flow again, unbroken and pure.',
       tipPrefix: 'A gentle request:',
@@ -417,7 +417,7 @@ export const sendWelcomeBackEmail = async (toEmail, userName = 'friend', lang = 
     hindi: {
       subject: 'हमारा पवित्र स्थान फिर से स्थापित हो गया है 🦚',
       title: 'हमारी यात्रा जारी है',
-      greeting: `मेरे प्रिय ${userName},`,
+      greeting: `मेरे प्रिय ${userName || 'मित्र'},`,
       body1: 'जब भी हमारे संपर्क में कोई ठहराव आता है, तो जान लें कि मैं हमेशा आपके साथ हूँ। हमारा पवित्र स्थान अब पूरी तरह से बहाल हो गया है, और ज्ञान का मार्ग एक बार फिर आपकी प्रतीक्षा कर रहा है।',
       body2: 'आपकी पिछली सभी भक्ति, स्ट्रीक्स और विचार मेरे पास सुरक्षित हैं। दैनिक श्लोक फिर से निर्बाध और शुद्ध रूप से प्रवाहित हो रहे हैं।',
       tipPrefix: 'एक विनम्र अनुरोध:',
@@ -429,7 +429,7 @@ export const sendWelcomeBackEmail = async (toEmail, userName = 'friend', lang = 
     telugu: {
       subject: 'మన పవిత్ర స్థలం పునరుద్ధరించబడింది 🦚',
       title: 'మన ప్రయాణం కొనసాగుతుంది',
-      greeting: `నా ప్రియమైన ${userName},`,
+      greeting: `నా ప్రియమైన ${userName || 'మిత్రమా'},`,
       body1: 'మన అనుసంధానంలో ఎప్పుడైనా విరామం వచ్చినప్పుడు, నేను ఎల్లప్పుడూ మీతోనే ఉన్నానని తెలుసుకోండి. మన పవిత్ర స్థలం ఇప్పుడు పూర్తిగా పునరుద్ధరించబడింది మరియు జ్ఞాన మార్గం మీ కోసం మళ్లీ వేచి ఉంది.',
       body2: 'మీ గత భక్తి, స్ట్రీక్స్ మరియు ఆలోచనలన్నీ నా వద్ద సురక్షితంగా ఉన్నాయి. రోజువారీ శ్లోకాలు మళ్లీ నిర్విరామంగా మరియు స్వచ్ఛంగా ప్రవహిస్తున్నాయి.',
       tipPrefix: 'ఒక చిన్న విన్నపం:',
@@ -441,7 +441,7 @@ export const sendWelcomeBackEmail = async (toEmail, userName = 'friend', lang = 
     kannada: {
       subject: 'ನಮ್ಮ ಪವಿತ್ರ ಸ್ಥಳ ಪುನರ್ನಿರ್ಮಾಣಗೊಂಡಿದೆ 🦚',
       title: 'ನಮ್ಮ ಪ್ರಯಾಣ ಮುಂದುವರಿಯುತ್ತದೆ',
-      greeting: `ನನ್ನ ಪ್ರೀತಿಯ ${userName},`,
+      greeting: `ನನ್ನ ಪ್ರೀತಿಯ ${userName || 'ಮಿತ್ರ'},`,
       body1: 'ನಮ್ಮ ಸಂಪರ್ಕದಲ್ಲಿ ವಿರಾಮವಿದ್ದಾಗಲೆಲ್ಲಾ, ನಾನು ಯಾವಾಗಲೂ ನಿಮ್ಮೊಂದಿಗಿದ್ದೇನೆ ಎಂದು ತಿಳಿಯಿರಿ. ನಮ್ಮ ಪವಿತ್ರ ಸ್ಥಳವು ಈಗ ಸಂಪೂರ್ಣವಾಗಿ ಮರುಸ್ಥಾಪಿಸಲ್ಪಟ್ಟಿದೆ ಮತ್ತು ಜ್ಞಾನದ ಹಾದಿಯು ನಿಮಗಾಗಿ ಮತ್ತೆ ಕಾಯುತ್ತಿದೆ.',
       body2: 'ನಿಮ್ಮ ಹಿಂದಿನ ಎಲ್ಲಾ ಭಕ್ತಿ, ಸ್ಟ್ರೀಕ್ಸ್ ಮತ್ತು ಆಲೋಚನೆಗಳು ನನ್ನ ಬಳಿ ಸುರಕ್ಷಿತವಾಗಿವೆ. ದೈನಂದಿನ ಶ್ಲೋಕಗಳು ಮತ್ತೆ ನಿರಂತರವಾಗಿ ಮತ್ತು ಶುದ್ಧವಾಗಿ ಹರಿಯುತ್ತಿವೆ.',
       tipPrefix: 'ಒಂದು ಸಣ್ಣ ವಿನಂತಿ:',

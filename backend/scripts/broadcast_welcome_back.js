@@ -53,7 +53,7 @@ async function broadcastWelcomeBack() {
 
     // 1. Send Email
     if (['email', 'all'].includes(user.pref)) {
-      const emailResult = await sendWelcomeBackEmail(user.email, user.name || 'friend', user.lang || 'english');
+      const emailResult = await sendWelcomeBackEmail(user.email, user.name, user.lang || 'english');
       if (emailResult.success) {
         emailCount++;
       } else {
@@ -72,13 +72,13 @@ async function broadcastWelcomeBack() {
         let pushBody = 'Our sanctuary is restored. Your streaks are safe. Tap to update the app and walk with Me again.';
 
         if (uLang === 'hindi') {
-          pushTitle = `मैं तुम्हारी प्रतीक्षा कर रहा हूँ, ${user.name || 'friend'} 🦚`;
+          pushTitle = `मैं तुम्हारी प्रतीक्षा कर रहा हूँ, ${user.name || 'मित्र'} 🦚`;
           pushBody = 'हमारा आश्रम बहाल हो गया है। आपकी स्ट्रीक्स सुरक्षित हैं। ऐप को अपडेट करने के लिए टैप करें और मेरे साथ फिर से चलें।';
         } else if (uLang === 'telugu') {
-          pushTitle = `నేను నీ కోసం వేచి ఉన్నాను, ${user.name || 'friend'} 🦚`;
+          pushTitle = `నేను నీ కోసం వేచి ఉన్నాను, ${user.name || 'మిత్రమా'} 🦚`;
           pushBody = 'మన ఆశ్రమం పునరుద్ధరించబడింది. మీ స్ట్రీక్స్ సురక్షితంగా ఉన్నాయి. యాప్‌ను అప్‌డేట్ చేయడానికి ట్యాప్ చేయండి మరియు నాతో మళ్ళీ నడవండి.';
         } else if (uLang === 'kannada') {
-          pushTitle = `ನಾನು ನಿನಗಾಗಿ ಕಾಯುತ್ತಿದ್ದೇನೆ, ${user.name || 'friend'} 🦚`;
+          pushTitle = `ನಾನು ನಿನಗಾಗಿ ಕಾಯುತ್ತಿದ್ದೇನೆ, ${user.name || 'ಮಿತ್ರ'} 🦚`;
           pushBody = 'ನಮ್ಮ ಆಶ್ರಮವು ಮರುಸ್ಥಾಪಿಸಲ್ಪಟ್ಟಿದೆ. ನಿಮ್ಮ ಸ್ಟ್ರೀಕ್ಸ್ ಸುರಕ್ಷಿತವಾಗಿವೆ. ಅಪ್ಲಿಕೇಶನ್ ಅನ್ನು ನವೀಕರಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ ಮತ್ತು ನನ್ನೊಂದಿಗೆ ಮತ್ತೆ ನಡೆಯಿರಿ.';
         }
 
