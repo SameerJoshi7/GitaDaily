@@ -98,17 +98,22 @@ router.post('/active', async (req, res) => {
   }
 });
 
-// Check guidance limits
-router.get('/guidance-ping', async (req, res) => {
-  const { email } = req.query;
-  if (!email) {
-    return res.status(400).json({ error: 'Email required' });
+// Check guidance limits / ping
+router.post('/guidance-ping', async (req, res) => {
+  const { userId, email } = req.body;
+  if (!userId && !email) {
+    return res.status(400).json({ error: 'User ID or Email required' });
   }
 
   try {
-    const user = await User.findOne({ email: email.toLowerCase() });
+    let query = {};
+    if (userId) query._id = userId;
+    else if (email) query.email = email.toLowerCase();
+
+    const user = await User.findOne(query);
     if (!user) return res.status(404).json({ error: 'User not found' });
     
+    // In a real app we'd increment their limit here or verify it
     return res.json({ 
       guidanceUsedToday: user.guidanceUsedToday || 0 
     });
