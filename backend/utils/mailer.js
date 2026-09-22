@@ -424,6 +424,9 @@ export const sendWelcomeBackEmail = async (toEmail) => {
                 <p>Namaste,</p>
                 <p>Thank you for your patience during our recent downtime. We are thrilled to announce that Krishna Bodha is fully restored, healthy, and running stronger than ever!</p>
                 <p>All services including Daily Shlokas, streaks, and Divine Guidance are fully operational. Your historical data and streaks are safe.</p>
+                <div style="background-color: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; color: #92400e; font-size: 0.95em;">
+                  <strong>Tip:</strong> To see all the latest beautiful updates, we suggest <strong>re-installing the app</strong> (Add to Home Screen) and making sure <strong>push & email notifications</strong> are enabled!
+                </div>
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="https://krishnabodha.in" style="background-color: #eab308; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Continue Your Spiritual Journey</a>
                 </div>

@@ -69,8 +69,8 @@ async function broadcastWelcomeBack() {
       } else {
         const payload = JSON.stringify({
           title: `Krishna Bodha is Back! 🚀`,
-          body: `We are back online, healthy, and stronger than ever. Continue your spiritual journey!`,
-          icon: '/flute-icon.png',
+          body: `We are back online! Tip: To see the latest updates, please reinstall the app and ensure push & email notifications are enabled.`,
+          icon: '/app-icon.png',
           url: '/'
         });
 
