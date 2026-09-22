@@ -26,6 +26,17 @@ if (process.env.GROQ_API_KEY) {
   console.error('[AI Setup] GROQ_API_KEY not found in .env. Fallback disabled.');
 }
 
+let openRouter = null;
+if (process.env.OPENROUTER_API_KEY) {
+  openRouter = new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: "https://openrouter.ai/api/v1"
+  });
+  console.log('[AI Setup] OpenRouter fallback initialized successfully');
+} else {
+  console.error('[AI Setup] OPENROUTER_API_KEY not found in .env. Plan C fallback disabled.');
+}
+
 const inFlightReflections = new Map();
 
 /**
@@ -55,38 +66,65 @@ export const generateContentWithFallback = async (prompt, responseMimeType = "te
 
   // Fallback to Groq
   if (groq) {
-    try {
-      console.log(`[AI] Attempting fallback generation with Groq (Context: ${context})...`);
-      const responseFormat = responseMimeType === "application/json" ? { type: "json_object" } : null;
-      
-      const completion = await groq.chat.completions.create({
-        model: "qwen/qwen3.8-27b", // Verified active Groq model 2026
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        max_tokens: 800,
-        response_format: responseFormat
-      });
+      let groqError = null;
+      try {
+        console.log(`[AI] Attempting fallback generation with Groq (Context: ${context})...`);
+        const responseFormat = responseMimeType === "application/json" ? { type: "json_object" } : null;
+        
+        const completion = await groq.chat.completions.create({
+          model: "qwen/qwen3.8-27b", // Verified active Groq model 2026
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+          max_tokens: 800,
+          response_format: responseFormat
+        });
 
-      console.log(`[AI] Groq generation successful for ${context}.`);
-      return {
-        response: {
-          text: () => completion.choices[0]?.message?.content || ""
-        }
-      };
-    } catch (groqErr) {
-      console.error(`[AI] Groq fallback also failed for ${context}:`, groqErr.message);
-      throw new Error(`Both Gemini and Groq failed. Gemini: ${geminiError?.message}, Groq: ${groqErr.message}`);
+        console.log(`[AI] Groq generation successful for ${context}.`);
+        return {
+          response: {
+            text: () => completion.choices[0]?.message?.content || ""
+          }
+        };
+      } catch (err) {
+        console.warn(`[AI] Groq fallback failed for ${context}:`, err.message);
+        groqError = err;
+      }
     }
-  }
 
-  throw new Error(`Gemini failed and no Groq fallback available. Error: ${geminiError?.message}`);
+    // Plan C: Fallback to OpenRouter
+    if (openRouter) {
+      try {
+        console.log(`[AI] Attempting Plan C fallback generation with OpenRouter (Context: ${context})...`);
+        const responseFormat = responseMimeType === "application/json" ? { type: "json_object" } : null;
+        
+        const completion = await openRouter.chat.completions.create({
+          model: "meta-llama/llama-3-8b-instruct:free", // Free tier model on OpenRouter
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+          max_tokens: 800,
+          response_format: responseFormat
+        });
+
+        console.log(`[AI] OpenRouter generation successful for ${context}.`);
+        return {
+          response: {
+            text: () => completion.choices[0]?.message?.content || ""
+          }
+        };
+      } catch (orErr) {
+        console.error(`[AI] OpenRouter fallback also failed for ${context}:`, orErr.message);
+        throw new Error(`All APIs failed. Gemini, Groq, and OpenRouter.`);
+      }
+    }
+
+    throw new Error(`Gemini failed and no active fallbacks available. Error: ${geminiError?.message}`);
 };
 
 /**
  * Gets reflection for a specific shloka, using cache and preventing stampedes.
  */
 export const getGeminiReflection = async (shloka, language) => {
-  if (!genAI && !groq) {
+  if (!genAI && !groq && !openRouter) {
     return {
       modernReflection: "Connect with your inner wisdom to find strength in action.",
       emotionalWellbeing: "Maintain equanimity under all circumstances, acknowledging that feelings come and go.",
