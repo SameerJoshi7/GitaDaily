@@ -60,7 +60,7 @@ export const generateContentWithFallback = async (prompt, responseMimeType = "te
       const responseFormat = responseMimeType === "application/json" ? { type: "json_object" } : null;
       
       const completion = await groq.chat.completions.create({
-        model: "mixtral-8x7b-32768", // Updated Groq model
+        model: "llama-3.1-8b-instant", // Updated Groq model
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         response_format: responseFormat
