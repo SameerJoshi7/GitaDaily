@@ -22,9 +22,10 @@
   --card-border-active: rgba(212, 175, 55, 0.3);
   
   /* Typography */
-  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Playfair Display', Georgia, Cambria, serif;
   --font-display: 'Cinzel', serif;
+  --font-sanskrit: 'Noto Sans Devanagari', 'Yatra One', 'Rozha One', var(--font-serif);
 }
 
 * {
@@ -126,7 +127,7 @@ button, a, input, select, textarea {
 }
 
 .brand-name-sanskrit {
-  font-family: 'Yatra One', 'Rozha One', var(--font-serif);
+  font-family: var(--font-sanskrit);
   font-size: 1.4rem;
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -137,6 +138,12 @@ button, a, input, select, textarea {
   display: inline-block;
   padding: 4px 6px 2px 0;
   line-height: 1.2;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
 .brand-subtitle {

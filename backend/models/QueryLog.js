@@ -29,4 +29,7 @@ const queryLogSchema = new mongoose.Schema({
   }
 });
 
+// Index for efficient per-user query lookup and cleanup of old entries
+queryLogSchema.index({ userId: 1, createdAt: -1 });
+
 export const QueryLog = mongoose.model('QueryLog', queryLogSchema);

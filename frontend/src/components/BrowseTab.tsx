@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, ArrowLeft, ChevronLeft, ChevronRight, Loader2, Sparkles, Heart, Compass } from 'lucide-react';
+import { Bookmark, ArrowLeft, ChevronLeft, ChevronRight, Sparkles, Heart, Compass } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { t } from '../i18n';
 import type { Shloka } from './ShlokaCard';
 import { ShlokaShare } from './ShlokaShare';
@@ -337,11 +338,12 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
         </button>
       </div>
 
-      {/* Loading state */}
+      {/* Loading state - Skeletons */}
       {loading && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 0' }}>
-          <Loader2 className="spinner" size={36} style={{ color: 'var(--gold-primary)', marginBottom: '1rem' }} />
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Loading Shloka Details...</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1rem 0' }}>
+          <div style={{ height: '300px', borderRadius: '20px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out' }} />
+          <div style={{ height: '100px', borderRadius: '12px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out', animationDelay: '0.2s' }} />
+          <div style={{ height: '100px', borderRadius: '12px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out', animationDelay: '0.4s' }} />
         </div>
       )}
 
@@ -353,9 +355,17 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
       )}
 
       {/* Detail card */}
-      {shloka && !loading && !error && (
-        <div className="shloka-card-container" style={{ animation: 'fadeIn 0.4s ease-out' }}>
-          <div className="shloka-card" style={{ position: 'relative', overflow: 'hidden', border: '1px solid rgba(212, 175, 55, 0.25)', boxShadow: '0 10px 40px rgba(212, 175, 55, 0.05)' }}>
+      <AnimatePresence mode="wait">
+        {shloka && !loading && !error && (
+          <motion.div 
+            key={`${shloka.chapter}-${shloka.verse}`}
+            className="shloka-card-container" 
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
+            <div className="shloka-card" style={{ position: 'relative', overflow: 'hidden', border: '1px solid rgba(212, 175, 55, 0.25)', boxShadow: '0 10px 40px rgba(212, 175, 55, 0.05)' }}>
             
             {/* Background Illustration Overlay */}
             <div
@@ -452,8 +462,9 @@ export const BrowseTab: React.FC<BrowseTabProps> = ({
               )}
             </div>
           </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -1,214 +1,52 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { Shloka } from '../components/ShlokaCard';
-import type { Chapter } from '../components/BrowseTab';
 import { t } from '../i18n';
+import { useAuth } from './useAuth';
+import { usePreferences } from './usePreferences';
+import { useGuidance } from './useGuidance';
+import { useDataSync } from './useDataSync';
+import { usePush } from './usePush';
+import { useUI } from '../contexts/UIContext';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://gita-daily-backend.onrender.com/api/v1';
 
 export type Tab = 'daily' | 'browse' | 'search' | 'bookmarks' | 'guidance' | 'about' | 'shloka-detail' | 'journal';
 
 export function useApp() {
   const location = useLocation();
-  const [email, setEmail] = useState<string>(() => localStorage.getItem('gitadaily_email') || '');
-  const [userId, setUserId] = useState<string>(() => localStorage.getItem('gitadaily_userId') || '');
-  const [userName, setUserName] = useState<string>(() => localStorage.getItem('gitadaily_name') || '');
-  const [pref, setPref] = useState<string>(() => localStorage.getItem('gitadaily_pref') || 'email');
-  const [lang, setLang] = useState<string>(() => localStorage.getItem('gitadaily_lang') || 'english');
-  const [activeTab, setActiveTab] = useState<Tab>('guidance');
+  const ui = useUI();
+  const { activeTab, setActiveTab, toast, showToast } = ui;
+  
+  const auth = useAuth();
+  const { email, userId, userName, currentStreak, longestStreak, setUserName, setCurrentStreak, setLongestStreak } = auth;
+  
+  const prefs = usePreferences(userName);
+  const { pref, setPref, lang, setLang, editPref, setEditPref, editLang, setEditLang, editName, setEditName, isPrefsModalOpen, setIsPrefsModalOpen } = prefs;
+  
+  const guidance = useGuidance();
+  const { guidanceQuery, setGuidanceQuery, guidanceLoading, setGuidanceLoading, guidanceResult, setGuidanceResult, guidanceError, setGuidanceError, guidanceRetryTimer, setGuidanceRetryTimer } = guidance;
+  
+  const dataSync = useDataSync();
+  const { loading, setLoading, dailyShloka, setDailyShloka, specificShloka, setSpecificShloka, chapters, setChapters, bookmarks, setBookmarks, readingHistory, setReadingHistory, searchQuery, setSearchQuery, searchResults, setSearchResults, activeTopic, setActiveTopic, searchError, setSearchError, searchRetryTimer, setSearchRetryTimer, topics } = dataSync;
+  
+  const pushState = usePush();
+  const { publicVapidKey, isPushSubscribed, setIsPushSubscribed } = pushState;
+
   const [browseChapterNumber, setBrowseChapterNumber] = useState<number | null>(null);
   const [browseVerseNumber, setBrowseVerseNumber] = useState<number | null>(null);
-  const [readingHistory, setReadingHistory] = useState<{ chapter: number, verse: number } | null>(null);
-  const [currentStreak, setCurrentStreak] = useState<number>(() => parseInt(localStorage.getItem('gitadaily_currentStreak') || '0', 10));
-  const [longestStreak, setLongestStreak] = useState<number>(() => parseInt(localStorage.getItem('gitadaily_longestStreak') || '0', 10));
-  
-  // Seek Guidance States
-  const [guidanceQuery, setGuidanceQuery] = useState(() => sessionStorage.getItem('gitadaily_guidanceQuery') || '');
-  const [guidanceLoading, setGuidanceLoading] = useState(false);
-  const [guidanceResult, setGuidanceResult] = useState<{
-    shloka: Shloka;
-    counsel: {
-      modernCounsel: string;
-      wellbeingInsight: string;
-      actionStep: string;
-    };
-  } | null>(() => {
-    const saved = sessionStorage.getItem('gitadaily_guidanceResult');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [guidanceError, setGuidanceError] = useState<string | null>(null);
-  const [guidanceRetryTimer, setGuidanceRetryTimer] = useState(0);
-
-  useEffect(() => {
-    sessionStorage.setItem('gitadaily_guidanceQuery', guidanceQuery);
-  }, [guidanceQuery]);
-
-  useEffect(() => {
-    if (guidanceResult) {
-      sessionStorage.setItem('gitadaily_guidanceResult', JSON.stringify(guidanceResult));
-    } else {
-      sessionStorage.removeItem('gitadaily_guidanceResult');
-    }
-  }, [guidanceResult]);
-
-  useEffect(() => {
-    let interval: number;
-    if (guidanceRetryTimer > 0) {
-      interval = setInterval(() => {
-        setGuidanceRetryTimer(prev => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [guidanceRetryTimer]);
-  
-  // Edit Prefs States
-  const [editPref, setEditPref] = useState(pref);
-  const [editLang, setEditLang] = useState(lang);
-  const [editName, setEditName] = useState(userName);
-  const [isPrefsModalOpen, setIsPrefsModalOpen] = useState(false);
-
-  // Keep editName in sync if userName loads asynchronously
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setEditName(userName);
-  }, [userName]);
-  // In-app toast notification
-  const [toast, setToast] = useState<string | null>(null);
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3500);
-  };
-  // Web Push configuration states
-  const [publicVapidKey, setPublicVapidKey] = useState('');
-  const [isPushSubscribed, setIsPushSubscribed] = useState(false);
-  
-  // editPref and editLang are initialised directly from pref/lang useState above.
-  // They are kept in sync via the PreferencesModal's own reset logic on open.
-  
-  // Fetch app configs and check Service Worker push subscription status on startup
-  useEffect(() => {
-    // 1. Fetch backend configuration (unused now but kept for future structure)
-    fetch(`${API_BASE}/config`)
-      .then(res => res.json())
-      .catch(err => console.error('Failed to fetch config', err));
-
-    // 2. Fetch VAPID Public Key
-    fetch(`${API_BASE}/push/public-key`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.publicKey) {
-          setPublicVapidKey(data.publicKey);
-        }
-      })
-      .catch(err => console.error('Failed to fetch VAPID key', err));
-
-    // 3. Check push subscription status
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => {
-          console.log('Service Worker registered successfully');
-          return reg.pushManager.getSubscription();
-        })
-        .then(sub => {
-          setIsPushSubscribed(!!sub);
-        })
-        .catch(err => console.error('Service Worker / Push subscription error', err));
-    }
-  }, []);
-  
-  // Loading & Data States
-  const [loading, setLoading] = useState(false);
-  const [dailyShloka, setDailyShloka] = useState<Shloka | null>(null);
-  const [specificShloka, setSpecificShloka] = useState<Shloka | null>(null);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-
-  const [bookmarks, setBookmarks] = useState<Shloka[]>([]);
-  
-  // Search States
-  const [searchQuery, setSearchQuery] = useState(() => sessionStorage.getItem('gitadaily_searchQuery') || '');
-  const [searchResults, setSearchResults] = useState<Shloka[]>(() => {
-    const saved = sessionStorage.getItem('gitadaily_searchResults');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [activeTopic, setActiveTopic] = useState<string | null>(null);
-  const [searchError, setSearchError] = useState<string | null>(null);
-  const [searchRetryTimer, setSearchRetryTimer] = useState(0);
-
-  useEffect(() => {
-    sessionStorage.setItem('gitadaily_searchQuery', searchQuery);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    sessionStorage.setItem('gitadaily_searchResults', JSON.stringify(searchResults));
-  }, [searchResults]);
-
-  useEffect(() => {
-    let interval: number;
-    if (searchRetryTimer > 0) {
-      interval = setInterval(() => {
-        setSearchRetryTimer(prev => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [searchRetryTimer]);
-  
-  const topics = ['duty', 'karma', 'focus', 'anxiety', 'mindfulness', 'soul', 'career', 'wisdom', 'peace', 'devotion'];
 
   // Helper: save user to localStorage and state
   const loginUser = (userData: { email: string; pref: string; lang: string; name?: string; _id?: string; currentStreak?: number; longestStreak?: number }) => {
-    localStorage.setItem('gitadaily_email', userData.email);
-    if (userData._id) localStorage.setItem('gitadaily_userId', userData._id);
-    localStorage.setItem('gitadaily_pref', userData.pref || 'email');
-    localStorage.setItem('gitadaily_lang', userData.lang || 'english');
-    if (userData.name) {
-      localStorage.setItem('gitadaily_name', userData.name);
-      setUserName(userData.name);
-    }
-    setEmail(userData.email);
-    if (userData._id) setUserId(userData._id);
-    setPref(userData.pref || 'email');
-    setLang(userData.lang || 'english');
-    setEditPref(userData.pref || 'email');
-    if (userData.currentStreak !== undefined) {
-      localStorage.setItem('gitadaily_currentStreak', userData.currentStreak.toString());
-      setCurrentStreak(userData.currentStreak);
-    }
-    if (userData.longestStreak !== undefined) {
-      localStorage.setItem('gitadaily_longestStreak', userData.longestStreak.toString());
-      setLongestStreak(userData.longestStreak);
-    }
+    auth.loginUser(userData);
+    prefs.loginPreferences(userData);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('gitadaily_email');
-    localStorage.removeItem('gitadaily_userId');
-    localStorage.removeItem('gitadaily_pref');
-    localStorage.removeItem('gitadaily_name');
-    localStorage.removeItem('gitadaily_currentStreak');
-    localStorage.removeItem('gitadaily_longestStreak');
-    // We intentionally DO NOT remove 'gitadaily_lang' so language persists post-logout
-    setEmail('');
-    setUserId('');
-    setCurrentStreak(0);
-    setLongestStreak(0);
-    setUserName('');
-    setPref('email');
-    // We intentionally DO NOT reset lang to 'english'
-    setDailyShloka(null);
-    setBookmarks([]);
-    setReadingHistory(null);
-    
-    // Clear Guidance state
-    setGuidanceQuery('');
-    setGuidanceResult(null);
-    sessionStorage.removeItem('gitadaily_guidanceQuery');
-    sessionStorage.removeItem('gitadaily_guidanceResult');
-    
-    // Clear Search state
-    setSearchQuery('');
-    setSearchResults([]);
-    sessionStorage.removeItem('gitadaily_searchQuery');
-    sessionStorage.removeItem('gitadaily_searchResults');
+    auth.clearAuth();
+    prefs.clearPreferences();
+    dataSync.clearDataSync();
+    guidance.clearGuidance();
   };
 
   const handleDeleteAccount = async () => {

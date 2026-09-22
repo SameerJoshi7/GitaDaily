@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles, Bookmark, Lock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Shloka } from './ShlokaCard';
 import { ShlokaShare } from './ShlokaShare';
 import { t } from '../i18n';
@@ -126,8 +127,31 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
         </div>
       )}
 
-      {guidanceResult && (
-        <div className="shloka-card-container" style={{ animation: 'fadeIn 0.6s ease-out' }}>
+      <AnimatePresence mode="wait">
+        {guidanceLoading && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <div className="spinner" style={{ width: 32, height: 32, borderTopColor: 'var(--gold-primary)', margin: '0 auto 1rem auto' }} />
+              <div style={{ color: 'var(--gold-primary)', fontWeight: 600 }}>{T.guidance.consultingGita}...</div>
+            </div>
+            <div style={{ height: '200px', borderRadius: '20px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out' }} />
+            <div style={{ height: '150px', borderRadius: '12px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out', animationDelay: '0.2s' }} />
+          </motion.div>
+        )}
+
+        {guidanceResult && !guidanceLoading && (
+          <motion.div 
+            className="shloka-card-container" 
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.98 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
           <div style={{ textAlign: 'center', margin: '1rem 0 2rem 0' }}>
             <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: 2, color: 'var(--gold-primary)', fontWeight: 600 }}>
               {T.guidance.solutionFound}
@@ -215,8 +239,9 @@ export const GuidanceTab: React.FC<GuidanceTabProps> = ({
               </div>
             </div>
           </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

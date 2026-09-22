@@ -1,30 +1,32 @@
-const otpStore = new Map();
+import { Otp } from '../models/Otp.js';
 
-// Generate a random 6-digit OTP
-export const generateOTP = (identifier) => {
+// Generate a random 6-digit OTP and persist to MongoDB (auto-expires via TTL index)
+export const generateOTP = async (identifier) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  // Store OTP with an expiration of 5 minutes (300000 ms)
-  otpStore.set(identifier, {
-    otp,
-    expiresAt: Date.now() + 300000,
-  });
+  
+  // Upsert: replace any existing OTP for this identifier
+  await Otp.findOneAndUpdate(
+    { identifier: identifier.toLowerCase() },
+    { otp, createdAt: new Date() },
+    { upsert: true, new: true }
+  );
+  
   return otp;
 };
 
-// Validate the OTP
-export const verifyOTP = (identifier, inputOtp) => {
-  const record = otpStore.get(identifier);
-  if (!record) return { valid: false, error: 'OTP expired or not found' };
-
-  if (Date.now() > record.expiresAt) {
-    otpStore.delete(identifier);
-    return { valid: false, error: 'OTP expired' };
+// Validate the OTP against MongoDB store
+export const verifyOTP = async (identifier, inputOtp) => {
+  const record = await Otp.findOne({ identifier: identifier.toLowerCase() });
+  
+  if (!record) {
+    return { valid: false, error: 'OTP expired or not found. Please request a new one.' };
   }
 
   if (record.otp === inputOtp) {
-    otpStore.delete(identifier); // Clean up after successful use
+    // Clean up after successful verification
+    await Otp.deleteOne({ _id: record._id });
     return { valid: true };
   }
 
-  return { valid: false, error: 'Invalid OTP' };
+  return { valid: false, error: 'Invalid OTP. Please check and try again.' };
 };

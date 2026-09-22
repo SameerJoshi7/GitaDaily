@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ShlokaCard } from './ShlokaCard';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Shloka } from './ShlokaCard';
 import { t } from '../i18n';
 
@@ -71,24 +72,41 @@ export function DailyTab({
         </button>
       </div>
 
-      {loading ? (
-        <div className="loading-container">
-          <div className="spinner" />
-          <span style={{ color: 'var(--gold-primary)', fontWeight: 500, letterSpacing: 1 }}>{T.daily.loadingReflection}</span>
-        </div>
-      ) : dailyShloka ? (
-        <ShlokaCard
-          shloka={dailyShloka}
-          isBookmarked={bookmarks.some(b => b.chapter === dailyShloka.chapter && b.verse === dailyShloka.verse)}
-          onToggleBookmark={() => onToggleBookmark(dailyShloka)}
-          lang={lang}
-          email={email}
-        />
-      ) : (
-        <div className="empty-state">
-          <p>{T.daily.noShloka}</p>
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div 
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1rem 0' }}
+          >
+            <div style={{ height: '300px', borderRadius: '20px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out' }} />
+            <div style={{ height: '100px', borderRadius: '12px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out', animationDelay: '0.2s' }} />
+            <div style={{ height: '100px', borderRadius: '12px', background: 'var(--bg-secondary)', animation: 'pulse 1.5s infinite ease-in-out', animationDelay: '0.4s' }} />
+          </motion.div>
+        ) : dailyShloka ? (
+          <motion.div
+            key="shloka"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+          >
+            <ShlokaCard
+              shloka={dailyShloka}
+              isBookmarked={bookmarks.some(b => b.chapter === dailyShloka.chapter && b.verse === dailyShloka.verse)}
+              onToggleBookmark={() => onToggleBookmark(dailyShloka)}
+              lang={lang}
+              email={email}
+            />
+          </motion.div>
+        ) : (
+          <div className="empty-state">
+            <p>{T.daily.noShloka}</p>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

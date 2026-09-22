@@ -4,8 +4,9 @@ import cors from 'cors';
 
 // Minimal test app setup (avoids loading cron/twilio/etc.)
 // We import only the routes we want to integration-test
-import { generateOTP } from '../utils/otp.js';
-import { verifyOTP } from '../utils/otp.js';
+import { generateOTP, verifyOTP } from '../utils/otp.js';
+import { Otp } from '../models/Otp.js';
+import { jest } from '@jest/globals';
 
 // Simple test express app that mirrors key endpoints
 const buildTestApp = () => {
@@ -13,18 +14,18 @@ const buildTestApp = () => {
   app.use(cors());
   app.use(express.json());
 
-  app.post('/api/auth/send-otp', (req, res) => {
+  app.post('/api/auth/send-otp', async (req, res) => {
     const { identifier } = req.body;
     if (!identifier) return res.status(400).json({ error: 'Identifier is required.' });
-    const otp = generateOTP(identifier);
+    const otp = await generateOTP(identifier);
     // In tests, always return the OTP directly
     return res.json({ message: 'OTP simulated', devOtp: otp });
   });
 
-  app.post('/api/auth/verify-otp', (req, res) => {
+  app.post('/api/auth/verify-otp', async (req, res) => {
     const { identifier, otp } = req.body;
     if (!identifier || !otp) return res.status(400).json({ error: 'Identifier and OTP are required.' });
-    const result = verifyOTP(identifier, otp);
+    const result = await verifyOTP(identifier, otp);
     if (!result.valid) return res.status(401).json({ error: result.error });
     return res.json({ verified: true, isNewUser: true });
   });
@@ -49,6 +50,10 @@ describe('API Integration Tests', () => {
     app = buildTestApp();
   });
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   // --- OTP Auth Flow ---
   describe('POST /api/auth/send-otp', () => {
     test('returns 400 if identifier is missing', async () => {
@@ -58,6 +63,7 @@ describe('API Integration Tests', () => {
     });
 
     test('returns 200 and devOtp when identifier is provided', async () => {
+      jest.spyOn(Otp, 'findOneAndUpdate').mockResolvedValueOnce({});
       const res = await request(app).post('/api/auth/send-otp').send({ identifier: 'test@example.com', method: 'email' });
       expect(res.status).toBe(200);
       expect(res.body.devOtp).toHaveLength(6);
@@ -71,17 +77,23 @@ describe('API Integration Tests', () => {
     });
 
     test('returns 401 for incorrect OTP', async () => {
+      jest.spyOn(Otp, 'findOneAndUpdate').mockResolvedValueOnce({});
       await request(app).post('/api/auth/send-otp').send({ identifier: 'wrong@example.com' });
+      
+      jest.spyOn(Otp, 'findOne').mockResolvedValueOnce(null);
       const res = await request(app).post('/api/auth/verify-otp').send({ identifier: 'wrong@example.com', otp: '000000' });
       expect(res.status).toBe(401);
     });
 
     test('returns 200 and verified=true for correct OTP', async () => {
       // Step 1: send OTP to get the code
+      jest.spyOn(Otp, 'findOneAndUpdate').mockResolvedValueOnce({});
       const sendRes = await request(app).post('/api/auth/send-otp').send({ identifier: 'correct@example.com' });
       const { devOtp } = sendRes.body;
 
       // Step 2: verify with the correct code
+      jest.spyOn(Otp, 'findOne').mockResolvedValueOnce({ _id: '123', otp: devOtp });
+      jest.spyOn(Otp, 'deleteOne').mockResolvedValueOnce({});
       const verifyRes = await request(app).post('/api/auth/verify-otp').send({ identifier: 'correct@example.com', otp: devOtp });
       expect(verifyRes.status).toBe(200);
       expect(verifyRes.body.verified).toBe(true);
