@@ -456,11 +456,11 @@ export const sendWelcomeBackEmail = async (toEmail, userName = 'friend', lang = 
 
   if (process.env.RESEND_API_KEY) {
     try {
-      console.log(\`[Mailer] Sending Welcome Back email to \${toEmail} in \${lang} using Resend HTTP API...\`);
+      console.log(`[Mailer] Sending Welcome Back email to ${toEmail} in ${lang} using Resend HTTP API...`);
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': \`Bearer \${process.env.RESEND_API_KEY}\`,
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
