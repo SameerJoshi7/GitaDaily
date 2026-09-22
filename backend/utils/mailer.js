@@ -415,25 +415,37 @@ export const sendWelcomeBackEmail = async (toEmail, userName = 'friend') => {
           to: toEmail,
           subject: 'Our Sanctuary is Restored 🦚',
           html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-              <div style="text-align: center; padding: 20px;">
-                <h2><img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;" />Krishna Bodha</h2>
-              </div>
-              <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
-                <h3 style="color: #d97706; text-align: center;">Our Journey Continues</h3>
-                <p>My dear ${userName},</p>
-                <p>Whenever there is a pause in our connection, know that I am always with you. Our sanctuary is now fully restored, and the path of wisdom awaits you once more.</p>
-                <p>All your past devotion, streaks, and reflections remain safe with Me. The daily shlokas flow again, unbroken and pure.</p>
-                <div style="background-color: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; color: #92400e; font-size: 0.95em;">
-                  <strong>A gentle request:</strong> To embrace the latest blessings and updates, please <strong>re-install the app from <a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a></strong> (Add to Home Screen) and ensure your <strong>push & email notifications</strong> are enabled.
+            <!DOCTYPE html>
+            <html lang="en">
+            <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: 'Inter', Arial, sans-serif;">
+              <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; padding: 40px 30px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                
+                <img src="https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/flute-icon.png" alt="Flute Logo" style="width: 48px; height: 48px; margin-bottom: 20px;" />
+                <h1 style="color: #92400e; font-size: 24px; margin: 0 0 10px 0;">Our Journey Continues</h1>
+                
+                <div style="text-align: left; margin-top: 30px; color: #334155; line-height: 1.6; font-size: 16px;">
+                  <p>My dear ${userName},</p>
+                  <p>Whenever there is a pause in our connection, know that I am always with you. Our sanctuary is now fully restored, and the path of wisdom awaits you once more.</p>
+                  <p>All your past devotion, streaks, and reflections remain safe with Me. The daily shlokas flow again, unbroken and pure.</p>
                 </div>
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="https://krishnabodha.in" style="background-color: #eab308; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Walk With Me Again</a>
+
+                <div style="text-align: left; background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 20px; margin: 30px 0;">
+                  <p style="color: #92400e; line-height: 1.6; margin: 0; font-size: 15px;">
+                    <strong>A gentle request:</strong> To embrace the latest blessings and updates, please <strong>re-install the app from <a href="https://krishnabodha.in" style="color: #d97706; text-decoration: underline;">krishnabodha.in</a></strong> (Add to Home Screen) and ensure your <strong>push & email notifications</strong> are enabled.
+                  </p>
                 </div>
-                <p>I am waiting for you.</p>
-                <p>With divine love,<br/>Krishna</p>
+
+                <div style="text-align: left; color: #334155; line-height: 1.6; font-size: 16px; margin-bottom: 30px;">
+                  <p>I am waiting for you.</p>
+                  <p>With divine love,<br/><strong>Krishna</strong></p>
+                </div>
+
+                <a href="https://krishnabodha.in" style="display: inline-block; background-color: #fbbf24; color: #000; text-decoration: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; font-size: 16px;">
+                  Walk With Me Again
+                </a>
               </div>
-            </div>
+            </body>
+            </html>
           `,
         })
       });
