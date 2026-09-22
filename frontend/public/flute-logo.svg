@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Soft vibrant background circle for modern look, without white border -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)"/>
+  
+  <!-- Peacock Feather (Mor Pankh) -->
+  <g transform="translate(256, 210) rotate(-45)">
+    <!-- Feather stalk -->
+    <path d="M0 0 Q-10 120 -20 220" stroke="#16a34a" stroke-width="6" stroke-linecap="round" fill="none"/>
+    
+    <!-- Feather plumage background (green/gold) -->
+    <path d="M0 -110 C-60 -90, -80 0, 0 40 C80 0, 60 -90, 0 -110 Z" fill="#22c55e"/>
+    
+    <!-- Feather outer eye (gold) -->
+    <path d="M0 -90 C-40 -70, -50 -10, 0 20 C50 -10, 40 -70, 0 -90 Z" fill="#eab308"/>
+    
+    <!-- Feather inner eye (dark blue) -->
+    <path d="M0 -70 C-20 -50, -25 0, 0 10 C25 0, 20 -50, 0 -70 Z" fill="#1e3a8a"/>
+    
+    <!-- Feather core eye (cyan) -->
+    <circle cx="0" cy="-40" r="16" fill="#38bdf8"/>
+  </g>
+  
+  <!-- Flute (Bansuri) -->
+  <g transform="translate(100, 360) rotate(-20)">
+    <!-- Flute body -->
+    <rect x="0" y="0" width="340" height="24" rx="12" fill="#d97706"/>
+    <!-- Flute shade/gradient for depth -->
+    <rect x="0" y="0" width="340" height="10" rx="10" fill="#fcd34d" opacity="0.6"/>
+    
+    <!-- Flute holes -->
+    <circle cx="160" cy="12" r="6" fill="#451a03"/>
+    <circle cx="190" cy="12" r="6" fill="#451a03"/>
+    <circle cx="220" cy="12" r="6" fill="#451a03"/>
+    <circle cx="250" cy="12" r="6" fill="#451a03"/>
+    <circle cx="280" cy="12" r="6" fill="#451a03"/>
+    <circle cx="310" cy="12" r="6" fill="#451a03"/>
+    <circle cx="60" cy="12" r="8" fill="#451a03"/> <!-- Mouth piece -->
+    
+    <!-- Flute thread/bindings -->
+    <line x1="30" y1="-2" x2="30" y2="26" stroke="#b91c1c" stroke-width="4"/>
+    <line x1="38" y1="-2" x2="38" y2="26" stroke="#b91c1c" stroke-width="4"/>
+    
+    <line x1="130" y1="-2" x2="130" y2="26" stroke="#b91c1c" stroke-width="4"/>
+    <line x1="138" y1="-2" x2="138" y2="26" stroke="#b91c1c" stroke-width="4"/>
+  </g>
+  
+  <!-- Definition for modern gradient background -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="512" y2="512">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+  </defs>
+</svg>

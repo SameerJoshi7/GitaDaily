@@ -14,7 +14,7 @@ export function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
         <button className="modal-close-btn" onClick={onClose}>×</button>
         
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <img src="/flute-icon.png" alt="Krishna Bodha Logo" style={{ width: '56px', height: '56px', filter: 'drop-shadow(0 0 8px rgba(212, 175, 55, 0.4))', marginBottom: '1rem' }} />
+          <img src="/flute-logo.svg" alt="Krishna Bodha Logo" style={{ width: '56px', height: '56px', filter: 'drop-shadow(0 0 8px rgba(212, 175, 55, 0.4))', marginBottom: '1rem' }} />
           <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-primary)', fontSize: '1.5rem', margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>
             Welcome to
           </h2>
