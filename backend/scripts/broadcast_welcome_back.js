@@ -30,7 +30,7 @@ async function broadcastWelcomeBack() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log(`[Broadcast] Connected to MongoDB. Test Mode: ${isTest}`);
 
-  let query = { verified: true };
+  let query = {};
   if (isTest) {
     // Only send to an explicitly specified test user or first verified user
     const testEmailIndex = process.argv.indexOf('--email');
