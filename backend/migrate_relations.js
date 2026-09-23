@@ -4,7 +4,7 @@ import { User } from './models/User.js';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://sameer_db_user:Harisarvottama_096@krishnabodhacluster.hsdvyhy.mongodb.net/?appName=KrishnaBodhaCluster';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://sameer_db_user:Harisarvottama_096@krishnabodhacluster.hsdvyhy.mongodb.net/krishnabodha?appName=KrishnaBodhaCluster';
 
 async function migrateData() {
   console.log('Connecting to MongoDB...');
