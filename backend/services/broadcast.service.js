@@ -2,9 +2,12 @@ import webpush from 'web-push';
 import { User } from '../models/User.js';
 import { sendDailyShlokaEmail } from '../utils/mailer.js';
 import { getGeminiReflection } from './ai.service.js';
+import path from 'path';
 import { getDailyShloka } from './data.service.js';
+import { generateAndUploadImages } from './image.service.js';
+import { DailyCache } from '../models/DailyCache.js';
 
-const ARTWORKS = [
+const DAILY_IMAGES_CACHE_PATH = path.join(process.cwd(), 'daily_images.json');const ARTWORKS = [
   'https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/chariot.jpg',
   'https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/discourse.jpg',
   'https://raw.githubusercontent.com/SameerJoshi7/GitaDaily/main/frontend/public/images/vishwaroopa.jpg'
@@ -85,6 +88,98 @@ ${reflection.mindfulnessTip}
 Made with ❤️ by Krishna Bodha Team
 
 ${footer}`;
+}
+
+// 5:30 AM Task: Generate Images
+export async function generateDailyImagesTask() {
+  console.log('[Cron] Starting 5:30 AM Image Generation Task...');
+  const shloka = getDailyShloka();
+  if (!shloka) return;
+
+  const reflectionCache = {};
+  const instagramLangs = ['english', 'hindi', 'kannada', 'telugu'];
+  
+  for (const lang of instagramLangs) {
+    reflectionCache[lang] = await getGeminiReflection(shloka, lang);
+  }
+
+  const bgImage = getArtworkForShloka(shloka);
+  const imageUrls = await generateAndUploadImages(shloka, reflectionCache, bgImage);
+
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    await DailyCache.findOneAndUpdate(
+      { dateStr: todayStr },
+      { imageUrls: imageUrls },
+      { upsert: true, new: true }
+    );
+    console.log('[Cron] Successfully saved generated image URLs to MongoDB.');
+  } catch (err) {
+    console.error('[Cron] Failed to save image URLs to DB:', err.message);
+  }
+}
+
+// Instagram broadcast task (6:00 AM)
+export async function triggerInstagramBroadcast(shloka = null, reflectionCache = null) {
+  if (!shloka) {
+    shloka = getDailyShloka();
+    if (!shloka) return;
+  }
+
+  const cache = reflectionCache || {};
+  const instagramLangs = ['english', 'hindi', 'kannada', 'telugu'];
+  
+  for (const lang of instagramLangs) {
+    if (!cache[lang]) {
+      cache[lang] = await getGeminiReflection(shloka, lang);
+    }
+  }
+
+  let generatedImageUrls = {};
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const cacheRecord = await DailyCache.findOne({ dateStr: todayStr });
+    if (cacheRecord && cacheRecord.imageUrls) {
+      generatedImageUrls = cacheRecord.imageUrls;
+    } else {
+      console.warn('[Make.com] No pre-generated images found in DB for today. Did the 5:30 AM job run?');
+    }
+  } catch (err) {
+    console.error('[Make.com] Error retrieving pre-generated images from DB:', err.message);
+  }
+
+  if (process.env.MAKE_WEBHOOK_URL) {
+    try {
+      const englishReflection = cache['english'];
+      const caption = `🦚 Gita Chapter ${shloka.chapter}, Verse ${shloka.verse} 🦚\n\n${shloka.sanskrit}\n\nTranslation:\n${englishReflection?.translatedTranslation || shloka.translation}\n\nReflection:\n${englishReflection?.modernReflection || ''}\n\nSwipe left to read in Hindi, Kannada, and Telugu!\n\n#sarathispeaks #krishnabodha #gitadaily`;
+      
+      const instagramPayload = {
+        chapter: shloka.chapter,
+        verse: shloka.verse,
+        sanskrit: shloka.sanskrit,
+        caption: caption,
+        background_image: getArtworkForShloka(shloka),
+        carouselData: instagramLangs.map(lang => ({
+          language: lang,
+          translation: cache[lang].translatedTranslation || shloka.translation,
+          reflection: cache[lang].modernReflection,
+          mindfulnessTip: cache[lang].mindfulnessTip,
+          image_url: generatedImageUrls[lang] || null, // Add the Cloudinary URL here!
+          media_type: 'IMAGE' // Make.com requires this to know if it's an image or video
+        }))
+      };
+      await fetch(process.env.MAKE_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(instagramPayload)
+      });
+      console.log('[Make.com] Successfully sent payload to Make webhook for Instagram Carousel');
+    } catch (err) {
+      console.error('[Make.com] Failed to send payload to Make webhook:', err.message);
+    }
+  } else {
+    console.warn('[Make.com] MAKE_WEBHOOK_URL is not set.');
+  }
 }
 
 // Broadcast task

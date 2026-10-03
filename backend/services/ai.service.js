@@ -152,7 +152,9 @@ export const getGeminiReflection = async (shloka, language) => {
       const prompt = DAILY_SHLOKA_PROMPT(shloka, language);
 
       const result = await generateContentWithFallback(prompt, "application/json", "guidance");
-      const counselStr = result.response.text();
+      let counselStr = result.response.text();
+      // Clean up markdown block formatting commonly returned by Groq/Llama-3
+      counselStr = counselStr.replace(/```json/i, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(counselStr);
 
       // Save to cache

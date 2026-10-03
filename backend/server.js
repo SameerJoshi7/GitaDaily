@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import webpush from 'web-push';
-import { broadcastDailyShloka } from './services/broadcast.service.js';
+import { broadcastDailyShloka, triggerInstagramBroadcast } from './services/broadcast.service.js';
 
 import authRoutes from './routes/auth.routes.js';
 import pushRoutes from './routes/push.routes.js';
@@ -133,6 +133,18 @@ app.all('/api/v1/trigger-daily-broadcast', (req, res) => {
   });
   
   res.json({ success: true, message: 'Broadcast triggered in the background successfully.' });
+});
+
+// Trigger Instagram Carousel manually (for testing or external triggers)
+app.all('/api/v1/trigger-instagram-broadcast', (req, res) => {
+  console.log('[API] Triggering Instagram broadcast manually in the background...');
+  
+  // Fire and forget
+  triggerInstagramBroadcast().catch(error => {
+    console.error('[API] Error during background Instagram broadcast:', error);
+  });
+  
+  res.json({ success: true, message: 'Instagram broadcast triggered in the background.' });
 });
 
 // Trigger Welcome Broadcast manually (for free tier users without shell)

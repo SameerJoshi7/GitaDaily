@@ -1,8 +1,9 @@
 import cron from 'node-cron';
+import { broadcastDailyShloka, generateDailyImagesTask } from '../services/broadcast.service.js';
 import webpush from 'web-push';
 import { User } from '../models/User.js';
 import { sendDailySubscribersReport } from '../utils/mailer.js';
-import { broadcastDailyShloka } from '../services/broadcast.service.js';
+import { broadcastDailyShloka, generateDailyImagesTask, triggerInstagramBroadcast } from '../services/broadcast.service.js';
 
 export function initCronJobs() {
   console.log('[Cron] Initializing scheduled tasks...');
@@ -120,10 +121,26 @@ export function initCronJobs() {
     }
   }, { timezone: 'Asia/Kolkata' });
 
-  // Schedule morning broadcast daily at 6:00 AM local time
+  // Schedule morning image generation at 6:30 AM local time
+  cron.schedule('30 6 * * *', async () => {
+    console.log('[Cron] Triggering daily morning image generation for Instagram...');
+    await generateDailyImagesTask();
+  }, {
+    timezone: 'Asia/Kolkata'
+  });
+
+  // Schedule morning email/push broadcast daily at 6:00 AM local time
   cron.schedule('0 6 * * *', async () => {
-    console.log('[Cron] Triggering daily morning shloka broadcast...');
+    console.log('[Cron] Triggering daily morning shloka email/push broadcast...');
     await broadcastDailyShloka();
+  }, {
+    timezone: 'Asia/Kolkata'
+  });
+
+  // Schedule Instagram Webhook at 7:00 AM local time
+  cron.schedule('0 7 * * *', async () => {
+    console.log('[Cron] Triggering daily Instagram Carousel webhook...');
+    await triggerInstagramBroadcast();
   }, {
     timezone: 'Asia/Kolkata'
   });
