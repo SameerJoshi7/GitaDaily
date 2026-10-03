@@ -1,9 +1,8 @@
 import cron from 'node-cron';
-import { broadcastDailyShloka, generateDailyImagesTask } from '../services/broadcast.service.js';
+import { broadcastDailyShloka, generateDailyImagesTask, triggerInstagramBroadcast } from '../services/broadcast.service.js';
 import webpush from 'web-push';
 import { User } from '../models/User.js';
 import { sendDailySubscribersReport } from '../utils/mailer.js';
-import { broadcastDailyShloka, generateDailyImagesTask, triggerInstagramBroadcast } from '../services/broadcast.service.js';
 
 export function initCronJobs() {
   console.log('[Cron] Initializing scheduled tasks...');
