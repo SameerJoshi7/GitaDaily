@@ -151,7 +151,7 @@ export async function triggerInstagramBroadcast(shloka = null, reflectionCache =
   if (process.env.MAKE_WEBHOOK_URL) {
     try {
       const englishReflection = cache['english'];
-      const caption = `🦚 Gita Chapter ${shloka.chapter}, Verse ${shloka.verse} 🦚\n\n${shloka.sanskrit}\n\nTranslation:\n${englishReflection?.translatedTranslation || shloka.translation}\n\nReflection:\n${englishReflection?.modernReflection || ''}\n\nSwipe left to read in Hindi, Kannada, and Telugu!\n\n#sarathispeaks #krishnabodha #gitadaily`;
+      const caption = `🦚 Gita Chapter ${shloka.chapter}, Verse ${shloka.verse} 🦚\n\n${shloka.sanskrit}\n\nTranslation:\n${englishReflection?.translatedTranslation || shloka.translation}\n\nReflection:\n${englishReflection?.modernReflection || ''}\n\nSwipe left to read in Hindi, Kannada, and Telugu!\n\n@gitaistheway\n#sarathispeaks #krishnabodha #gitadaily`;
       
       const instagramPayload = {
         chapter: shloka.chapter,

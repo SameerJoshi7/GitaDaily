@@ -12,16 +12,16 @@ English Translation:
 
 Provide a deep analysis explaining how this shloka applies to modern-day challenges, emotional well-being, mindfulness, and careers.
 
-You MUST respond and translate the analysis and translation into the following language: ${language}.
+CRITICAL INSTRUCTION: You MUST respond and translate the analysis and translation entirely into the following language: ${language.toUpperCase()}. If the language is Hindi, Telugu, or Kannada, you must use their respective native scripts. Do NOT respond in English unless the requested language is English.
 
 Respond STRICTLY in JSON format with the following schema:
 {
-  "translatedTransliteration": "The phonetic transliteration of the Sanskrit shloka written in the script of the chosen language: ${language} (e.g. Devanagari script for Hindi, Telugu script for Telugu, Kannada script for Kannada, Latin letters for English). Make it easy to read and phonetically accurate.",
-  "translatedTranslation": "The direct translation of the Sanskrit shloka itself into the language: ${language}.",
-  "modernReflection": "A detailed, eloquent paragraph (3-4 sentences) connecting this verse to modern societal pressures, relationships, and self-understanding, written in the language: ${language}.",
-  "emotionalWellbeing": "Practical advice (2-3 sentences) on mental health, anxiety, self-compassion, and stress management based on this verse, written in the language: ${language}.",
-  "careerApplication": "Actionable career advice (2-3 sentences) regarding leadership, work ethic, overcoming professional failure, or professional focus, written in the language: ${language}.",
-  "mindfulnessTip": "A simple 1-sentence mindful exercise or affirmation inspired directly by this verse to practice today, written in the language: ${language}."
+  "translatedTransliteration": "The phonetic transliteration of the Sanskrit shloka written in the script of the chosen language: ${language.toUpperCase()} (e.g. Devanagari script for Hindi, Telugu script for Telugu, Kannada script for Kannada, Latin letters for English). Make it easy to read and phonetically accurate.",
+  "translatedTranslation": "The direct translation of the Sanskrit shloka itself into the language: ${language.toUpperCase()}.",
+  "modernReflection": "A detailed, eloquent paragraph (3-4 sentences) connecting this verse to modern societal pressures, relationships, and self-understanding, written in the language: ${language.toUpperCase()}.",
+  "emotionalWellbeing": "Practical advice (2-3 sentences) on mental health, anxiety, self-compassion, and stress management based on this verse, written in the language: ${language.toUpperCase()}.",
+  "careerApplication": "Actionable career advice (2-3 sentences) regarding leadership, work ethic, overcoming professional failure, or professional focus, written in the language: ${language.toUpperCase()}.",
+  "mindfulnessTip": "A simple 1-sentence mindful exercise or affirmation inspired directly by this verse to practice today, written in the language: ${language.toUpperCase()}."
 }
 `;
 

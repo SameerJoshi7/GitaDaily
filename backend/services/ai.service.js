@@ -183,12 +183,32 @@ export const getGeminiReflection = async (shloka, language) => {
           translatedTranslation: trans,
           translatedTransliteration: translit
         };
+      } else if (lang === 'telugu') {
+        return {
+          modernReflection: "కర్మలో బలాన్ని కనుగొనండి.",
+          emotionalWellbeing: "సుఖదుఃఖాలలో సమతుల్యతను కాపాడుకోండి.",
+          careerApplication: "ఫలితాల పట్ల ఆసక్తి లేకుండా మీ విధిని నిర్వర్తించండి.",
+          mindfulnessTip: "లోతుగా శ్వాస తీసుకోండి మరియు వర్తమానంపై దృష్టి పెట్టండి.",
+          translatedTranslation: trans,
+          translatedTransliteration: translit
+        };
+      } else if (lang === 'kannada') {
+        return {
+          modernReflection: "ಕರ್ಮದಲ್ಲಿ ಶಕ್ತಿಯನ್ನು ಕಂಡುಕೊಳ್ಳಿ.",
+          emotionalWellbeing: "ಸುಖ ಮತ್ತು ದುಃಖದಲ್ಲಿ ಸಮಚಿತ್ತತೆಯನ್ನು ಕಾಪಾಡಿಕೊಳ್ಳಿ.",
+          careerApplication: "ಫಲದ ಬಗ್ಗೆ ಆಸಕ್ತಿ ಇಲ್ಲದೆ ನಿಮ್ಮ ಕರ್ತವ್ಯವನ್ನು ಮಾಡಿ.",
+          mindfulnessTip: "ಆಳವಾಗಿ ಉಸಿರಾಡಿ ಮತ್ತು ಪ್ರಸ್ತುತದ ಮೇಲೆ ಗಮನಹರಿಸಿ.",
+          translatedTranslation: trans,
+          translatedTransliteration: translit
+        };
       }
       return {
         modernReflection: "Find strength in your prescribed duty.",
         emotionalWellbeing: "Maintain equanimity in all circumstances.",
         careerApplication: "Perform your work without attachment to the results.",
-        mindfulnessTip: "Affirm: 'I am centered, focused, and detached from results.'"
+        mindfulnessTip: "Affirm: 'I am centered, focused, and detached from results.'",
+        translatedTranslation: trans,
+        translatedTransliteration: translit
       };
     }
   })();
