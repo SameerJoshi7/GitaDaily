@@ -52,7 +52,30 @@ export function Footer() {
         </a>
       </div>
       
-      <div style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
+      <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+        <a 
+          href="https://instagram.com/gitaistheway" 
+          target="_blank"
+          rel="noreferrer"
+          style={{ 
+            color: 'var(--text-muted)', 
+            textDecoration: 'none',
+            transition: 'color 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem'
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.color = '#E1306C'; }}
+          onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+          @gitaistheway
+        </a>
+
         <a 
           href="mailto:help@krishnabodha.in?subject=Krishna Bodha Support" 
           style={{ 
